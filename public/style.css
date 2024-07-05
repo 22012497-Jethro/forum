@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 body {
     background-image: url('background.png'); /* Ensure this path matches the location of your image file */
     background-size: cover;
@@ -64,3 +65,71 @@ input[type="text"], input[type="password"] {
     padding: 8px;
     box-sizing: border-box;
 }
+=======
+body {
+    background-image: url('background.png'); /* Ensure this path matches the location of your image file */
+    background-size: cover;
+    background-position: center;
+    margin: 0;
+    font-family: 'Arial, sans-serif';
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+section {
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
+#logo {
+    width: 256px;
+    height: 256px;
+}
+
+h1 {
+    font-size: 2em;
+    margin: 10px 0;
+}
+
+#buttons, .form-group {
+    margin-top: 20px;
+}
+
+button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+>>>>>>> 88c585683f7df74830429509e9cb830dccdd1533
