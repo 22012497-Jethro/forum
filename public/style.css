@@ -21,6 +21,7 @@ section {
 #logo {
     width: 256px;
     height: 256px;
+    margin-bottom: 20px;
 }
 
 h1 {
