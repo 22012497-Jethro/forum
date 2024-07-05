@@ -10,29 +10,44 @@ const supabaseUrl = "https://your-supabase-url.supabase.co";
 const supabaseKey = "your-supabase-api-key";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, 'public/index.html')));
 app.get("/login", (req, res) => res.sendFile(path.join(__dirname, 'public/login.html')));
 
+// Handle user login
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;
 
-    // Validate credentials against Supabase
-    const { data, error } = await supabase
-        .from('users') // Replace 'users' with your actual table name
-        .select('*')
-        .eq('username', username)
-        .eq('password', password)
-        .single();
+    // Authenticate the user with Supabase Auth
+    const { user, session, error } = await supabase.auth.signInWithPassword({
+        email: username,
+        password: password
+    });
 
-    if (error || !data) {
-        res.send("Invalid username or password");
-    } else {
-        res.send("Login successful!"); // You can redirect or handle the login success here
+    if (error) {
+        return res.send("Invalid username or password");
     }
+
+    res.send("Login successful!"); // You can redirect or handle the login success here
+});
+
+// Handle user signup
+app.post("/signup", async (req, res) => {
+    const { username, password } = req.body;
+
+    // Register the user with Supabase Auth
+    const { user, session, error } = await supabase.auth.signUp({
+        email: username,
+        password: password
+    });
+
+    if (error) {
+        return res.send("Signup failed");
+    }
+
+    res.send("Signup successful!"); // You can redirect or handle the signup success here
 });
 
 const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
