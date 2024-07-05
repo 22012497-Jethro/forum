@@ -1,11 +1,16 @@
 {
+  "name": "revibe-forum",
+  "version": "1.0.0",
+  "description": "A forum project",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
   "dependencies": {
-<<<<<<< HEAD
     "@supabase/supabase-js": "^2.44.2",
     "body-parser": "^1.20.2",
     "express": "^4.19.2"
-=======
-    "@supabase/supabase-js": "^2.44.2"
->>>>>>> 88c585683f7df74830429509e9cb830dccdd1533
-  }
+  },
+  "author": "",
+  "license": "ISC"
 }
