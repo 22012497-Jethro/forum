@@ -80,6 +80,7 @@ nav {
     position: fixed;
     top: 0;
     z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .nav-left {
@@ -96,7 +97,6 @@ nav {
 .nav-right {
     display: flex;
     align-items: center;
-    margin-left: auto; /* Aligns items to the right */
 }
 
 #profile-pic {
@@ -167,6 +167,16 @@ nav {
 
 .dark-mode .dropdown-content p {
     color: white;
+}
+
+/* Ensure text color is white in dark mode */
+.dark-mode section {
+    color: white;
+    background-color: rgba(50, 50, 50, 0.8); /* Adjust background color for better contrast */
+}
+
+.dark-mode .dropdown-content p:hover {
+    background-color: #777;
 }
 
 /* Light mode styles */
