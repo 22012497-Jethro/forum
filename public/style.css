@@ -144,6 +144,7 @@ nav {
     border: none;
     cursor: pointer;
     border-radius: 4px;
+    margin-left: 10px; /* Add margin to the left of theme switch */
 }
 
 #theme-switch:hover {
