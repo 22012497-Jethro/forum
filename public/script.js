@@ -23,6 +23,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (savedTheme) {
         document.body.classList.add(savedTheme);
         logo.src = savedTheme === 'dark-mode' ? 'logo-light.png' : 'logo-dark.png';
+    } else {
+        // Set default theme to light-mode if not set
+        document.body.classList.add('light-mode');
+        logo.src = 'logo-dark.png';
     }
 
     themeSwitch.addEventListener('click', () => {
