@@ -1,4 +1,4 @@
-/* Existing styles */
+/* Existing styles for login and signup pages */
 body {
     background-image: url('background.png'); /* Ensure this path matches the location of your image file */
     background-size: cover;
@@ -79,6 +79,7 @@ nav {
     color: white;
     position: fixed;
     top: 0;
+    z-index: 1000;
 }
 
 .nav-left {
@@ -149,6 +150,7 @@ nav {
     background-color: #ddd;
 }
 
+/* Dark mode styles */
 .dark-mode {
     background-color: #333;
     color: white;
@@ -166,12 +168,30 @@ nav {
     color: white;
 }
 
+/* Light mode styles */
+.light-mode {
+    background-color: #f0f8ff;
+    color: black;
+}
+
+.light-mode nav {
+    background-color: #4CAF50;
+}
+
+.light-mode .dropdown-content {
+    background-color: #fff;
+}
+
+.light-mode .dropdown-content p {
+    color: black;
+}
+
 /* Adjust body height and flex direction for main page */
 body.main-page {
+    background-image: none;
     height: auto;
     flex-direction: column;
     justify-content: flex-start;
     align-items: stretch;
     padding-top: 60px; /* height of the navbar */
 }
-

@@ -16,56 +16,34 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, 'public/index.html')));
 app.get("/login", (req, res) => res.sendFile(path.join(__dirname, 'public/login.html')));
 app.get("/signup", (req, res) => res.sendFile(path.join(__dirname, 'public/signup.html')));
-app.get("/main", (req, res) => res.sendFile(path.join(__dirname, 'public/main.html')));
 
-// Handle user login
 app.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
-    // Authenticate the user with Supabase Auth
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: email,
         password: password
     });
 
-    if (error) {
+    if (authError) {
         return res.send("Invalid email or password");
     }
 
-    res.redirect("/main"); // Redirect to main page after successful login
+    const { data: userData, error: userError } = await supabase
+        .from('users') // Replace 'users' with your actual table name
+        .select('*')
+        .eq('email', email)
+        .single();
+
+    if (userError) {
+        return res.send("User not found");
+    }
+
+    res.redirect(`/main?username=${userData.username}&pfp=${encodeURIComponent(userData.pfp)}`);
 });
 
-// Handle user signup
-app.post("/signup", async (req, res) => {
-    const { username, email, password, "confirm-password": confirmPassword } = req.body;
-
-    // Check if passwords match
-    if (password !== confirmPassword) {
-        return res.send("Passwords do not match");
-    }
-
-    // Register the user with Supabase Auth
-    const { data, error } = await supabase.auth.signUp({
-        email: email,
-        password: password
-    });
-
-    if (error) {
-        return res.send("Signup failed");
-    }
-
-    // Store additional user information in Supabase
-    const { data: insertData, error: insertError } = await supabase
-        .from('users') // Replace 'users' with your actual table name
-        .insert([
-            { id: data.user.id, username: username, email: email }
-        ]);
-
-    if (insertError) {
-        return res.send("Signup failed");
-    }
-
-    res.send("Signup successful! Please check your email to confirm your account."); // Prompt user to check their email for confirmation
+app.get("/main", (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/main.html'));
 });
 
 const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
