@@ -17,15 +17,24 @@ document.addEventListener('DOMContentLoaded', () => {
         profilePic.src = decodeURIComponent(pfp);
     }
 
+    // Load theme from localStorage
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        document.body.classList.add(savedTheme);
+        logo.src = savedTheme === 'dark-mode' ? 'logo-light.png' : 'logo-dark.png';
+    }
+
     themeSwitch.addEventListener('click', () => {
         if (document.body.classList.contains('light-mode')) {
             document.body.classList.remove('light-mode');
             document.body.classList.add('dark-mode');
             logo.src = 'logo-light.png';
+            localStorage.setItem('theme', 'dark-mode');
         } else {
             document.body.classList.remove('dark-mode');
             document.body.classList.add('light-mode');
             logo.src = 'logo-dark.png';
+            localStorage.setItem('theme', 'light-mode');
         }
     });
 

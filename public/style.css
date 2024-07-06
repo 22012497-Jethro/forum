@@ -103,6 +103,7 @@ nav {
     height: 40px;
     border-radius: 50%;
     cursor: pointer;
+    margin-right: 10px; /* Add margin to the right of profile pic */
 }
 
 .dropdown {
@@ -137,7 +138,6 @@ nav {
 }
 
 #theme-switch {
-    margin-left: 20px;
     padding: 10px;
     background-color: white;
     color: #4CAF50;
