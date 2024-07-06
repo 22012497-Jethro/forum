@@ -16,6 +16,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, 'public/index.html')));
 app.get("/login", (req, res) => res.sendFile(path.join(__dirname, 'public/login.html')));
 app.get("/signup", (req, res) => res.sendFile(path.join(__dirname, 'public/signup.html')));
+app.get("/main", (req, res) => res.sendFile(path.join(__dirname, 'public/main.html')));
 
 app.post("/login", async (req, res) => {
     const { email, password } = req.body;
@@ -42,8 +43,14 @@ app.post("/login", async (req, res) => {
     res.redirect(`/main?username=${userData.username}&pfp=${encodeURIComponent(userData.pfp)}`);
 });
 
-app.get("/main", (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/main.html'));
+app.get("/logout", async (req, res) => {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+        return res.send("Logout failed");
+    }
+
+    res.redirect("/login");
 });
 
 const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));

@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const logo = document.getElementById('nav-logo');
     const profilePic = document.getElementById('profile-pic');
     const profileUsername = document.getElementById('profile-username');
+    const logoutOption = document.querySelector('.dropdown-content p:last-child');
 
     // Parse URL parameters to get username and profile picture URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -44,4 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         logo.src = 'logo-dark.png';
     }
+
+    // Handle logout click
+    logoutOption.addEventListener('click', () => {
+        window.location.href = '/logout';
+    });
 });
