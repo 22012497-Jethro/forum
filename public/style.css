@@ -96,6 +96,7 @@ nav {
 .nav-right {
     display: flex;
     align-items: center;
+    margin-left: auto; /* Aligns items to the right */
 }
 
 #profile-pic {
@@ -144,7 +145,6 @@ nav {
     border: none;
     cursor: pointer;
     border-radius: 4px;
-    margin-left: 10px; /* Add margin to the left of theme switch */
 }
 
 #theme-switch:hover {
@@ -195,4 +195,17 @@ body.main-page {
     justify-content: flex-start;
     align-items: stretch;
     padding-top: 60px; /* height of the navbar */
+}
+
+nav h1 {
+    margin: 0; /* Remove margin around the title */
+}
+
+#nav-logo {
+    margin-right: 20px; /* Add more space between logo and title */
+}
+
+section {
+    margin: 80px auto; /* Center the section */
+    max-width: 1200px; /* Add a maximum width for the content */
 }
