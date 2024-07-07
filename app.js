@@ -66,6 +66,11 @@ app.get("/logout", async (req, res) => {
 // Create post endpoint
 app.post('/create-post', upload.single('image'), async (req, res) => {
     const { title, caption, category, theme, rooms, room_category } = req.body;
+
+    if (!title || !caption) {
+        return res.status(400).send('Title and caption are required');
+    }
+
     let imageUrl = '';
 
     if (req.file) {
