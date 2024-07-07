@@ -12,6 +12,7 @@
             <h1>ReVibe Forum</h1>
         </div>
         <div class="nav-right">
+            <button id="create-post-button">Create Post</button>
             <div class="dropdown">
                 <img src="default-profile.png" alt="Profile Picture" id="profile-pic">
                 <div class="dropdown-content">
@@ -24,7 +25,52 @@
     </nav>
     <section>
         <h2>Welcome to ReVibe Forum</h2>
-        <!-- Forum content goes here -->
+        <div id="posts-container">
+            <!-- Posts will be displayed here -->
+        </div>
     </section>
+    
+    <!-- Post Creation Modal -->
+    <div id="post-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <form id="post-form">
+                <div class="form-group">
+                    <label for="post-title">Title:</label>
+                    <input type="text" id="post-title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="post-caption">Caption:</label>
+                    <textarea id="post-caption" name="caption"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="post-image">Image (optional):</label>
+                    <input type="file" id="post-image" name="image" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label for="post-category">Category:</label>
+                    <select id="post-category" name="category" required>
+                        <option value="design">Design</option>
+                        <option value="furniture">Furniture</option>
+                        <option value="decoration">Decoration</option>
+                        <!-- Add more categories as needed -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="post-theme">Theme (optional):</label>
+                    <input type="text" id="post-theme" name="theme">
+                </div>
+                <div class="form-group">
+                    <label for="post-rooms">Number of Rooms (optional):</label>
+                    <input type="number" id="post-rooms" name="rooms" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="post-room-category">Room Category (optional):</label>
+                    <input type="text" id="post-room-category" name="room_category">
+                </div>
+                <button type="submit">Post</button>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
