@@ -36,6 +36,7 @@ app.post("/login", async (req, res) => {
     });
 
     if (authError) {
+        console.error("Auth Error:", authError);
         return res.send("Invalid email or password");
     }
 
@@ -46,6 +47,7 @@ app.post("/login", async (req, res) => {
         .single();
 
     if (userError) {
+        console.error("User Error:", userError);
         return res.send("User not found");
     }
 
@@ -57,6 +59,7 @@ app.get("/logout", async (req, res) => {
     const { error } = await supabase.auth.signOut();
 
     if (error) {
+        console.error("Logout Error:", error);
         return res.send("Logout failed");
     }
 
