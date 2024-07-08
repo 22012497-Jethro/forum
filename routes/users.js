@@ -62,6 +62,7 @@ router.post("/login", async (req, res) => {
             return res.status(400).send("Invalid email or password");
         }
 
+        console.log("Login successful. Redirecting to main page.");
         res.redirect(`/main?username=${user.username}&pfp=${encodeURIComponent(user.pfp)}`);
     } catch (err) {
         console.error("Error during login:", err);

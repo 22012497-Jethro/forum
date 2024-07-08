@@ -17,7 +17,7 @@
                 <img src="default-profile.png" alt="Profile Picture" id="profile-pic">
                 <div class="dropdown-content">
                     <p id="profile-username">Profile</p>
-                    <p>Logout</p>
+                    <p id="logout-button">Logout</p>
                 </div>
             </div>
             <button id="theme-switch">Switch Theme</button>
@@ -72,5 +72,21 @@
             </form>
         </div>
     </div>
+    <script>
+        // Handle profile information from URL parameters
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const username = urlParams.get('username');
+            const pfp = urlParams.get('pfp');
+            
+            if (username) {
+                document.getElementById('profile-username').innerText = username;
+            }
+            
+            if (pfp) {
+                document.getElementById('profile-pic').src = pfp;
+            }
+        });
+    </script>
 </body>
 </html>
