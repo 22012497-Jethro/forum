@@ -45,27 +45,28 @@ router.post("/login", async (req, res) => {
         return res.status(400).send("All fields are required");
     }
 
-    const { data: user, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('email', email)
-        .single();
+    try {
+        const { data: user, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('email', email)
+            .single();
 
-    if (error) {
-        console.error("Error fetching user:", error);
-        return res.status(500).send("Internal server error");
+        if (error || !user) {
+            console.error("Error fetching user:", error);
+            return res.status(400).send("Invalid email or password");
+        }
+
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
+            return res.status(400).send("Invalid email or password");
+        }
+
+        res.redirect(`/main?username=${user.username}&pfp=${encodeURIComponent(user.pfp)}`);
+    } catch (err) {
+        console.error("Error during login:", err);
+        res.status(500).send("Internal server error");
     }
-
-    if (!user) {
-        return res.status(400).send("Invalid email or password");
-    }
-
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) {
-        return res.status(400).send("Invalid email or password");
-    }
-
-    res.redirect(`/main?username=${user.username}&pfp=${encodeURIComponent(user.pfp)}`);
 });
 
 // Logout endpoint
