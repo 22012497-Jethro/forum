@@ -2,14 +2,19 @@ const express = require("express");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-const db = require('../database'); // Import the SQLite database
+const { createClient } = require("@supabase/supabase-js");
 
 const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+// Supabase setup
+const supabaseUrl = "https://fudsrzbhqpmryvmxgced.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1ZHNyemJocXBtcnl2bXhnY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM5MjE3OTQsImV4cCI6MjAyOTQ5Nzc5NH0.6UMbzoD8J1BQl01h6NSyZAHVhrWerUcD5VVGuBwRcag";
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 // Create post endpoint
-router.post('/create-post', upload.single('image'), (req, res) => {
+router.post('/create-post', upload.single('image'), async (req, res) => {
     const { title, caption, category, theme, rooms, room_category } = req.body;
     let imageUrl = '';
 
@@ -24,28 +29,32 @@ router.post('/create-post', upload.single('image'), (req, res) => {
         imageUrl = imagePath;
     }
 
-    const stmt = db.prepare("INSERT INTO posts (title, caption, image, category, theme, rooms, room_category) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    stmt.run(title, caption, imageUrl, category, theme, rooms, room_category, function (err) {
-        if (err) {
-            console.error('Error creating post:', err);
-            return res.status(500).send('Error creating post');
-        }
+    const parsedRooms = rooms ? parseInt(rooms) : null;
 
-        res.json({ id: this.lastID, title, caption, image: imageUrl, category, theme, rooms, room_category });
-    });
-    stmt.finalize();
+    const { data, error } = await supabase
+        .from('posts')
+        .insert([{ title, caption, image: imageUrl, category, theme, rooms: parsedRooms, room_category }]);
+
+    if (error) {
+        console.error('Error creating post:', error);
+        return res.status(500).send('Error creating post');
+    }
+
+    res.json(data);
 });
 
 // Fetch posts endpoint
-router.get('/posts', (req, res) => {
-    db.all("SELECT * FROM posts", (err, rows) => {
-        if (err) {
-            console.error('Error fetching posts:', err);
-            return res.status(500).send('Error fetching posts');
-        }
+router.get('/posts', async (req, res) => {
+    const { data, error } = await supabase
+        .from('posts')
+        .select('*');
 
-        res.json(rows);
-    });
+    if (error) {
+        console.error('Error fetching posts:', error);
+        return res.status(500).send('Error fetching posts');
+    }
+
+    res.json(data);
 });
 
 module.exports = router;
