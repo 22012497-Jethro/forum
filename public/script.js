@@ -10,18 +10,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const postForm = document.getElementById('post-form');
     const postsContainer = document.getElementById('posts-container');
 
-    // Parse URL parameters to get username and profile picture URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const username = urlParams.get('username');
-    const pfp = urlParams.get('pfp');
-
-    if (username) {
-        profileUsername.textContent = username;
+    // Fetch user profile data
+    async function fetchUserProfile(userId) {
+        try {
+            const response = await fetch(`/user-profile?userId=${userId}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            
+            console.log("Fetched user profile data:", data); // Debugging statement
+            
+            if (data.pfp) {
+                profilePic.src = data.pfp;
+            } else {
+                console.error("Profile picture URL not found");
+            }
+            
+            if (data.username) {
+                profileUsername.textContent = data.username;
+            } else {
+                console.error("Username not found");
+            }
+        } catch (error) {
+            console.error("Error fetching user profile:", error);
+        }
     }
 
-    if (pfp) {
-        profilePic.src = decodeURIComponent(pfp);
-    }
+    // Replace 'userId' with the actual user ID
+    const userId = 'replace_with_actual_user_id';
+    fetchUserProfile(userId);
 
     // Load theme from localStorage
     const savedTheme = localStorage.getItem('theme');
