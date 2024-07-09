@@ -1,14 +1,15 @@
 const express = require("express");
 const bcrypt = require('bcrypt');
-const { createClient } = require("@supabase/supabase-js");
+const { createClient } = require('@supabase/supabase-js');
 
 const router = express.Router();
 const saltRounds = 10; // Number of salt rounds for bcrypt
 
-// Supabase setup
-const supabaseUrl = "https://fudsrzbhqpmryvmxgced.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1ZHNyemJocXBtcnl2bXhnY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM5MjE3OTQsImV4cCI6MjAyOTQ5Nzc5NH0.6UMbzoD8J1BQl01h6NSyZAHVhrWerUcD5VVGuBwRcag";
+// Supabase URL and API Key
+const supabaseUrl = 'https://fudsrzbhqpmryvmxgced.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1ZHNyemJocXBtcnl2bXhnY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM5MjE3OTQsImV4cCI6MjAyOTQ5Nzc5NH0.6UMbzoD8J1BQl01h6NSyZAHVhrWerUcD5VVGuBwRcag';
 const supabase = createClient(supabaseUrl, supabaseKey);
+
 
 // User registration endpoint
 router.post("/signup", async (req, res) => {
@@ -49,7 +50,7 @@ router.post("/login", async (req, res) => {
     }
 
     try {
-        const { session, error } = await supabase.auth.signIn({
+        const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password
         });
@@ -59,7 +60,7 @@ router.post("/login", async (req, res) => {
             return res.status(400).send("Invalid email or password");
         }
 
-        console.log("Login successful:", session);
+        console.log("Login successful:", data);
 
         // Assuming you want to redirect to the main page
         res.redirect(`/main?email=${encodeURIComponent(email)}`);
