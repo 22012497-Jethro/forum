@@ -22,12 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             console.log("Fetched user profile data:", data); // Debugging statement
             
-            if (data.pfp) {
-                profilePic.src = data.pfp;
-            } else {
-                console.error("Profile picture URL not found");
-            }
-            
             if (data.username) {
                 profileUsername.textContent = data.username;
             } else {
