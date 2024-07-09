@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fetch user profile data
     async function fetchUserProfile(userId) {
         try {
+            console.log("Fetching user profile for userId:", userId);
             const response = await fetch(`/user-profile?userId=${userId}`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
