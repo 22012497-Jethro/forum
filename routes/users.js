@@ -37,7 +37,7 @@ router.post("/signup", async (req, res) => {
     }
 });
 
-// Login endpoint with detailed logging
+// Login endpoint
 router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
@@ -49,38 +49,20 @@ router.post("/login", async (req, res) => {
     }
 
     try {
-        const { data: user, error } = await supabase
-            .from('users')
-            .select('*')
-            .eq('email', email)
-            .single();
+        const { session, error } = await supabase.auth.signIn({
+            email,
+            password
+        });
 
         if (error) {
-            console.error("Error fetching user from Supabase:", error);
-            return res.status(500).send("Internal server error");
-        }
-
-        if (!user) {
-            console.log("No user found with the provided email");
+            console.error("Error during login:", error);
             return res.status(400).send("Invalid email or password");
         }
 
-        console.log("User fetched from Supabase:", user);
+        console.log("Login successful:", session);
 
-        if (!user.password) {
-            console.log("User password is missing");
-            return res.status(400).send("Internal server error");
-        }
-
-        const match = await bcrypt.compare(password, user.password);
-        if (!match) {
-            console.log("Password does not match");
-            return res.status(400).send("Invalid email or password");
-        }
-
-        console.log("Password match successful");
-
-        res.redirect(`/main?username=${user.username}&pfp=${encodeURIComponent(user.pfp || '')}`);
+        // Assuming you want to redirect to the main page
+        res.redirect(`/main?email=${encodeURIComponent(email)}`);
     } catch (err) {
         console.error("Error during login:", err);
         res.status(500).send("Internal server error");
