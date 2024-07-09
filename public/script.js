@@ -11,10 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const postsContainer = document.getElementById('posts-container');
 
     // Fetch user profile data
-    async function fetchUserProfile(userId) {
+    async function fetchUserProfile(id) {
         try {
-            console.log("Fetching user profile for userId:", userId);
-            const response = await fetch(`/user-profile?userId=${userId}`);
+            console.log("Fetching user profile for id:", id);
+            const response = await fetch(`/user-profile?id=${id}`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -27,14 +27,20 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 console.error("Username not found");
             }
+            
+            if (data.pfp) {
+                profilePic.src = data.pfp;
+            } else {
+                console.error("Profile picture URL not found");
+            }
         } catch (error) {
             console.error("Error fetching user profile:", error);
         }
     }
 
-    // Replace 'userId' with the actual user ID
-    const userId = 'replace_with_actual_user_id';
-    fetchUserProfile(userId);
+    // Replace 'id' with the actual user ID
+    const id = 'replace_with_actual_id';
+    fetchUserProfile(id);
 
     // Load theme from localStorage
     const savedTheme = localStorage.getItem('theme');
