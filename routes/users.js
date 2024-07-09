@@ -37,11 +37,14 @@ router.post("/signup", async (req, res) => {
     }
 });
 
-// Login endpoint
+// Login endpoint with detailed logging
 router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
+    console.log("Login request received:", { email, password });
+
     if (!email || !password) {
+        console.log("Missing fields in login request");
         return res.status(400).send("All fields are required");
     }
 
@@ -52,17 +55,26 @@ router.post("/login", async (req, res) => {
             .eq('email', email)
             .single();
 
-        if (error || !user) {
-            console.error("Error fetching user:", error);
+        if (error) {
+            console.error("Error fetching user from Supabase:", error);
+            return res.status(500).send("Internal server error");
+        }
+
+        if (!user) {
+            console.log("No user found with the provided email");
             return res.status(400).send("Invalid email or password");
         }
+
+        console.log("User fetched from Supabase:", user);
 
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
+            console.log("Password does not match");
             return res.status(400).send("Invalid email or password");
         }
 
-        console.log("Login successful. Redirecting to main page.");
+        console.log("Password match successful");
+
         res.redirect(`/main?username=${user.username}&pfp=${encodeURIComponent(user.pfp)}`);
     } catch (err) {
         console.error("Error during login:", err);
