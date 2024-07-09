@@ -67,6 +67,11 @@ router.post("/login", async (req, res) => {
 
         console.log("User fetched from Supabase:", user);
 
+        if (!user.password) {
+            console.log("User password is missing");
+            return res.status(400).send("Internal server error");
+        }
+
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
             console.log("Password does not match");
@@ -75,7 +80,7 @@ router.post("/login", async (req, res) => {
 
         console.log("Password match successful");
 
-        res.redirect(`/main?username=${user.username}&pfp=${encodeURIComponent(user.pfp)}`);
+        res.redirect(`/main?username=${user.username}&pfp=${encodeURIComponent(user.pfp || '')}`);
     } catch (err) {
         console.error("Error during login:", err);
         res.status(500).send("Internal server error");
