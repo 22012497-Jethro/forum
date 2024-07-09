@@ -70,6 +70,28 @@ router.post("/login", async (req, res) => {
     }
 });
 
+router.get("/user-profile", async (req, res) => {
+    const userId = req.query.userId;
+
+    try {
+        const { data, error } = await supabase
+            .from('users')
+            .select('username, pfp')
+            .eq('id', userId)
+            .single();
+
+        if (error) {
+            console.error("Error fetching user profile:", error);
+            return res.status(500).send("Internal server error");
+        }
+
+        res.json(data);
+    } catch (err) {
+        console.error("Error during fetching user profile:", err);
+        res.status(500).send("Internal server error");
+    }
+});
+
 // Logout endpoint
 router.get("/logout", (req, res) => {
     // Logic for handling logout, such as clearing sessions or cookies

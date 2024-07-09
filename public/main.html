@@ -73,20 +73,21 @@
         </div>
     </div>
     <script>
-        // Handle profile information from URL parameters
-        document.addEventListener('DOMContentLoaded', (event) => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const username = urlParams.get('username');
-            const pfp = urlParams.get('pfp');
-            
-            if (username) {
-                document.getElementById('profile-username').innerText = username;
+        async function fetchUserProfile(userId) {
+            try {
+                const response = await fetch(`/user-profile?userId=${userId}`);
+                const data = await response.json();
+                
+                document.getElementById('profile-pic').src = data.pfp;
+                document.getElementById('profile-username').textContent = data.username;
+            } catch (error) {
+                console.error("Error fetching user profile:", error);
             }
-            
-            if (pfp) {
-                document.getElementById('profile-pic').src = pfp;
-            }
-        });
+        }
+
+        // Replace 'userId' with the actual user ID
+        const userId = 'replace_with_actual_user_id';
+        fetchUserProfile(userId);
     </script>
 </body>
 </html>
