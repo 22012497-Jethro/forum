@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const logo = document.getElementById('nav-logo');
     const profilePic = document.getElementById('profile-pic');
     const profileUsername = document.getElementById('profile-username');
-    const logoutOption = document.querySelector('.dropdown-content p:last-child');
+    const logoutOption = document.querySelector('.dropdown-content p');
     const postForm = document.getElementById('post-form');
     const postsContainer = document.getElementById('posts-container');
 
