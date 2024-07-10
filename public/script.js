@@ -11,10 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const postsContainer = document.getElementById('posts-container');
 
     // Fetch user profile data
-    async function fetchUserProfile(id) {
+    async function fetchUserProfile(email) {
         try {
-            console.log("Fetching user profile for id:", id);
-            const response = await fetch(`/user-profile?id=${id}`);
+            console.log("Fetching user profile for email:", email);
+            const response = await fetch(`/users/user-profile?email=${encodeURIComponent(email)}`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -38,9 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Replace 'id' with the actual user ID
-    const id = 'replace_with_actual_id';
-    fetchUserProfile(id);
+    // Replace this with the actual way to get the user's email
+    const email = getEmailFromUrl();
+    fetchUserProfile(email);
 
     // Load theme from localStorage
     const savedTheme = localStorage.getItem('theme');
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle logout click
     logoutOption.addEventListener('click', () => {
-        window.location.href = '/logout';
+        window.location.href = '/users/logout';
     });
 
     // Handle modal open and close
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
 
         const formData = new FormData(postForm);
-        const response = await fetch('/create-post', {
+        const response = await fetch('/posts/create-post', {
             method: 'POST',
             body: formData
         });
@@ -131,4 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     loadPosts();
+
+    // Helper function to get email from URL
+    function getEmailFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('email');
+    }
 });

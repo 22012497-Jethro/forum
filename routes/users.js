@@ -71,13 +71,13 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/user-profile", async (req, res) => {
-    const id = req.query.id;
+    const email = req.query.email;
 
     try {
         const { data, error } = await supabase
             .from('users')
             .select('username, pfp')
-            .eq('id', id)
+            .eq('email', email)
             .single();
 
         if (error) {
