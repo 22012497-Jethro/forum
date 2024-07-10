@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Create post endpoint
-router.post("/posts/create", upload.single('image'), async (req, res) => {
+router.post("/create", upload.single('image'), async (req, res) => {
     const { title, caption, category, theme, rooms, room_category } = req.body;
     let imageUrl = null;
 
