@@ -8,7 +8,7 @@ const router = express.Router();
 
 // Supabase setup
 const supabaseUrl = "https://fudsrzbhqpmryvmxgced.supabase.co";
-const supabaseKey = "eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1ZHNyemJocXBtcnl2bXhnY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM5MjE3OTQsImV4cCI6MjAyOTQ5Nzc5NH0";
+const supabaseKey = "eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1ZHNyemJocXBtcnl2bXhnY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM5MjE3OTQsImV4cCI6MjAyOTQ5Nzc5NH0"; // Replace with your actual key
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Configure multer for image uploads
@@ -44,14 +44,14 @@ router.post("/create", upload.single('image'), async (req, res) => {
 
         if (error) {
             console.error("Supabase error details:", error);
-            return res.status(500).send("Error creating post");
+            return res.status(500).send("Error creating post: " + error.message);
         }
 
         console.log("Post created successfully:", data);
         res.redirect("/main");
     } catch (err) {
         console.error("Error creating post:", err.message);
-        res.status(500).send("Internal server error");
+        res.status(500).send("Internal server error: " + err.message);
     }
 });
 
@@ -64,13 +64,13 @@ router.get('/posts', async (req, res) => {
 
         if (error) {
             console.error('Error fetching posts:', error);
-            return res.status(500).send('Error fetching posts');
+            return res.status(500).send('Error fetching posts: ' + error.message);
         }
 
         res.json(data);
     } catch (err) {
         console.error("Error fetching posts:", err.message);
-        res.status(500).send("Internal server error");
+        res.status(500).send("Internal server error: " + err.message);
     }
 });
 
