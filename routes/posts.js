@@ -39,7 +39,7 @@ router.post("/create", upload.single('image'), async (req, res) => {
             .insert([{ title, caption, image: imageUrl, category, theme, rooms, room_category }]);
 
         if (error) {
-            console.error("Supabase error:", error);
+            console.error("Supabase error details:", error);
             return res.status(500).send("Error creating post");
         }
 
