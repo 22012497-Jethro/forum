@@ -14,7 +14,11 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // Configure multer for image uploads
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads/');
+        const uploadPath = 'uploads/';
+        if (!fs.existsSync(uploadPath)){
+            fs.mkdirSync(uploadPath);
+        }
+        cb(null, uploadPath);
     },
     filename: function (req, file, cb) {
         cb(null, Date.now() + '-' + file.originalname);
@@ -53,16 +57,21 @@ router.post("/create", upload.single('image'), async (req, res) => {
 
 // Fetch posts endpoint
 router.get('/posts', async (req, res) => {
-    const { data, error } = await supabase
-        .from('posts')
-        .select('*');
+    try {
+        const { data, error } = await supabase
+            .from('posts')
+            .select('*');
 
-    if (error) {
-        console.error('Error fetching posts:', error);
-        return res.status(500).send('Error fetching posts');
+        if (error) {
+            console.error('Error fetching posts:', error);
+            return res.status(500).send('Error fetching posts');
+        }
+
+        res.json(data);
+    } catch (err) {
+        console.error("Error fetching posts:", err.message);
+        res.status(500).send("Internal server error");
     }
-
-    res.json(data);
 });
 
 module.exports = router;
