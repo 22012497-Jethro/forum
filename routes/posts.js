@@ -46,7 +46,7 @@ router.post("/create", upload.single('image'), async (req, res) => {
         console.log("Post created successfully:", data);
         res.redirect("/main");
     } catch (err) {
-        console.error("Error creating post:", err);
+        console.error("Error creating post:", err.message);
         res.status(500).send("Internal server error");
     }
 });
