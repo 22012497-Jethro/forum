@@ -10,6 +10,7 @@ const port = process.env.PORT || 3001;
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Serve uploaded files
 
 // Configure body-parser middleware
 app.use(bodyParser.urlencoded({ extended: true }));

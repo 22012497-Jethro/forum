@@ -7,8 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const profilePic = document.getElementById('profile-pic');
     const profileUsername = document.getElementById('profile-username');
     const logoutOption = document.querySelector('.dropdown-content p');
-    const postForm = document.getElementById('post-form');
-    const postsContainer = document.getElementById('posts-container');
 
     // Fetch user profile data
     async function fetchUserProfile(email) {
