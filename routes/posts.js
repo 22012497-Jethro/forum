@@ -32,15 +32,18 @@ router.post("/create", upload.single('image'), async (req, res) => {
     }
 
     try {
+        console.log("Creating post with data:", { title, caption, image: imageUrl, category, theme, rooms, room_category });
+
         const { data, error } = await supabase
             .from('posts')
             .insert([{ title, caption, image: imageUrl, category, theme, rooms, room_category }]);
 
         if (error) {
-            console.error("Error creating post:", error);
+            console.error("Supabase error:", error);
             return res.status(500).send("Error creating post");
         }
 
+        console.log("Post created successfully:", data);
         res.redirect("/main");
     } catch (err) {
         console.error("Error creating post:", err);
