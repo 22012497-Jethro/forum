@@ -8,7 +8,7 @@ const router = express.Router();
 
 // Supabase setup
 const supabaseUrl = "https://fudsrzbhqpmryvmxgced.supabase.co";
-const supabaseKey = "eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1ZHNyemJocXBtcnl2bXhnY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM5MjE3OTQsImV4cCI6MjAyOTQ5Nzc5NH0"; // Replace with your actual key
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1ZHNyemJocXBtcnl2bXhnY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM5MjE3OTQsImV4cCI6MjAyOTQ5Nzc5NH0.6UMbzoD8J1BQl01h6NSyZAHVhrWerUcD5VVGuBwRcag"; // Replace with your actual key
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Configure multer for image uploads
