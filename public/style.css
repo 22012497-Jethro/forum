@@ -1,4 +1,4 @@
-/* Existing styles for login and signup pages */
+/* General body styles */
 body {
     background-image: url('background.png'); /* Ensure this path matches the location of your image file */
     background-size: cover;
@@ -12,64 +12,16 @@ body {
     flex-direction: column;
 }
 
+/* Section styling */
 section {
     text-align: center;
     background-color: rgba(255, 255, 255, 0.8);
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-    margin: 20px 0;
 }
 
-#logo {
-    width: 256px;
-    height: 256px;
-    margin-bottom: 20px;
-}
-
-h1 {
-    font-size: 2em;
-    margin: 10px 0;
-}
-
-#buttons {
-    margin-top: 20px;
-}
-
-button {
-    background-color: #4CAF50;
-    border: none;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 4px;
-}
-
-button:hover {
-    background-color: #45a049;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-input[type="text"], input[type="password"], input[type="email"] {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
-}
-
-/* New styles for navigation bar and theme switch */
+/* Navigation bar styling */
 nav {
     display: flex;
     justify-content: space-between;
@@ -153,7 +105,7 @@ nav {
     background-color: #ddd;
 }
 
-/* Modal styles */
+/* Modal styling */
 .modal {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
@@ -191,7 +143,7 @@ nav {
     cursor: pointer;
 }
 
-/* Dark mode styles */
+/* Dark mode styling */
 .dark-mode {
     background-color: #333;
     color: white;
@@ -209,7 +161,6 @@ nav {
     color: white;
 }
 
-/* Ensure text color is white in dark mode */
 .dark-mode section {
     color: white;
     background-color: rgba(50, 50, 50, 0.8); /* Adjust background color for better contrast */
@@ -229,7 +180,7 @@ nav {
     color: black;
 }
 
-/* Light mode styles */
+/* Light mode styling */
 .light-mode {
     background-color: #f0f8ff;
     color: black;
@@ -268,16 +219,4 @@ nav h1 {
 section {
     margin: 80px auto; /* Center the section */
     max-width: 1200px; /* Add a maximum width for the content */
-}
-
-/* Add a specific style for Recent Posts section */
-section h3 {
-    margin-top: 20px;
-    font-size: 1.5em;
-    color: #333;
-}
-
-/* Ensure Recent Posts have distinct style */
-#posts-container {
-    margin-top: 20px;
 }
