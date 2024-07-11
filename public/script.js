@@ -47,20 +47,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const postsContainer = document.getElementById('posts-container');
             postsContainer.innerHTML = ''; // Clear previous posts if any
-            posts.forEach(post => {
+
+            // Display only the 3 latest posts
+            const latestPosts = posts.slice(-3).reverse();
+
+            for (const post of latestPosts) {
+                const userResponse = await fetch(`/users/user-profile?id=${post.user_id}`);
+                const userData = await userResponse.json();
+
                 const postElement = document.createElement('div');
                 postElement.classList.add('post');
                 postElement.innerHTML = `
-                    <h3>${post.title}</h3>
-                    <p>${post.caption}</p>
+                    <div class="post-header">
+                        <img src="${userData.pfp || 'default-profile.png'}" alt="Profile Picture">
+                        <span class="username">${userData.username}</span>
+                    </div>
                     ${post.image ? `<img src="${post.image}" alt="Post Image">` : ''}
-                    <p>Category: ${post.category}</p>
-                    ${post.theme ? `<p>Theme: ${post.theme}</p>` : ''}
-                    ${post.rooms ? `<p>Number of Rooms: ${post.rooms}</p>` : ''}
-                    ${post.room_category ? `<p>Room Category: ${post.room_category}</p>` : ''}
+                    <p>${post.caption}</p>
                 `;
                 postsContainer.prepend(postElement);
-            });
+            }
         } catch (error) {
             console.error('Error fetching posts:', error);
         }

@@ -63,17 +63,39 @@ router.get('/posts', async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('posts')
-            .select('*');
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(3);
 
         if (error) {
-            console.error('Error fetching posts:', error);
-            return res.status(500).send('Error fetching posts: ' + error.message);
+            throw error;
         }
 
         res.json(data);
-    } catch (err) {
-        console.error('Error fetching posts:', err);
-        res.status(500).send('Internal server error: ' + err.message);
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        res.status(500).send('Error fetching posts');
+    }
+});
+
+router.get("/user-profile", async (req, res) => {
+    const userId = req.query.id;
+
+    try {
+        const { data, error } = await supabase
+            .from("users")
+            .select("username, pfp")
+            .eq("id", userId)
+            .single();
+
+        if (error) {
+            throw error;
+        }
+
+        res.json(data);
+    } catch (error) {
+        console.error("Error fetching user profile:", error);
+        res.status(500).send("Error fetching user profile");
     }
 });
 
