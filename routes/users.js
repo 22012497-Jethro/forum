@@ -20,35 +20,20 @@ router.post("/login", async (req, res) => {
     }
 
     try {
-        const { data: userData, error: fetchError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('email', email)
-            .single();
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
 
-        if (fetchError) {
-            console.error("Error fetching user:", fetchError);
+        if (error) {
+            console.error("Error during login:", error);
             return res.status(400).send("Invalid email or password");
         }
 
-        console.log("User fetched successfully:", userData);
-
-        // Check password
-        console.log("User password:", password);
-        console.log("Stored hash password:", userData.password);
-        if (!userData.password) {
-            console.error("Stored hash password is missing");
-            return res.status(500).send("Internal server error: Stored hash password is missing");
-        }
-
-        const isPasswordValid = await bcrypt.compare(password, userData.password);
-        if (!isPasswordValid) {
-            console.log("Invalid password");
-            return res.status(400).send("Invalid email or password");
-        }
+        console.log("Login successful:", data);
 
         // Store user ID in session
-        req.session.userId = userData.id;
+        req.session.userId = data.user.id;
         console.log("User ID stored in session:", req.session.userId);
 
         res.redirect(`/main?email=${encodeURIComponent(email)}`);
