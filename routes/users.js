@@ -43,4 +43,31 @@ router.post("/login", async (req, res) => {
     }
 });
 
+// Fetch user profile data
+router.get("/user-profile", async (req, res) => {
+    const userId = req.session.userId;
+
+    if (!userId) {
+        return res.status(401).send("Unauthorized");
+    }
+
+    try {
+        const { data, error } = await supabase
+            .from('users')
+            .select('username, pfp')
+            .eq('id', userId)
+            .single();
+
+        if (error) {
+            console.error("Error fetching user profile:", error);
+            return res.status(500).send("Internal server error");
+        }
+
+        res.json(data);
+    } catch (err) {
+        console.error("Error during fetching user profile:", err);
+        res.status(500).send("Internal server error");
+    }
+});
+
 module.exports = router;
