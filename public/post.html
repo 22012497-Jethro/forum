@@ -24,6 +24,7 @@
     <section>
         <h2>Create a New Post</h2>
         <form id="post-form" action="/posts/create" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="user_id" value="replace_with_actual_user_id"> <!-- Update this value dynamically -->
             <div class="form-group">
                 <label for="post-title">Title:</label>
                 <input type="text" id="post-title" name="title" required>
@@ -67,10 +68,5 @@
             <button type="submit">Post</button>
         </form>
     </section>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Theme switch logic here
-        });
-    </script>
 </body>
 </html>

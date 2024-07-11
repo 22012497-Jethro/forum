@@ -3,6 +3,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const { createClient } = require("@supabase/supabase-js");
+const authenticateUser = require("../middleware/authenticateUser"); // Import the middleware
 
 const router = express.Router();
 
@@ -29,6 +30,7 @@ const upload = multer({ storage: storage });
 // Create post endpoint
 router.post("/create", upload.single('image'), async (req, res) => {
     const { title, caption, category, theme, rooms, room_category } = req.body;
+    const userId = req.userId;
     let imageUrl = null;
 
     if (req.file) {
@@ -36,11 +38,11 @@ router.post("/create", upload.single('image'), async (req, res) => {
     }
 
     try {
-        console.log("Creating post with data:", { title, caption, image: imageUrl, category, theme, rooms, room_category });
+        console.log("Creating post with data:", { title, caption, image: imageUrl, category, theme, rooms, room_category, user_id: userId });
 
         const { data, error } = await supabase
             .from('posts')
-            .insert([{ title, caption, image: imageUrl, category, theme, rooms, room_category }]);
+            .insert([{ title, caption, image: imageUrl, category, theme, rooms, room_category, user_id: userId }]);
 
         if (error) {
             console.error("Supabase error details:", error);

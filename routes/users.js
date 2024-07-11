@@ -62,6 +62,8 @@ router.post("/login", async (req, res) => {
 
         console.log("Login successful:", data);
 
+        req.session.userId = data.user.id;
+
         // Assuming you want to redirect to the main page
         res.redirect(`/main?email=${encodeURIComponent(email)}`);
     } catch (err) {
@@ -94,8 +96,12 @@ router.get("/user-profile", async (req, res) => {
 
 // Logout endpoint
 router.get("/logout", (req, res) => {
-    // Logic for handling logout, such as clearing sessions or cookies
-    res.redirect("/login");
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).send("Error logging out");
+        }
+        res.redirect("/login");
+    });
 });
 
 module.exports = router;
