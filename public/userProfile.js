@@ -5,6 +5,7 @@ async function fetchAndDisplayUserData() {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
+        console.log('Fetched user data:', data); // Debugging line
         if (data) {
             document.getElementById('profile-username').textContent = data.username;
             document.getElementById('profile-pic').src = data.pfp || 'default-profile.png';

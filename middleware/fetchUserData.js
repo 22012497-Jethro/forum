@@ -24,6 +24,7 @@ const fetchUserData = async (req, res, next) => {
         }
 
         req.userData = data;
+        console.log('Middleware fetched user data:', data); // Debugging line
         next();
     } catch (err) {
         console.error("Error fetching user data:", err);
