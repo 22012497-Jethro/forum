@@ -3,26 +3,10 @@
 <head>
     <title>ReVibe Forum</title>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="userProfile.js" defer></script>
+    <script src="script.js" defer></script>
 </head>
 <body class="main-page light-mode">
-    <nav>
-        <div class="nav-left">
-            <img src="logo-dark.png" alt="ReVibe Logo" id="nav-logo">
-            <h1>ReVibe Forum</h1>
-        </div>
-        <div class="nav-right">
-            <a href="/post" class="nav-button" id="create-post-button">Create Post</a>
-            <div class="dropdown">
-                <img src="default-profile.png" alt="Profile Picture" id="profile-pic">
-                <span id="profile-username">Username</span>
-                <div class="dropdown-content">
-                    <p id="logout-button">Logout</p>
-                </div>
-            </div>
-            <button id="theme-switch">Switch Theme</button>
-        </div>
-    </nav>
+    <div id="navbar"></div>
     <section>
         <h2>Welcome to ReVibe Forum</h2>
         <div id="posts-container">
