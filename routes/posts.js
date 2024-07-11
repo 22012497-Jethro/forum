@@ -53,16 +53,21 @@ router.post("/create", upload.single('image'), async (req, res) => {
 
 // Fetch posts endpoint
 router.get('/posts', async (req, res) => {
-    const { data, error } = await supabase
-        .from('posts')
-        .select('*');
+    try {
+        const { data, error } = await supabase
+            .from('posts')
+            .select('*');
 
-    if (error) {
-        console.error('Error fetching posts:', error);
-        return res.status(500).send('Error fetching posts');
+        if (error) {
+            console.error('Error fetching posts:', error);
+            return res.status(500).send('Error fetching posts: ' + error.message);
+        }
+
+        res.json(data);
+    } catch (err) {
+        console.error('Error fetching posts:', err);
+        res.status(500).send('Internal server error: ' + err.message);
     }
-
-    res.json(data);
 });
 
 module.exports = router;
