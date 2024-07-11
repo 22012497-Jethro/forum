@@ -7,6 +7,12 @@ key: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI
 # Create a Supabase client
 supabase: Client = create_client(url, key)
 
-# Example: Fetching data from a table
-response = supabase.table('users').select('*').execute()
-print(response.data)
+try:
+    # Example: Fetching data from a table
+    response = supabase.table('users').select('*').execute()
+    if response.error:
+        print("Error fetching data:", response.error)
+    else:
+        print(response.data)
+except Exception as e:
+    print("An error occurred:", e)

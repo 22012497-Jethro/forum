@@ -7,7 +7,7 @@ const saltRounds = 10; // Number of salt rounds for bcrypt
 
 // Supabase URL and API Key
 const supabaseUrl = 'https://fudsrzbhqpmryvmxgced.supabase.co';
-const supabaseKey = 'eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1ZHNyemJocXBtcnl2bXhnY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM5MjE3OTQsImV4cCI6MjAyOTQ5Nzc5NH0';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1ZHNyemJocXBtcnl2bXhnY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM5MjE3OTQsImV4cCI6MjAyOTQ5Nzc5NH0.6UMbzoD8J1BQl01h6NSyZAHVhrWerUcD5VVGuBwRcag';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Login endpoint
@@ -22,20 +22,26 @@ router.post("/login", async (req, res) => {
     }
 
     try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password
-        });
+        // Fetch user by email
+        const { data: userData, error: fetchError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('email', email)
+            .single();
 
-        if (error) {
-            console.error("Error during login:", error);
+        if (fetchError) {
+            console.error("Error fetching user:", fetchError);
             return res.status(400).send("Invalid email or password");
         }
 
-        console.log("Login successful:", data);
+        // Check password
+        const isPasswordValid = await bcrypt.compare(password, userData.password);
+        if (!isPasswordValid) {
+            return res.status(400).send("Invalid email or password");
+        }
 
         // Store user ID in session
-        req.session.userId = data.user.id;
+        req.session.userId = userData.id;
 
         res.redirect(`/main?email=${encodeURIComponent(email)}`);
     } catch (err) {
