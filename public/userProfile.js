@@ -1,6 +1,6 @@
 async function fetchAndDisplayUserData() {
     try {
-        const response = await fetch('/users/user-data');
+        const response = await fetch('/users/user-profile');
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }

@@ -2,27 +2,23 @@ const express = require("express");
 const path = require("path");
 const bodyParser = require("body-parser");
 const session = require("express-session");
-const postsRouter = require('./routes/posts');
-const usersRouter = require('./routes/users');
-const fetchUserData = require('./middleware/fetchUserData'); // Import the middleware
+const postsRouter = require('./routes/posts'); // Import the posts router
+const usersRouter = require('./routes/users'); // Import the users router
 
 const app = express();
 const port = process.env.PORT || 3001;
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+// Session middleware
 app.use(session({
     secret: 'your_secret_key',
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false } // Set to true if using HTTPS
 }));
-
-app.use(fetchUserData); // Use the middleware
 
 // Serve static files for the frontend
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, 'public/index.html')));
