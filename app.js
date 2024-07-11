@@ -3,7 +3,7 @@ const path = require("path");
 const bodyParser = require("body-parser");
 const session = require("express-session");
 const postsRouter = require('./routes/posts');
-const usersRouter = require('./routes/users');
+const usersRouter = require('./routes/users'); // Import the users router
 const fetchUserData = require('./middleware/fetchUserData'); // Import the middleware
 
 const app = express();
@@ -33,7 +33,7 @@ app.get("/post", (req, res) => res.sendFile(path.join(__dirname, 'public/post.ht
 
 // Use the posts and users routers
 app.use('/posts', postsRouter);
-app.use('/users', usersRouter);
+app.use('/users', usersRouter); // Register the users router
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
