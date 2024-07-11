@@ -34,6 +34,13 @@ router.post("/login", async (req, res) => {
         console.log("User fetched successfully:", userData);
 
         // Check password
+        console.log("User password:", password);
+        console.log("Stored hash password:", userData.password);
+        if (!userData.password) {
+            console.error("Stored hash password is missing");
+            return res.status(500).send("Internal server error: Stored hash password is missing");
+        }
+
         const isPasswordValid = await bcrypt.compare(password, userData.password);
         if (!isPasswordValid) {
             console.log("Invalid password");
@@ -47,7 +54,7 @@ router.post("/login", async (req, res) => {
         res.redirect(`/main?email=${encodeURIComponent(email)}`);
     } catch (err) {
         console.error("Error during login:", err);
-        res.status(500).send("Internal server error");
+        res.status(500).send("Internal server error: " + err.message);
     }
 });
 
