@@ -1,14 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Load the navigation bar
-    fetch('/nav.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('navbar').innerHTML = data;
-            fetchAndDisplayUserData(); // Ensure user data is fetched and displayed after navbar is loaded
-            setupThemeSwitch(); // Ensure theme switch setup after navbar is loaded
-        })
-        .catch(error => console.error('Error loading navigation bar:', error));
-
     // Fetch user profile data
     async function fetchAndDisplayUserData() {
         try {
@@ -45,4 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
             applyTheme(newTheme);
         });
     }
+
+    fetchAndDisplayUserData();
+    setupThemeSwitch();
 });
