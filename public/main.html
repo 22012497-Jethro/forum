@@ -3,7 +3,15 @@
 <head>
     <title>ReVibe Forum</title>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="userProfile.js" defer></script> <!-- Include the userProfile.js script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userData = JSON.parse('<%= JSON.stringify(userData || {}) %>');
+            if (userData.username) {
+                document.getElementById('profile-username').textContent = userData.username;
+                document.getElementById('profile-pic').src = userData.pfp || 'default-profile.png';
+            }
+        });
+    </script>
 </head>
 <body class="main-page light-mode">
     <nav>
