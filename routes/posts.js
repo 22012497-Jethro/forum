@@ -25,7 +25,13 @@ const upload = multer({ storage: storage });
 // Create post endpoint
 router.post("/create", upload.single('image'), async (req, res) => {
     const { title, caption, category, theme, rooms, room_category } = req.body;
+    const userId = req.session.userId;
     let imageUrl = null;
+
+    if (!userId) {
+        console.error("Unauthorized attempt to create post");
+        return res.status(401).send("Unauthorized");
+    }
 
     if (req.file) {
         imageUrl = `/uploads/${req.file.filename}`;
