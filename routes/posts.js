@@ -39,12 +39,12 @@ router.post("/create", upload.single('image'), async (req, res) => {
 
     try {
         const createdAt = new Date().toISOString();  // Get current timestamp
-        console.log("Creating post with data:", { title, caption, image: imageUrl, category, theme, rooms, room_category, userId });
+        console.log("Creating post with data:", { title, caption, image: imageUrl, category, theme, rooms, room_category, userId, createdAt });
 
         const { data, error } = await supabase
             .from('posts')
             .insert([{ title, caption, image: imageUrl, category, theme, rooms, room_category, user_id: userId, created_at: createdAt }]);
-        
+
         if (error) {
             console.error("Supabase error details:", error);
             return res.status(500).send("Error creating post: " + error.message);
