@@ -36,14 +36,14 @@ router.post("/create", upload.single('image'), async (req, res) => {
             .insert([{ title, caption, image: imageUrl, category, theme, rooms, room_category, user_id: req.session.userId }]);
 
         if (error) {
-            console.error("Error creating post:", error);
-            return res.status(500).send("Error creating post");
+            console.error("Supabase error details:", error);
+            return res.status(500).send("Error creating post: " + error.message);
         }
 
         res.redirect("/main");
     } catch (err) {
-        console.error("Error creating post:", err);
-        res.status(500).send("Internal server error");
+        console.error("Error creating post:", err.message);
+        res.status(500).send("Internal server error: " + err.message);
     }
 });
 
