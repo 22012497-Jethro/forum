@@ -25,7 +25,7 @@ const upload = multer({ storage: storage });
 // Create post endpoint
 router.post("/create", upload.single('image'), async (req, res) => {
     const { title, caption, category, theme, rooms, room_category } = req.body;
-    const userId = req.session.userId;
+    const userId = req.session.userId;  // Retrieve user ID from session
     let imageUrl = null;
 
     if (!userId) {
@@ -38,22 +38,22 @@ router.post("/create", upload.single('image'), async (req, res) => {
     }
 
     try {
-        console.log("Creating post with data:", { title, caption, image: imageUrl, category, theme, rooms, room_category });
+        console.log("Creating post with data:", { title, caption, image: imageUrl, category, theme, rooms, room_category, userId });
 
         const { data, error } = await supabase
             .from('posts')
-            .insert([{ title, caption, image: imageUrl, category, theme, rooms, room_category }]);
+            .insert([{ title, caption, image: imageUrl, category, theme, rooms, room_category, user_id: userId }]);
 
         if (error) {
             console.error("Supabase error details:", error);
-            return res.status(500).send("Error creating post");
+            return res.status(500).send("Error creating post: " + error.message);
         }
 
         console.log("Post created successfully:", data);
         res.redirect("/main");
     } catch (err) {
         console.error("Error creating post:", err.message);
-        res.status(500).send("Internal server error");
+        res.status(500).send("Internal server error: " + err.message);
     }
 });
 
