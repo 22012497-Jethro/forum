@@ -61,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="username">${userData.username}</span>
                     </div>
                     ${post.image ? `<img src="${post.image}" alt="Post Image">` : ''}
+                    <p>${post.title}</p>
                     <p>${post.caption}</p>
                 `;
                 postsContainer.appendChild(postElement);
