@@ -45,7 +45,7 @@ router.post("/login", async (req, res) => {
 
 // Fetch user profile data
 router.get("/user-profile", async (req, res) => {
-    const userId = req.session.userId;
+    const userId = req.query.id;
 
     if (!userId) {
         return res.status(401).send("Unauthorized");
