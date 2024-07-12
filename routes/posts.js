@@ -77,13 +77,16 @@ router.get('/posts', async (req, res) => {
             .limit(3);
 
         if (error) {
-            throw error;
+            console.error('Error fetching latest posts:', error);
+            return res.status(500).send('Error fetching latest posts');
         }
 
+        console.log('Fetched latest posts:', data); // Debugging line
+
         res.json(data);
-    } catch (error) {
-        console.error('Error fetching posts:', error);
-        res.status(500).send('Error fetching posts');
+    } catch (err) {
+        console.error('Error during fetching latest posts:', err);
+        res.status(500).send('Internal server error');
     }
 });
 
@@ -105,28 +108,6 @@ router.get("/user-profile", async (req, res) => {
     } catch (error) {
         console.error("Error fetching user profile:", error);
         res.status(500).send("Error fetching user profile");
-    }
-});
-
-router.get('/latest-posts', async (req, res) => {
-    try {
-        const { data, error } = await supabase
-            .from('posts')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(3);
-
-        if (error) {
-            console.error('Error fetching latest posts:', error);
-            return res.status(500).send('Error fetching latest posts');
-        }
-
-        console.log('Fetched latest posts:', data); // Debugging line
-
-        res.json(data);
-    } catch (err) {
-        console.error('Error during fetching latest posts:', err);
-        res.status(500).send('Internal server error');
     }
 });
 
