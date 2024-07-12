@@ -12,14 +12,7 @@ const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Configure multer for image uploads
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/');
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
-    }
-});
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // Create post endpoint
@@ -34,7 +27,20 @@ router.post("/create", upload.single('image'), async (req, res) => {
     }
 
     if (req.file) {
-        imageUrl = `/uploads/${req.file.filename}`;
+        const {data, error} = await supabase
+            .storage
+            .from('post-images')
+            .upload(`public/${Date.now()}-${req.file.originalname}`, req.file.buffer, {cacheControl:'3600', upsert: false});
+        
+        if (error) {
+            console.error("Supabase storage error:", error);
+            return res.status(500).send("Error uploading image");
+        }
+
+        imageUrl = supabase
+            .storage
+            .from('post-images')
+            .getPublicUrl(data.path).publicURL;
     }
 
     try {
