@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error fetching posts:', error);
         }
     }
-
+    
     function displayPost(post) {
         const postElement = document.createElement('div');
         postElement.classList.add('post');
