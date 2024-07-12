@@ -99,4 +99,24 @@ router.get("/user-profile", async (req, res) => {
     }
 });
 
+router.get('/latest-posts', async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('posts')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(3);
+
+        if (error) {
+            console.error('Error fetching latest posts:', error);
+            return res.status(500).send('Error fetching latest posts');
+        }
+
+        res.json(data);
+    } catch (err) {
+        console.error('Error during fetching latest posts:', err);
+        res.status(500).send('Internal server error');
+    }
+});
+
 module.exports = router;
