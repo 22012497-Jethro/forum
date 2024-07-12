@@ -47,10 +47,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const postsContainer = document.getElementById('posts-container');
             postsContainer.innerHTML = ''; // Clear previous posts if any
-
+    
             // Display only the 3 latest posts
-            posts.forEach(async (post) => {
-                const userResponse = await fetch(`/users/user-profile?id=${post.user_id}`);
+            for (const post of posts) {
+                const userResponse = await fetch(/users/user-profile?id=${post.user_id});
                 const userData = await userResponse.json();
 
                 const postElement = document.createElement('div');
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p>${post.caption}</p>
                 `;
                 postsContainer.appendChild(postElement);
-            });
+            }
         } catch (error) {
             console.error('Error fetching posts:', error);
         }
