@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
             // Display only the 3 latest posts
             for (const post of posts) {
-                const userResponse = await fetch(`/users/user-profile?id=${post.user_id}`);
+                const userResponse = await fetch(`/users/post-profile?id=${post.user_id}`);
                 const userData = await userResponse.json();
 
                 const postElement = document.createElement('div');
