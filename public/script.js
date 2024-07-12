@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchAndDisplayPosts() {
         try {
-            const response = await fetch('/posts/latest-posts');
+            const response = await fetch('/posts');
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
