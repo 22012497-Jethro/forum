@@ -77,7 +77,8 @@ router.get('/posts', async (req, res) => {
             .limit(3);
 
         if (error) {
-            throw error;
+            console.error('Error fetching posts:', error);
+            return res.status(500).send('Error fetching posts');
         }
 
         console.log('Fetched posts:', data); // Debugging line
