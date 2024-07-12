@@ -77,16 +77,14 @@ router.get('/posts', async (req, res) => {
             .limit(3);
 
         if (error) {
-            console.error('Error fetching latest posts:', error);
-            return res.status(500).send('Error fetching latest posts');
+            throw error;
         }
 
-        console.log('Fetched latest posts:', data); // Debugging line
-
+        console.log('Fetched posts:', data); // Debugging line
         res.json(data);
-    } catch (err) {
-        console.error('Error during fetching latest posts:', err);
-        res.status(500).send('Internal server error');
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        res.status(500).send('Error fetching posts');
     }
 });
 

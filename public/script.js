@@ -44,31 +44,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const posts = await response.json();
             console.log('Fetched posts:', posts); // Debugging line
-
-            const postsContainer = document.getElementById('posts-container');
-            postsContainer.innerHTML = ''; // Clear previous posts if any
-    
-            // Display only the 3 latest posts
-            for (const post of posts) {
-                const userResponse = await fetch(`/users/post-profile?id=${post.user_id}`);
-                const userData = await userResponse.json();
-
-                const postElement = document.createElement('div');
-                postElement.classList.add('post');
-                postElement.innerHTML = `
-                    <div class="post-header">
-                        <img src="${userData.pfp || 'default-profile.png'}" alt="Profile Picture">
-                        <span class="username">${userData.username}</span>
-                    </div>
-                    ${post.image ? `<img src="${post.image}" alt="Post Image">` : ''}
-                    <p>${post.title}</p>
-                    <p>${post.caption}</p>
-                `;
-                postsContainer.appendChild(postElement);
-            }
+            posts.forEach(displayPost);
         } catch (error) {
             console.error('Error fetching posts:', error);
         }
+    }
+
+    function displayPost(post) {
+        const postElement = document.createElement('div');
+        postElement.classList.add('post');
+        postElement.innerHTML = `
+            <div class="post-header">
+                <img src="${post.pfp}" alt="Profile Picture">
+                <span class="username">${post.username}</span>
+            </div>
+            ${post.image ? `<img src="${post.image}" alt="Post Image">` : ''}
+            <p>${post.caption}</p>
+            ${post.category ? `<p>Category: ${post.category}</p>` : ''}
+            ${post.theme ? `<p>Theme: ${post.theme}</p>` : ''}
+            ${post.rooms ? `<p>Number of Rooms: ${post.rooms}</p>` : ''}
+            ${post.room_category ? `<p>Room Category: ${post.room_category}</p>` : ''}
+        `;
+        document.getElementById('posts-container').appendChild(postElement);
     }
 
     fetchAndDisplayUserData();
