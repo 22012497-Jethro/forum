@@ -228,8 +228,16 @@ section h3 {
 }
 
 /* Ensure Recent Posts have distinct style */
+.recent-posts-section {
+    text-align: center;
+    margin: 20px auto;
+    max-width: 1200px;
+}
+
 #posts-container {
-    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
 }
 
 .post {
@@ -237,8 +245,9 @@ section h3 {
     border-radius: 10px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    margin-bottom: 20px;
     text-align: left;
+    flex: 0 0 calc(33.33% - 20px);
+    max-width: calc(33.33% - 20px);
 }
 
 .post img {
