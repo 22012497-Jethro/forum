@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchAndDisplayPosts() {
         try {
-            const response = await fetch('/posts');
+            const response = await fetch('/posts/latest-posts');
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -49,9 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
             postsContainer.innerHTML = ''; // Clear previous posts if any
 
             // Display only the 3 latest posts
-            const latestPosts = posts.slice(-3).reverse();
-
-            for (const post of latestPosts) {
+            posts.forEach(async (post) => {
                 const userResponse = await fetch(`/users/user-profile?id=${post.user_id}`);
                 const userData = await userResponse.json();
 
@@ -65,8 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${post.image ? `<img src="${post.image}" alt="Post Image">` : ''}
                     <p>${post.caption}</p>
                 `;
-                postsContainer.prepend(postElement);
-            }
+                postsContainer.appendChild(postElement);
+            });
         } catch (error) {
             console.error('Error fetching posts:', error);
         }

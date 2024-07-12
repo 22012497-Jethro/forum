@@ -112,6 +112,8 @@ router.get('/latest-posts', async (req, res) => {
             return res.status(500).send('Error fetching latest posts');
         }
 
+        console.log('Fetched latest posts:', data); // Debugging line
+
         res.json(data);
     } catch (err) {
         console.error('Error during fetching latest posts:', err);
