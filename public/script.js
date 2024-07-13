@@ -49,14 +49,14 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error fetching posts:', error);
         }
     }
-    
+
     function displayPost(post) {
         const postElement = document.createElement('div');
         postElement.classList.add('post');
         postElement.innerHTML = `
             <div class="post-header">
-                <img src="${post.pfp}" alt="Profile Picture">
-                <span class="username">${post.username}</span>
+                <img src="${post.pfp || 'default-profile.png'}" alt="Profile Picture">
+                <span class="username">${post.username || 'Unknown User'}</span>
             </div>
             ${post.image ? `<img src="${post.image}" alt="Post Image">` : ''}
             <p>${post.caption}</p>
@@ -67,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         document.getElementById('posts-container').appendChild(postElement);
     }
+
 
     fetchAndDisplayUserData();
     setupThemeSwitch();
