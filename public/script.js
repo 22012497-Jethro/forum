@@ -64,13 +64,13 @@ document.addEventListener('DOMContentLoaded', () => {
             ${post.theme ? `<p>Theme: ${post.theme}</p>` : ''}
             ${post.rooms ? `<p>Number of Rooms: ${post.rooms}</p>` : ''}
             ${post.room_category ? `<p>Room Category: ${post.room_category}</p>` : ''}
-            <div class="comments-section">
-                <h4>Comments</h4>
-                <div class="comments-container" id="comments-${post.id}">
-                    <!-- Comments will be displayed here -->
-                </div>
-                <textarea id="comment-input-${post.id}" placeholder="Add a comment"></textarea>
-                <button onclick="addComment(${post.id})">Comment</button>
+            <div class="comments">
+                ${post.comments ? post.comments.map(comment => `
+                    <div class="comment">
+                        <span>${comment.user}:</span>
+                        <p>${comment.text}</p>
+                    </div>
+                `).join('') : '<p>No comments yet.</p>'}
             </div>
         `;
         document.getElementById('posts-container').appendChild(postElement);
