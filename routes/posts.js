@@ -27,6 +27,7 @@ router.post("/create", upload.single('image'), async (req, res) => {
     }
 
     if (req.file) {
+        console.log("Received file:", req.file);  // Log file information
         try {
             const { data, error } = await supabase
                 .storage
@@ -37,17 +38,21 @@ router.post("/create", upload.single('image'), async (req, res) => {
                 });
 
             if (error) {
-                throw error;
+                console.error("Error uploading to Supabase storage:", error.message);
+                return res.status(500).send("Error uploading image: " + error.message);
             }
 
             imageUrl = supabase
                 .storage
                 .from('post-images')
                 .getPublicUrl(data.path).publicURL;
+            console.log("Image uploaded successfully. URL:", imageUrl);  // Log successful upload
         } catch (error) {
             console.error("Supabase storage error:", error.message);
             return res.status(500).send("Error uploading image: " + error.message);
         }
+    } else {
+        console.log("No file uploaded");  // Log if no file is uploaded
     }
 
     try {
@@ -59,16 +64,18 @@ router.post("/create", upload.single('image'), async (req, res) => {
             .insert([{ title, caption, image: imageUrl, category, theme, rooms, room_category, user_id: userId, created_at: createdAt }]);
 
         if (error) {
-            throw error;
+            console.error("Error inserting post into database:", error.message);
+            return res.status(500).send("Error creating post: " + error.message);
         }
 
-        console.log("Post created successfully:", data);
+        console.log("Post created successfully:", data);  // Log successful post creation
         res.redirect("/main");
     } catch (err) {
         console.error("Error creating post:", err.message);
         res.status(500).send("Internal server error: " + err.message);
     }
 });
+
 
 // Fetch posts endpoint
 router.get('/posts', async (req, res) => {
