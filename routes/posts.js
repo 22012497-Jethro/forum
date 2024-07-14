@@ -27,23 +27,27 @@ router.post("/create", upload.single('image'), async (req, res) => {
     }
 
     if (req.file) {
-        const {data, error} = await supabase
-            .storage
-            .from('post-images')
-            .upload(`${Date.now()}-${req.file.originalname}`, req.file.buffer, {
-                cacheControl:'3600',
-                upsert: false,
-            });
-        
-        if (error) {
-            console.error("Supabase storage error:", error);
-            return res.status(500).send("Error uploading image");
-        }
+        try {
+            const { data, error } = await supabase
+                .storage
+                .from('post-images')
+                .upload(`${Date.now()}-${req.file.originalname}`, req.file.buffer, {
+                    cacheControl: '3600',
+                    upsert: false,
+                });
 
-        imageUrl = supabase
-            .storage
-            .from('post-images')
-            .getPublicUrl(data.path).publicURL;
+            if (error) {
+                throw error;
+            }
+
+            imageUrl = supabase
+                .storage
+                .from('post-images')
+                .getPublicUrl(data.path).publicURL;
+        } catch (error) {
+            console.error("Supabase storage error:", error.message);
+            return res.status(500).send("Error uploading image: " + error.message);
+        }
     }
 
     try {
@@ -55,8 +59,7 @@ router.post("/create", upload.single('image'), async (req, res) => {
             .insert([{ title, caption, image: imageUrl, category, theme, rooms, room_category, user_id: userId, created_at: createdAt }]);
 
         if (error) {
-            console.error("Supabase error details:", error);
-            return res.status(500).send("Error creating post: " + error.message);
+            throw error;
         }
 
         console.log("Post created successfully:", data);
