@@ -64,10 +64,48 @@ document.addEventListener('DOMContentLoaded', () => {
             ${post.theme ? `<p>Theme: ${post.theme}</p>` : ''}
             ${post.rooms ? `<p>Number of Rooms: ${post.rooms}</p>` : ''}
             ${post.room_category ? `<p>Room Category: ${post.room_category}</p>` : ''}
+            <div class="comments-section">
+                <h4>Comments</h4>
+                <div class="comments-container" id="comments-${post.id}">
+                    <!-- Comments will be displayed here -->
+                </div>
+                <textarea id="comment-input-${post.id}" placeholder="Add a comment"></textarea>
+                <button onclick="addComment(${post.id})">Comment</button>
+            </div>
         `;
         document.getElementById('posts-container').appendChild(postElement);
     }
 
+    async function addComment(postId) {
+        const commentInput = document.getElementById(`comment-input-${postId}`);
+        const commentText = commentInput.value;
+        if (!commentText) return;
+
+        try {
+            const response = await fetch(`/posts/${postId}/comments`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: commentText }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const comment = await response.json();
+            const commentsContainer = document.getElementById(`comments-${postId}`);
+            const commentElement = document.createElement('div');
+            commentElement.classList.add('comment');
+            commentElement.textContent = comment.text;
+            commentsContainer.appendChild(commentElement);
+
+            commentInput.value = ''; // Clear the input field
+        } catch (error) {
+            console.error('Error adding comment:', error);
+        }
+    }
 
     fetchAndDisplayUserData();
     setupThemeSwitch();
