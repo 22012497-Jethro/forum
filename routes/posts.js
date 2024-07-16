@@ -35,7 +35,7 @@ router.post("/create", upload.single('image'), async (req, res) => {
     if (req.file) {
         console.log("Received file:", req.file);
         try {
-            const { data, error } = await supabase
+            const uploadResponse = await supabase
                 .storage
                 .from('post-images')
                 .upload(`${Date.now()}-${req.file.originalname}`, req.file.buffer, {
@@ -43,16 +43,26 @@ router.post("/create", upload.single('image'), async (req, res) => {
                     upsert: false,
                 });
 
-            if (error) {
-                console.error("Error uploading to Supabase storage:", error.message);
-                return res.status(500).send("Error uploading image: " + error.message);
+            console.log("Upload response:", uploadResponse);
+
+            if (uploadResponse.error) {
+                console.error("Error uploading to Supabase storage:", uploadResponse.error.message);
+                return res.status(500).send("Error uploading image: " + uploadResponse.error.message);
             }
 
-            console.log("Upload response data:", data);  // Log the response data
-            imageUrl = supabase
+            const publicUrlResponse = supabase
                 .storage
                 .from('post-images')
-                .getPublicUrl(data.path).publicURL;
+                .getPublicUrl(uploadResponse.data.path);
+
+            console.log("Public URL response:", publicUrlResponse);
+
+            if (publicUrlResponse.error) {
+                console.error("Error generating public URL:", publicUrlResponse.error.message);
+                return res.status(500).send("Error generating public URL: " + publicUrlResponse.error.message);
+            }
+
+            imageUrl = publicUrlResponse.publicURL;
             console.log("Generated image URL:", imageUrl);
         } catch (error) {
             console.error("Supabase storage error:", error.message);
