@@ -50,9 +50,14 @@ router.post("/create", upload.single('image'), async (req, res) => {
                 return res.status(500).send("Error uploading image: " + uploadResponse.error.message);
             }
 
-            const { path: uploadedPath } = uploadResponse.data;
+            const uploadedPath = uploadResponse.data.path;
 
             console.log("Uploaded Path:", uploadedPath);
+
+            if (!uploadedPath) {
+                console.error("Uploaded path is null, something went wrong with the upload.");
+                return res.status(500).send("Uploaded path is null, something went wrong with the upload.");
+            }
 
             const publicUrlResponse = supabase
                 .storage
@@ -68,6 +73,7 @@ router.post("/create", upload.single('image'), async (req, res) => {
 
             imageUrl = publicUrlResponse.publicURL;
             console.log("Generated image URL:", imageUrl);
+
         } catch (error) {
             console.error("Supabase storage error:", error.message);
             return res.status(500).send("Error uploading image: " + error.message);
