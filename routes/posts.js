@@ -54,11 +54,6 @@ router.post("/create", upload.single('image'), async (req, res) => {
 
             console.log("Uploaded Path:", uploadedPath);
 
-            if (!uploadedPath) {
-                console.error("Uploaded path is null, something went wrong with the upload.");
-                return res.status(500).send("Uploaded path is null, something went wrong with the upload.");
-            }
-
             const publicUrlResponse = supabase
                 .storage
                 .from('post-images')
@@ -71,9 +66,8 @@ router.post("/create", upload.single('image'), async (req, res) => {
                 return res.status(500).send("Error generating public URL: " + publicUrlResponse.error.message);
             }
 
-            imageUrl = publicUrlResponse.publicURL;
+            imageUrl = publicUrlResponse.data.publicUrl;
             console.log("Generated image URL:", imageUrl);
-
         } catch (error) {
             console.error("Supabase storage error:", error.message);
             return res.status(500).send("Error uploading image: " + error.message);
@@ -82,14 +76,9 @@ router.post("/create", upload.single('image'), async (req, res) => {
         console.log("No file uploaded");
     }
 
-    if (!imageUrl && req.file) {
-        console.error("Image URL is null, something went wrong with the upload.");
-        return res.status(500).send("Image URL is null, something went wrong with the upload.");
-    }
-
     try {
         const createdAt = new Date().toISOString();
-        console.log("Creating post with data:", { title, caption, image: imageUrl, category, theme, rooms, room_category, userId, created_at: createdAt });
+        console.log("Creating post with data:", { title, caption, image: imageUrl, category, theme, rooms, room_category, user_id: userId, created_at: createdAt });
 
         const { data, error } = await supabase
             .from('posts')
