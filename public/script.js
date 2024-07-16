@@ -55,22 +55,17 @@ document.addEventListener('DOMContentLoaded', () => {
         postElement.classList.add('post');
         postElement.innerHTML = `
             <div class="post-header">
-                <img src="${post.pfp || 'default-profile.png'}" alt="Profile Picture">
-                <span class="username">${post.username || 'Unknown User'}</span>
+                <img src="${post.image || 'default-profile.png'}" alt="Post Image">
+                <h3>${post.title}</h3>
+                <p>${post.caption}</p>
             </div>
-            ${post.image ? `<img src="${post.image}" alt="Post Image">` : ''}
-            <p>${post.caption}</p>
-            ${post.category ? `<p>Category: ${post.category}</p>` : ''}
-            ${post.theme ? `<p>Theme: ${post.theme}</p>` : ''}
-            ${post.rooms ? `<p>Number of Rooms: ${post.rooms}</p>` : ''}
-            ${post.room_category ? `<p>Room Category: ${post.room_category}</p>` : ''}
-            <div class="comments">
-                ${post.comments ? post.comments.map(comment => `
-                    <div class="comment">
-                        <span>${comment.user}:</span>
-                        <p>${comment.text}</p>
-                    </div>
-                `).join('') : '<p>No comments yet.</p>'}
+            <div class="post-details">
+                <p>Category: ${post.category}</p>
+                <p>Theme: ${post.theme}</p>
+                <p>Rooms: ${post.rooms}</p>
+                <p>Room Category: ${post.room_category}</p>
+                <p>Posted by: ${post.user_id}</p>
+                <p>Created at: ${post.created_at}</p>
             </div>
         `;
         document.getElementById('posts-container').appendChild(postElement);

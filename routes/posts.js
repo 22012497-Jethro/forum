@@ -104,7 +104,7 @@ router.get('/posts', async (req, res) => {
             .from('posts')
             .select('*')
             .order('created_at', { ascending: false })
-            .limit(3);
+            .limit(10); // Adjust the limit as needed
 
         if (error) {
             console.error('Error fetching posts:', error);
