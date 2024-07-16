@@ -18,16 +18,11 @@ const upload = multer({ storage: storage });
 // Create post endpoint
 router.post("/create", upload.single('image'), async (req, res) => {
     const { title, caption, category, theme, rooms, room_category } = req.body;
-    const userId = req.session.userId;  // Retrieve user ID from session
+    const userId = req.session.userId;
     let imageUrl = null;
 
-    if (!userId) {
-        console.error("Unauthorized attempt to create post");
-        return res.status(401).send("Unauthorized");
-    }
-
     if (req.file) {
-        console.log("Received file:", req.file);  // Log file information
+        console.log("Received file:", req.file);
         try {
             const { data, error } = await supabase
                 .storage
@@ -46,18 +41,18 @@ router.post("/create", upload.single('image'), async (req, res) => {
                 .storage
                 .from('post-images')
                 .getPublicUrl(data.path).publicURL;
-            console.log("Image uploaded successfully. URL:", imageUrl);  // Log successful upload
+            console.log("Image uploaded successfully. URL:", imageUrl);
         } catch (error) {
             console.error("Supabase storage error:", error.message);
             return res.status(500).send("Error uploading image: " + error.message);
         }
     } else {
-        console.log("No file uploaded");  // Log if no file is uploaded
+        console.log("No file uploaded");
     }
 
     try {
-        const createdAt = new Date().toISOString();  // Get current timestamp
-        console.log("Creating post with data:", { title, caption, image: imageUrl, category, theme, rooms, room_category, userId, createdAt });
+        const createdAt = new Date().toISOString();
+        console.log("Creating post with data:", { title, caption, image: imageUrl, category, theme, rooms, room_category, userId, created_at: createdAt });
 
         const { data, error } = await supabase
             .from('posts')
@@ -68,14 +63,13 @@ router.post("/create", upload.single('image'), async (req, res) => {
             return res.status(500).send("Error creating post: " + error.message);
         }
 
-        console.log("Post created successfully:", data);  // Log successful post creation
+        console.log("Post created successfully:", data);
         res.redirect("/main");
     } catch (err) {
         console.error("Error creating post:", err.message);
         res.status(500).send("Internal server error: " + err.message);
     }
 });
-
 
 // Fetch posts endpoint
 router.get('/posts', async (req, res) => {
@@ -116,7 +110,7 @@ router.get("/user-profile", async (req, res) => {
         res.json(data);
     } catch (error) {
         console.error("Error fetching user profile:", error);
-        res.status(500).send("Error fetching user profiles");
+        res.status(500).send("Error fetching user profile");
     }
 });
 
