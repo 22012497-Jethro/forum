@@ -50,10 +50,14 @@ router.post("/create", upload.single('image'), async (req, res) => {
                 return res.status(500).send("Error uploading image: " + uploadResponse.error.message);
             }
 
+            const { path: uploadedPath } = uploadResponse.data;
+
+            console.log("Uploaded Path:", uploadedPath);
+
             const publicUrlResponse = supabase
                 .storage
                 .from('post-images')
-                .getPublicUrl(uploadResponse.data.path);
+                .getPublicUrl(uploadedPath);
 
             console.log("Public URL response:", publicUrlResponse);
 
@@ -72,7 +76,7 @@ router.post("/create", upload.single('image'), async (req, res) => {
         console.log("No file uploaded");
     }
 
-    if (!imageUrl) {
+    if (!imageUrl && req.file) {
         console.error("Image URL is null, something went wrong with the upload.");
         return res.status(500).send("Image URL is null, something went wrong with the upload.");
     }
