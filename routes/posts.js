@@ -15,6 +15,17 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+const authenticateUser = (req, res, next) => {
+    if (req.session && req.session.userId) {
+        next();
+    } else {
+        res.status(401).send('Unauthorized');
+    }
+};
+
+// Apply authentication middleware to the routes
+router.use(authenticateUser);
+
 // Create post endpoint
 router.post("/create", upload.single('image'), async (req, res) => {
     const { title, caption, category, theme, rooms, room_category } = req.body;
