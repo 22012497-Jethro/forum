@@ -116,7 +116,7 @@ router.get("/user-profile", async (req, res) => {
         res.json(data);
     } catch (error) {
         console.error("Error fetching user profile:", error);
-        res.status(500).send("Error fetching user profile");
+        res.status(500).send("Error fetching user profiles");
     }
 });
 
