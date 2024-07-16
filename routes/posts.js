@@ -76,6 +76,11 @@ router.post("/create", upload.single('image'), async (req, res) => {
         console.log("No file uploaded");
     }
 
+    if (!imageUrl && req.file) {
+        console.error("Image URL is null, something went wrong with the upload.");
+        return res.status(500).send("Image URL is null, something went wrong with the upload.");
+    }
+
     try {
         const createdAt = new Date().toISOString();
         console.log("Creating post with data:", { title, caption, image: imageUrl, category, theme, rooms, room_category, userId, created_at: createdAt });
