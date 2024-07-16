@@ -48,17 +48,23 @@ router.post("/create", upload.single('image'), async (req, res) => {
                 return res.status(500).send("Error uploading image: " + error.message);
             }
 
+            console.log("Upload response data:", data);  // Log the response data
             imageUrl = supabase
                 .storage
                 .from('post-images')
                 .getPublicUrl(data.path).publicURL;
-            console.log("Image uploaded successfully. URL:", imageUrl);
+            console.log("Generated image URL:", imageUrl);
         } catch (error) {
             console.error("Supabase storage error:", error.message);
             return res.status(500).send("Error uploading image: " + error.message);
         }
     } else {
         console.log("No file uploaded");
+    }
+
+    if (!imageUrl) {
+        console.error("Image URL is null, something went wrong with the upload.");
+        return res.status(500).send("Image URL is null, something went wrong with the upload.");
     }
 
     try {
