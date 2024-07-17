@@ -102,9 +102,9 @@ router.get('/posts', async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('posts')
-            .select('*')
+            .select('*, users(username)')
             .order('created_at', { ascending: false })
-            .limit(10); // Adjust the limit as needed
+            .limit(3);
 
         if (error) {
             console.error('Error fetching posts:', error);
