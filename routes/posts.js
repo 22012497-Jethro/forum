@@ -117,7 +117,7 @@ router.get('/', async (req, res) => {
         const userIds = posts.map(post => post.user_id);
         const { data: users, error: userError } = await supabase
             .from('users')
-            .select('id, username')
+            .select('id, username, pfp')
             .in('id', userIds);
 
         if (userError) {
@@ -126,7 +126,11 @@ router.get('/', async (req, res) => {
 
         const postsWithUsernames = posts.map(post => {
             const user = users.find(user => user.id === post.user_id);
-            return { ...post, username: user ? user.username : 'Unknown' };
+            return { 
+                ...post, 
+                username: user ? user.username : 'Unknown', 
+                profile_pic: user ? user.pfp : 'default-profile.png' 
+            };
         });
 
         res.json(postsWithUsernames);
