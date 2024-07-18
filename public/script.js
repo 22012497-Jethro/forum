@@ -36,9 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    let currentPage = 1;
+    const postsPerPage = 10;
+
     async function fetchAndDisplayPosts(page) {
         try {
-            const response = await fetch(`/api/posts?page=${page}&limit=${postsPerPage}`);
+            const response = await fetch(`/posts?page=${page}&limit=${postsPerPage}`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }

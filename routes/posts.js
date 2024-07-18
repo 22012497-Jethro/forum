@@ -98,7 +98,7 @@ router.post("/create", upload.single('image'), async (req, res) => {
 });
 
 // Fetch posts endpoint
-router.get('/posts', async (req, res) => {
+router.get('/', async (req, res) => {
     const { page = 1, limit = 10 } = req.query;
     const start = (page - 1) * limit;
     const end = start + limit - 1;
