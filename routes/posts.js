@@ -99,22 +99,38 @@ router.post("/create", upload.single('image'), async (req, res) => {
 
 // Fetch posts endpoint
 router.get('/posts', async (req, res) => {
+    const { page = 1, limit = 10 } = req.query;
+    const start = (page - 1) * limit;
+    const end = start + limit - 1;
+
     try {
-        const { data, error } = await supabase
+        const { data: posts, error } = await supabase
             .from('posts')
-            .select('*, users(username)')
+            .select('id, title, caption, user_id, created_at, category, theme, rooms, room_category, image')
             .order('created_at', { ascending: false })
-            .limit(3);
+            .range(start, end);
 
         if (error) {
-            console.error('Error fetching posts:', error);
             return res.status(500).send('Error fetching posts');
         }
 
-        console.log('Fetched posts:', data); // Debugging line
-        res.json(data);
+        const userIds = posts.map(post => post.user_id);
+        const { data: users, error: userError } = await supabase
+            .from('users')
+            .select('id, username')
+            .in('id', userIds);
+
+        if (userError) {
+            return res.status(500).send('Error fetching users');
+        }
+
+        const postsWithUsernames = posts.map(post => {
+            const user = users.find(user => user.id === post.user_id);
+            return { ...post, username: user ? user.username : 'Unknown' };
+        });
+
+        res.json(postsWithUsernames);
     } catch (error) {
-        console.error('Error fetching posts:', error);
         res.status(500).send('Error fetching posts');
     }
 });

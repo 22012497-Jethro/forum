@@ -36,73 +36,62 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    async function fetchAndDisplayPosts() {
+    async function fetchAndDisplayPosts(page) {
         try {
-            const response = await fetch('/posts');
+            const response = await fetch(`/api/posts?page=${page}&limit=${postsPerPage}`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
             const posts = await response.json();
-            console.log('Fetched posts:', posts); // Debugging line
-            posts.forEach(displayPost);
+            displayPosts(posts);
+            setupPagination(page);
         } catch (error) {
             console.error('Error fetching posts:', error);
         }
     }
 
-    function displayPost(post) {
-        const postElement = document.createElement('div');
-        postElement.classList.add('post');
-        postElement.innerHTML = `
-            <div class="post-header">
-                <img src="${post.image || 'default-profile.png'}" alt="Post Image">
-                <h3>${post.title}</h3>
-                <p>${post.caption}</p>
-            </div>
-            <div class="post-details">
-                <p>Category: ${post.category}</p>
-                <p>Theme: ${post.theme}</p>
-                <p>Rooms: ${post.rooms}</p>
-                <p>Room Category: ${post.room_category}</p>
-                <p>Posted by: ${post.user_id}</p>
-                <p>Created at: ${post.created_at}</p>
-            </div>
-        `;
-        document.getElementById('posts-container').appendChild(postElement);
+    function displayPosts(posts) {
+        const postsContainer = document.getElementById('posts-container');
+        postsContainer.innerHTML = '';
+
+        posts.forEach(post => {
+            const postElement = document.createElement('div');
+            postElement.classList.add('post');
+            postElement.innerHTML = `
+                <div class="post-header">
+                    <img src="${post.image || 'default-profile.png'}" alt="Post Image">
+                    <h3>${post.title}</h3>
+                    <p>${post.caption}</p>
+                </div>
+                <div class="post-details">
+                    <p>Category: ${post.category}</p>
+                    <p>Theme: ${post.theme}</p>
+                    <p>Rooms: ${post.rooms}</p>
+                    <p>Room Category: ${post.room_category}</p>
+                    <p>Posted by: ${post.username}</p>
+                    <p>Created at: ${new Date(post.created_at).toLocaleString()}</p>
+                </div>
+            `;
+            postsContainer.appendChild(postElement);
+        });
     }
 
-    async function addComment(postId) {
-        const commentInput = document.getElementById(`comment-input-${postId}`);
-        const commentText = commentInput.value;
-        if (!commentText) return;
+    function setupPagination(currentPage) {
+        const paginationContainer = document.getElementById('pagination-container');
+        paginationContainer.innerHTML = '';
 
-        try {
-            const response = await fetch(`/posts/${postId}/comments`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ text: commentText }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+        for (let i = 1; i <= 10; i++) { // Adjust the total number of pages as needed
+            const pageButton = document.createElement('button');
+            pageButton.textContent = i;
+            if (i === currentPage) {
+                pageButton.disabled = true;
             }
-
-            const comment = await response.json();
-            const commentsContainer = document.getElementById(`comments-${postId}`);
-            const commentElement = document.createElement('div');
-            commentElement.classList.add('comment');
-            commentElement.textContent = comment.text;
-            commentsContainer.appendChild(commentElement);
-
-            commentInput.value = ''; // Clear the input field
-        } catch (error) {
-            console.error('Error adding comment:', error);
+            pageButton.onclick = () => fetchAndDisplayPosts(i);
+            paginationContainer.appendChild(pageButton);
         }
     }
 
     fetchAndDisplayUserData();
     setupThemeSwitch();
-    fetchAndDisplayPosts();
+    fetchAndDisplayPosts(currentPage);
 });
