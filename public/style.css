@@ -237,6 +237,8 @@ section {
 .post-image {
     max-width: 100%;
     height: auto;
+    max-height: 200px; /* Ensure the image doesn't exceed 200px in height */
+    width: auto; /* Ensure the image doesn't exceed 100% of the container width */
     margin-top: 10px;
 }
 
