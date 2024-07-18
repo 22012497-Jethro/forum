@@ -246,19 +246,11 @@ section {
     color: #333; /* Default text color */
 }
 
-.dark-mode .post-username {
-    color: #fff; /* White text for dark mode */
-}
-
 /* Add styles for post title */
 .post-title {
     margin-top: 10px;
     font-size: 1.5em;
     color: #333; /* Default text color */
-}
-
-.dark-mode .post-title {
-    color: #fff; /* White text for dark mode */
 }
 
 /* Add styles for post image */
