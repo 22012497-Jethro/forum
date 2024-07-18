@@ -242,6 +242,18 @@ section {
     margin-top: 10px;
 }
 
+/* Add styles for post username */
+.post-username {
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+/* Add styles for post title */
+.post-title {
+    margin-top: 10px;
+    font-size: 1.5em;
+}
+
 /* Ensure Recent Posts have distinct style */
 .recent-posts-section {
     text-align: center;
