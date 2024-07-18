@@ -225,6 +225,21 @@ section {
     padding: 2rem;
 }
 
+/* Add styles for creator's profile picture */
+.creator-pfp {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+/* Add styles for post image */
+.post-image {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+}
+
 /* Ensure Recent Posts have distinct style */
 .recent-posts-section {
     text-align: center;
@@ -240,6 +255,8 @@ section {
 
 .post {
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     border: 1px solid #ccc;
     padding: 1rem;
     margin-bottom: 1rem;
@@ -248,15 +265,17 @@ section {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.post img {
-    height: 50px;
-    width: 50px;
-    border-radius: 50%;
-    margin-right: 15px;
+.post-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
 }
 
-.post-details {
-    flex-grow: 1;
+.post-header img {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
 }
 
 .post-details h3 {
