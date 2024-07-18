@@ -234,7 +234,7 @@ section {
 
 #posts-container {
     display: flex;
-    justify-content: center;
+    flex-direction: column; /* Changed to column for vertical stacking */
     gap: 20px;
 }
 

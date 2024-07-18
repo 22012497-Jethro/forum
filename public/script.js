@@ -62,12 +62,12 @@ document.addEventListener('DOMContentLoaded', () => {
             postElement.classList.add('post');
             postElement.innerHTML = `
                 <div class="post-header">
-                    <img src="${post.profile_pic || 'default-profile.png'}" alt="Creator's Profile Picture">
+                    <img src="${post.profile_pic || 'default-profile.png'}" alt="Creator's Profile Picture" class="creator-pfp">
                     <span>${post.username}</span>
                 </div>
                 <div class="post-details">
                     <h3><strong>${post.title}</strong></h3>
-                    ${post.image ? `<img src="${post.image}" alt="Post Image">` : ''}
+                    ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
                     <p>${post.caption}</p>
                 </div>
             `;
