@@ -239,37 +239,59 @@ section {
 }
 
 .post {
+    display: flex;
     border: 1px solid #ccc;
     padding: 1rem;
     margin-bottom: 1rem;
     border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.post-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.post-header img {
-    height: 40px;
+.post img {
+    height: 50px;
+    width: 50px;
     border-radius: 50%;
-    margin-right: 10px;
+    margin-right: 15px;
 }
 
-.comments-section {
-    margin-top: 1rem;
+.post-details {
+    flex-grow: 1;
 }
 
-.comments-container {
-    margin-bottom: 1rem;
+.post-details h3 {
+    margin: 0;
+    font-size: 1.2em;
 }
 
-textarea {
-    width: 100%;
-    padding: 0.5rem;
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
+.post-details p {
+    margin: 0.2em 0;
+    color: #555;
+}
+
+.post-details small {
+    color: #888;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination-container button {
+    padding: 10px 20px;
+    margin: 0 5px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.pagination-container button[disabled] {
+    background-color: #ddd;
+    cursor: not-allowed;
 }
 
 button {
