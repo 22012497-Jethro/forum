@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         postsContainer.innerHTML = '';
     
         posts.forEach(post => {
+            console.log(post); // Log each post for debugging
             const postElement = document.createElement('div');
             postElement.classList.add('post');
             postElement.innerHTML = `

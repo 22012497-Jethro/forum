@@ -225,12 +225,29 @@ section {
     padding: 2rem;
 }
 
+/* Debugging styles */
+.post-header {
+    border: 1px solid red; /* Temporary border for debugging */
+    background-color: #f0f0f0;
+}
+
 /* Add styles for creator's profile picture */
 .creator-pfp {
     height: 40px;
     width: 40px;
     border-radius: 50%;
     margin-right: 10px;
+}
+
+.post-username {
+    border: 1px solid blue; /* Temporary border for debugging */
+    margin-left: 10px;
+}
+
+.post-title {
+    border: 1px solid green; /* Temporary border for debugging */
+    margin-top: 10px;
+    font-size: 1.5em;
 }
 
 /* Add styles for post image */
@@ -240,18 +257,6 @@ section {
     max-height: 200px; /* Ensure the image doesn't exceed 200px in height */
     width: auto; /* Ensure the image doesn't exceed 100% of the container width */
     margin-top: 10px;
-}
-
-/* Add styles for post username */
-.post-username {
-    font-weight: bold;
-    margin-left: 10px;
-}
-
-/* Add styles for post title */
-.post-title {
-    margin-top: 10px;
-    font-size: 1.5em;
 }
 
 /* Ensure Recent Posts have distinct style */

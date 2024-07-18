@@ -133,6 +133,8 @@ router.get('/', async (req, res) => {
             };
         });
 
+        console.log(postsWithUsernames); // Log the fetched data for debugging
+
         res.json(postsWithUsernames);
     } catch (error) {
         res.status(500).send('Error fetching posts');
