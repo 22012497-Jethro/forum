@@ -239,15 +239,26 @@ section {
     margin-right: 10px;
 }
 
+/* Add styles for post username */
 .post-username {
-    border: 1px solid blue; /* Temporary border for debugging */
+    font-weight: bold;
     margin-left: 10px;
+    color: #333; /* Default text color */
 }
 
+.dark-mode .post-username {
+    color: #fff; /* White text for dark mode */
+}
+
+/* Add styles for post title */
 .post-title {
-    border: 1px solid green; /* Temporary border for debugging */
     margin-top: 10px;
     font-size: 1.5em;
+    color: #333; /* Default text color */
+}
+
+.dark-mode .post-title {
+    color: #fff; /* White text for dark mode */
 }
 
 /* Add styles for post image */
