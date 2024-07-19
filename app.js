@@ -27,6 +27,7 @@ app.get("/login", (req, res) => res.sendFile(path.join(__dirname, 'public/login.
 app.get("/signup", (req, res) => res.sendFile(path.join(__dirname, 'public/signup.html')));
 app.get("/main", (req, res) => res.sendFile(path.join(__dirname, 'public/main.html')));
 app.get("/post", (req, res) => res.sendFile(path.join(__dirname, 'public/post.html')));
+app.get("/settings", (req, res) => res.sendFile(path.join(__dirname, 'public/settings.html')));
 
 // Use the posts and users routers
 app.use('/posts', postsRouter);
