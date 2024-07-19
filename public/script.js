@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Signup function
     async function signup(event) {
         event.preventDefault();
 
@@ -24,6 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const username = formData.get('username');
         const email = formData.get('email');
         const password = formData.get('password');
+        const confirmPassword = formData.get('confirm-password');
+
+        if (password !== confirmPassword) {
+            alert('Passwords do not match');
+            return;
+        }
 
         try {
             const response = await fetch('/users/signup', {
