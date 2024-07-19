@@ -84,6 +84,11 @@ document.addEventListener('DOMContentLoaded', () => {
         settingsForm.addEventListener('submit', updateProfile);
         fetchAndDisplayUserProfile();
     }
+
+    // Back to homepage function
+    document.getElementById('back-to-homepage').addEventListener('click', () => {
+        window.location.href = '/main';
+    });
     
     // Navigate to settings page
     function goToSettings() {
