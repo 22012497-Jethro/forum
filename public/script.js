@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         settingsForm.addEventListener('submit', updateProfile);
         fetchAndDisplayUserProfile();
     }
-    
+
     // Fetch user profile data for settings page
     async function fetchAndDisplayUserProfile() {
         try {
@@ -113,8 +113,21 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = '/main';
     }
 
-    document.getElementById('settings-button').addEventListener('click', goToSettings);
-    document.getElementById('back-to-homepage').addEventListener('click', goToHomePage); // Add this line
+    // Ensure the button exists before adding an event listener
+    const backToHomepageButton = document.getElementById('back-to-homepage');
+    if (backToHomepageButton) {
+        backToHomepageButton.addEventListener('click', goToHomePage);
+    }
+
+    const settingsButton = document.getElementById('settings-button');
+    if (settingsButton) {
+        settingsButton.addEventListener('click', goToSettings);
+    }
+
+    const logoutButton = document.getElementById('logout-button');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', logout);
+    }
 
     // Logout function
     async function logout() {
