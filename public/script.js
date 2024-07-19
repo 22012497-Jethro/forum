@@ -192,6 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(post); // Log each post for debugging
             const postElement = document.createElement('div');
             postElement.classList.add('post');
+            postElement.dataset.postId = post.id;
             postElement.innerHTML = `
                 <div class="post-header">
                     <img src="${post.profile_pic || 'default-profile.png'}" alt="Creator's Profile Picture" class="creator-pfp">
@@ -201,6 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h3 class="post-title"><strong>${post.title}</strong></h3>
                     ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
                     <p>${post.caption}</p>
+                    <button class="add-comment-button" onclick="openCommentModal('${post.id}')">Add Comment</button>
                 </div>
             `;
             postsContainer.appendChild(postElement);
@@ -221,6 +223,95 @@ document.addEventListener('DOMContentLoaded', () => {
             paginationContainer.appendChild(pageButton);
         }
     }
+
+    // Function to fetch and display comments for a post
+    async function fetchAndDisplayComments(postId) {
+        try {
+            const response = await fetch(`/comments/${postId}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const comments = await response.json();
+            displayComments(comments);
+        } catch (error) {
+            console.error('Error fetching comments:', error);
+        }
+    }
+
+    // Function to display comments
+    function displayComments(comments) {
+        const commentsList = document.getElementById('comments-list');
+        commentsList.innerHTML = '';
+
+        comments.forEach(comment => {
+            const commentElement = document.createElement('div');
+            commentElement.classList.add('comment');
+            commentElement.innerHTML = `
+                <p><strong>${comment.users.username}</strong>:</p>
+                <p>${comment.comment_text}</p>
+                <p><small>${new Date(comment.created_at).toLocaleString()}</small></p>
+            `;
+            commentsList.appendChild(commentElement);
+        });
+    }
+
+    // Function to handle comment submission
+    async function handleCommentSubmission(event) {
+        event.preventDefault();
+
+        const postId = currentPostId; // Assume currentPostId is set when opening the modal
+        const commentText = document.getElementById('comment-text').value;
+
+        try {
+            const response = await fetch('/comments/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ post_id: postId, comment_text: commentText })
+            });
+
+            if (!response.ok) {
+                throw new Error('Error creating comment');
+            }
+
+            // Fetch and display comments again after adding a new one
+            fetchAndDisplayComments(postId);
+            closeModal(); // Close the modal after submission
+        } catch (error) {
+            console.error('Error creating comment:', error);
+        }
+    }
+
+    // Event listener for opening the comment modal
+    function openCommentModal(postId) {
+        currentPostId = postId; // Set the current post ID
+        document.getElementById('comment-modal').style.display = 'block';
+    }
+
+    // Event listener for closing the modal
+    function closeModal() {
+        document.getElementById('comment-modal').style.display = 'none';
+    }
+
+    // Ensure the modal close button works
+    const closeButton = document.querySelector('.close-button');
+    if (closeButton) {
+        closeButton.addEventListener('click', closeModal);
+    }
+
+    // Ensure the add comment form is handled
+    const addCommentForm = document.getElementById('add-comment-form');
+    if (addCommentForm) {
+        addCommentForm.addEventListener('submit', handleCommentSubmission);
+    }
+
+    // Example function to handle clicking on a post to add a comment
+    document.querySelectorAll('.post').forEach(post => {
+        post.addEventListener('click', () => openCommentModal(post.dataset.postId));
+    });
+
+    let currentPostId;
 
     fetchAndDisplayUserData();
     setupThemeSwitch();
