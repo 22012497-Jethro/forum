@@ -170,9 +170,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentPage = 1;
     const postsPerPage = 10;
 
+    // Fetch and display posts
     async function fetchAndDisplayPosts(page) {
         try {
-            const response = await fetch(`/posts?page=${page}&limit=${postsPerPage}`);
+            const response = await fetch(`/posts?page=${page}&limit=10`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -184,10 +185,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Function to display posts
     function displayPosts(posts) {
         const postsContainer = document.getElementById('posts-container');
         postsContainer.innerHTML = '';
-    
+
         posts.forEach(post => {
             console.log(post); // Log each post for debugging
             const postElement = document.createElement('div');
@@ -203,6 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
                     <p>${post.caption}</p>
                     <button class="add-comment-button" onclick="openCommentModal('${post.id}')">Add Comment</button>
+                    <div class="comments-list" id="comments-list-${post.id}"></div>
                 </div>
             `;
             postsContainer.appendChild(postElement);
@@ -288,6 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Opening modal for post ID:', postId); // Debugging line
         currentPostId = postId; // Set the current post ID
         document.getElementById('comment-modal').style.display = 'block';
+        fetchAndDisplayComments(postId); // Fetch and display comments for the post
     }
 
     // Ensure `openCommentModal` is accessible globally
