@@ -17,6 +17,41 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function signup(event) {
+        event.preventDefault();
+
+        const formData = new FormData(event.target);
+        const username = formData.get('username');
+        const email = formData.get('email');
+        const password = formData.get('password');
+
+        try {
+            const response = await fetch('/users/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, email, password })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText);
+            }
+
+            // Redirect to login page after successful signup
+            window.location.href = '/login';
+        } catch (error) {
+            console.error('Error signing up:', error);
+            alert(error.message); // Display error message to the user
+        }
+    }
+
+    const signupForm = document.getElementById('signup-form');
+    if (signupForm) {
+        signupForm.addEventListener('submit', signup);
+    }
+
     // Logout function
     async function logout() {
         try {

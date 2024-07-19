@@ -8,6 +8,57 @@ const supabaseUrl = 'https://fudsrzbhqpmryvmxgced.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1ZHNyemJocXBtcnl2bXhnY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM5MjE3OTQsImV4cCI6MjAyOTQ5Nzc5NH0.6UMbzoD8J1BQl01h6NSyZAHVhrWerUcD5VVGuBwRcag';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// Signup route
+router.post('/signup', async (req, res) => {
+    const { username, email, password } = req.body;
+
+    try {
+        // Check if username is already taken
+        const { data: usernameData, error: usernameError } = await supabase
+            .from('users')
+            .select('username')
+            .eq('username', username);
+
+        if (usernameError) {
+            return res.status(500).send('Error checking username');
+        }
+
+        if (usernameData.length > 0) {
+            return res.status(400).send('Username is already taken');
+        }
+
+        // Check if email is already taken
+        const { data: emailData, error: emailError } = await supabase
+            .from('users')
+            .select('email')
+            .eq('email', email);
+
+        if (emailError) {
+            return res.status(500).send('Error checking email');
+        }
+
+        if (emailData.length > 0) {
+            return res.status(400).send('Email is already taken');
+        }
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Store the new user in the database
+        const { data: newUser, error: newUserError } = await supabase
+            .from('users')
+            .insert([{ username, email, password: hashedPassword }]);
+
+        if (newUserError) {
+            return res.status(500).send('Error creating user');
+        }
+
+        res.status(201).send('User created successfully');
+    } catch (error) {
+        res.status(500).send('Internal server error');
+    }
+});
+
 // Login endpoint
 router.post("/login", async (req, res) => {
     const { email, password } = req.body;
