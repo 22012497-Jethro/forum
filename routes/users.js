@@ -18,7 +18,7 @@ router.post('/signup', async (req, res) => {
 
     try {
         // Create user using Supabase Auth
-        const { user, error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
             email: email,
             password: password
         });
@@ -28,7 +28,13 @@ router.post('/signup', async (req, res) => {
             return res.status(500).json({ message: `Error creating user with Supabase Auth: ${error.message}` });
         }
 
-        console.log('User created with Supabase Auth:', user);
+        console.log('Response from Supabase Auth:', data);
+
+        if (!data.user) {
+            return res.status(500).json({ message: 'User creation with Supabase Auth failed.' });
+        }
+
+        const user = data.user;
 
         // Store additional user data in the 'users' table
         const { data: newUser, error: newUserError } = await supabase
