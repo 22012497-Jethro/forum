@@ -17,6 +17,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Logout function
+    async function logout() {
+        try {
+            const response = await fetch('/users/logout', {
+                method: 'POST',
+                credentials: 'same-origin'
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            // Redirect to login page after logout
+            window.location.href = '/login';
+        } catch (error) {
+            console.error('Error logging out:', error);
+        }
+    }
+
+    document.getElementById('logout-button').addEventListener('click', logout);
+
     // Theme switch functions
     function applyTheme(theme) {
         document.body.className = theme;

@@ -96,4 +96,14 @@ router.get("/post-profile", async (req, res) => {
     }
 });
 
+router.post('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).send('Error logging out');
+        }
+        res.clearCookie('connect.sid'); // Clear the session cookie
+        res.sendStatus(200);
+    });
+});
+
 module.exports = router;
