@@ -59,6 +59,39 @@ document.addEventListener('DOMContentLoaded', () => {
         signupForm.addEventListener('submit', signup);
     }
 
+     // Update profile function
+     async function updateProfile(event) {
+        event.preventDefault();
+
+        const formData = new FormData(event.target);
+        const response = await fetch('/users/update-profile', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            alert(errorData.message);
+            return;
+        }
+
+        alert('Profile updated successfully');
+        window.location.reload();
+    }
+
+    const settingsForm = document.getElementById('settings-form');
+    if (settingsForm) {
+        settingsForm.addEventListener('submit', updateProfile);
+        fetchAndDisplayUserProfile();
+    }
+    
+    // Navigate to settings page
+    function goToSettings() {
+        window.location.href = '/settings';
+    }
+
+    document.getElementById('settings-button').addEventListener('click', goToSettings);
+
     // Logout function
     async function logout() {
         try {

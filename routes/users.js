@@ -12,6 +12,10 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const defaultProfilePicture = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
 const defaultRole = 'User';
 
+// Configure multer for profile picture uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
 // Signup route
 router.post('/signup', async (req, res) => {
     const { username, email, password } = req.body;
@@ -122,6 +126,100 @@ router.get("/user-profile", async (req, res) => {
         console.error("Error during fetching user profile:", err);
         res.status(500).send("Internal server error");
     }
+});
+
+// Update user profile route
+router.post('/update-profile', upload.single('pfp'), async (req, res) => {
+    const { username, email, password } = req.body;
+    const userId = req.session.userId; // Assuming you store user ID in the session
+    let updatedFields = {};
+
+    // Check if username is provided
+    if (username) {
+        // Check if username is already taken
+        const { data: usernameData, error: usernameError } = await supabase
+            .from('users')
+            .select('username')
+            .eq('username', username);
+
+        if (usernameError) {
+            return res.status(500).json({ message: 'Error checking username' });
+        }
+
+        if (usernameData.length > 0 && usernameData[0].id !== userId) {
+            return res.status(400).json({ message: 'Username is already taken' });
+        }
+
+        updatedFields.username = username;
+    }
+
+    // Check if email is provided
+    if (email) {
+        // Check if email is already taken
+        const { data: emailData, error: emailError } = await supabase
+            .from('users')
+            .select('email')
+            .eq('email', email);
+
+        if (emailError) {
+            return res.status(500).json({ message: 'Error checking email' });
+        }
+
+        if (emailData.length > 0 && emailData[0].id !== userId) {
+            return res.status(400).json({ message: 'Email is already taken' });
+        }
+
+        updatedFields.email = email;
+    }
+
+    // Check if password is provided
+    if (password) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        updatedFields.password = hashedPassword;
+    }
+
+    // Check if profile picture is provided
+    if (req.file) {
+        try {
+            const uploadPath = `user profile/pfp/${Date.now()}-${req.file.originalname}`;
+            const uploadResponse = await supabase
+                .storage
+                .from('user profile')
+                .upload(uploadPath, req.file.buffer, {
+                    cacheControl: '3600',
+                    upsert: false,
+                });
+
+            if (uploadResponse.error) {
+                return res.status(500).json({ message: 'Error uploading profile picture' });
+            }
+
+            const publicUrlResponse = supabase
+                .storage
+                .from('user profile')
+                .getPublicUrl(uploadPath);
+
+            if (publicUrlResponse.error) {
+                return res.status(500).json({ message: 'Error generating profile picture URL' });
+            }
+
+            updatedFields.pfp = publicUrlResponse.data.publicUrl;
+        } catch (error) {
+            return res.status(500).json({ message: 'Error uploading profile picture' });
+        }
+    }
+
+    // Update user data in Supabase
+    const { data, error } = await supabase
+        .from('users')
+        .update(updatedFields)
+        .eq('id', userId);
+
+    if (error) {
+        return res.status(500).json({ message: 'Error updating profile' });
+    }
+
+    res.status(200).json({ message: 'Profile updated successfully' });
 });
 
 router.get("/post-profile", async (req, res) => {
