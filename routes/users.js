@@ -25,7 +25,7 @@ router.post('/signup', async (req, res) => {
 
         if (error) {
             console.error('Error creating user with Supabase Auth:', error.message);
-            return res.status(500).json({ message: 'Error creating user with Supabase Auth' });
+            return res.status(500).json({ message: `Error creating user with Supabase Auth: ${error.message}` });
         }
 
         // Store additional user data in the 'users' table
@@ -42,13 +42,13 @@ router.post('/signup', async (req, res) => {
 
         if (newUserError) {
             console.error('Error creating user in users table:', newUserError.message);
-            return res.status(500).json({ message: 'Error creating user in users table' });
+            return res.status(500).json({ message: `Error creating user in users table: ${newUserError.message}` });
         }
 
         res.status(201).json({ message: 'User created successfully' });
     } catch (error) {
         console.error('Internal server error:', error.message);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: `Internal server error: ${error.message}` });
     }
 });
 
