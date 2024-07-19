@@ -131,7 +131,7 @@ router.get("/user-profile", async (req, res) => {
 
 // Update user profile route
 router.post('/update-profile', upload.single('pfp'), async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email } = req.body;
     const userId = req.session.userId; // Assuming you store user ID in the session
     let updatedFields = {};
 
@@ -171,12 +171,6 @@ router.post('/update-profile', upload.single('pfp'), async (req, res) => {
         }
 
         updatedFields.email = email;
-    }
-
-    // Check if password is provided
-    if (password) {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        updatedFields.password = hashedPassword;
     }
 
     // Check if profile picture is provided

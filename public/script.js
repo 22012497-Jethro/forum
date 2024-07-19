@@ -59,8 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
         signupForm.addEventListener('submit', signup);
     }
 
-     // Update profile function
-     async function updateProfile(event) {
+    // Update profile function
+    async function updateProfile(event) {
         event.preventDefault();
 
         const formData = new FormData(event.target);
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         alert('Profile updated successfully');
-        window.location.reload();
+        window.location.href = '/main'; // Redirect to main page after successful update
     }
 
     const settingsForm = document.getElementById('settings-form');
