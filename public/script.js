@@ -191,10 +191,8 @@ document.addEventListener('DOMContentLoaded', () => {
         postsContainer.innerHTML = '';
 
         posts.forEach(post => {
-            console.log(post); // Log each post for debugging
             const postElement = document.createElement('div');
             postElement.classList.add('post');
-            postElement.dataset.postId = post.id;
             postElement.innerHTML = `
                 <div class="post-header">
                     <img src="${post.profile_pic || 'default-profile.png'}" alt="Creator's Profile Picture" class="creator-pfp">
@@ -227,7 +225,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Function to fetch and display comments for a post
+    let currentPostId;
+
     async function fetchAndDisplayComments(postId) {
         try {
             const response = await fetch(`/comments/${postId}`);
@@ -235,15 +234,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('Network response was not ok');
             }
             const comments = await response.json();
-            displayComments(comments);
+            displayComments(comments, postId);
         } catch (error) {
             console.error('Error fetching comments:', error);
         }
     }
 
-    // Function to display comments
-    function displayComments(comments) {
-        const commentsList = document.getElementById('comments-list');
+    function displayComments(comments, postId) {
+        const commentsList = document.getElementById(`comments-list-${postId}`);
         commentsList.innerHTML = '';
 
         comments.forEach(comment => {
@@ -257,7 +255,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Function to handle comment submission
     async function handleCommentSubmission(event) {
         event.preventDefault();
 
@@ -276,36 +273,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('Error creating comment');
             }
 
-            // Fetch and display comments again after adding a new one
             fetchAndDisplayComments(currentPostId);
-            closeModal(); // Close the modal after submission
+            closeModal();
         } catch (error) {
             console.error('Error creating comment:', error);
         }
     }
 
-    // Event listener for opening the comment modal
     function openCommentModal(postId) {
         currentPostId = postId;
         document.getElementById('comment-modal').style.display = 'block';
         fetchAndDisplayComments(postId);
     }
 
-    // Ensure `openCommentModal` is accessible globally
     window.openCommentModal = openCommentModal;
 
-    // Event listener for closing the modal
     function closeModal() {
         document.getElementById('comment-modal').style.display = 'none';
     }
 
-    // Ensure the modal close button works
     const closeButton = document.querySelector('.close-button');
     if (closeButton) {
         closeButton.addEventListener('click', closeModal);
     }
 
-    // Ensure the add comment form is handled
     const addCommentForm = document.getElementById('add-comment-form');
     if (addCommentForm) {
         addCommentForm.addEventListener('submit', handleCommentSubmission);
