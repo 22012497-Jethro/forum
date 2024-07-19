@@ -38,12 +38,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ username, email, password })
+                body: JSON.stringify({ username, email, password, confirmPassword })
             });
 
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText);
+                const errorData = await response.json();
+                throw new Error(errorData.message);
             }
 
             // Redirect to login page after successful signup

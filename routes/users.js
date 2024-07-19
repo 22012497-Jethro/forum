@@ -9,8 +9,13 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Signup route
+// Signup route
 router.post('/signup', async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email, password, confirmPassword } = req.body;
+
+    if (password !== confirmPassword) {
+        return res.status(400).json({ message: 'Passwords do not match' });
+    }
 
     try {
         // Check if username is already taken
@@ -20,11 +25,11 @@ router.post('/signup', async (req, res) => {
             .eq('username', username);
 
         if (usernameError) {
-            return res.status(500).send('Error checking username');
+            return res.status(500).json({ message: 'Error checking username' });
         }
 
         if (usernameData.length > 0) {
-            return res.status(400).send('Username is already taken');
+            return res.status(400).json({ message: 'Username is already taken' });
         }
 
         // Check if email is already taken
@@ -34,11 +39,11 @@ router.post('/signup', async (req, res) => {
             .eq('email', email);
 
         if (emailError) {
-            return res.status(500).send('Error checking email');
+            return res.status(500).json({ message: 'Error checking email' });
         }
 
         if (emailData.length > 0) {
-            return res.status(400).send('Email is already taken');
+            return res.status(400).json({ message: 'Email is already taken' });
         }
 
         // Hash the password
@@ -50,12 +55,12 @@ router.post('/signup', async (req, res) => {
             .insert([{ username, email, password: hashedPassword }]);
 
         if (newUserError) {
-            return res.status(500).send('Error creating user');
+            return res.status(500).json({ message: 'Error creating user' });
         }
 
-        res.status(201).send('User created successfully');
+        res.status(201).json({ message: 'User created successfully' });
     } catch (error) {
-        res.status(500).send('Internal server error');
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
