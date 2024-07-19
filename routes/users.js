@@ -1,5 +1,4 @@
 const express = require("express");
-const bcrypt = require('bcrypt');
 const { createClient } = require('@supabase/supabase-js');
 
 const router = express.Router();
@@ -15,62 +14,40 @@ const defaultRole = 'User';
 
 // Signup route
 router.post('/signup', async (req, res) => {
-    const { username, email, password, confirmPassword } = req.body;
-
-    if (password !== confirmPassword) {
-        return res.status(400).json({ message: 'Passwords do not match' });
-    }
+    const { username, email, password } = req.body;
 
     try {
-        // Check if username is already taken
-        const { data: usernameData, error: usernameError } = await supabase
-            .from('users')
-            .select('username')
-            .eq('username', username);
+        // Create user using Supabase Auth
+        const { user, error } = await supabase.auth.signUp({
+            email: email,
+            password: password
+        });
 
-        if (usernameError) {
-            return res.status(500).json({ message: 'Error checking username' });
+        if (error) {
+            console.error('Error creating user with Supabase Auth:', error.message);
+            return res.status(500).json({ message: 'Error creating user with Supabase Auth' });
         }
 
-        if (usernameData.length > 0) {
-            return res.status(400).json({ message: 'Username is already taken' });
-        }
-
-        // Check if email is already taken
-        const { data: emailData, error: emailError } = await supabase
-            .from('users')
-            .select('email')
-            .eq('email', email);
-
-        if (emailError) {
-            return res.status(500).json({ message: 'Error checking email' });
-        }
-
-        if (emailData.length > 0) {
-            return res.status(400).json({ message: 'Email is already taken' });
-        }
-
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Store the new user in the database
+        // Store additional user data in the 'users' table
         const { data: newUser, error: newUserError } = await supabase
             .from('users')
             .insert([{
+                id: user.id, // Store the Supabase Auth user ID
                 username,
                 email,
-                password: hashedPassword,
                 pfp: defaultProfilePicture,
                 roles: defaultRole,
                 created_at: new Date().toISOString()
             }]);
 
         if (newUserError) {
-            return res.status(500).json({ message: 'Error creating user' });
+            console.error('Error creating user in users table:', newUserError.message);
+            return res.status(500).json({ message: 'Error creating user in users table' });
         }
 
         res.status(201).json({ message: 'User created successfully' });
     } catch (error) {
+        console.error('Internal server error:', error.message);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
