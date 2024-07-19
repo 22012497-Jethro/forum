@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Update profile function
-     async function updateProfile(event) {
+    async function updateProfile(event) {
         event.preventDefault();
 
         const formData = new FormData(event.target);
@@ -108,8 +108,14 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = '/settings';
     }
 
+    // Back to homepage function
+    function goToHomePage() {
+        window.location.href = '/main';
+    }
+
     document.getElementById('settings-button').addEventListener('click', goToSettings);
-    
+    document.getElementById('back-to-homepage').addEventListener('click', goToHomePage); // Add this line
+
     // Logout function
     async function logout() {
         try {
