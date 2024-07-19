@@ -9,6 +9,10 @@ const supabaseUrl = 'https://fudsrzbhqpmryvmxgced.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1ZHNyemJocXBtcnl2bXhnY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM5MjE3OTQsImV4cCI6MjAyOTQ5Nzc5NH0.6UMbzoD8J1BQl01h6NSyZAHVhrWerUcD5VVGuBwRcag';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// Default values
+const defaultProfilePicture = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
+const defaultRole = 'User';
+
 // Signup route
 router.post('/signup', async (req, res) => {
     const { username, email, password, confirmPassword } = req.body;
@@ -52,7 +56,14 @@ router.post('/signup', async (req, res) => {
         // Store the new user in the database
         const { data: newUser, error: newUserError } = await supabase
             .from('users')
-            .insert([{ username, email, password: hashedPassword }]);
+            .insert([{
+                username,
+                email,
+                password: hashedPassword,
+                pfp: defaultProfilePicture,
+                roles: defaultRole,
+                created_at: new Date().toISOString()
+            }]);
 
         if (newUserError) {
             return res.status(500).json({ message: 'Error creating user' });
