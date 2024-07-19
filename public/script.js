@@ -285,9 +285,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event listener for opening the comment modal
     function openCommentModal(postId) {
+        console.log('Opening modal for post ID:', postId); // Debugging line
         currentPostId = postId; // Set the current post ID
         document.getElementById('comment-modal').style.display = 'block';
     }
+
+    // Ensure `openCommentModal` is accessible globally
+    window.openCommentModal = openCommentModal;
 
     // Event listener for closing the modal
     function closeModal() {
@@ -305,11 +309,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (addCommentForm) {
         addCommentForm.addEventListener('submit', handleCommentSubmission);
     }
-
-    // Example function to handle clicking on a post to add a comment
-    document.querySelectorAll('.post').forEach(post => {
-        post.addEventListener('click', () => openCommentModal(post.dataset.postId));
-    });
 
     let currentPostId;
 
