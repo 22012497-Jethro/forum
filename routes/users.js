@@ -28,6 +28,8 @@ router.post('/signup', async (req, res) => {
             return res.status(500).json({ message: `Error creating user with Supabase Auth: ${error.message}` });
         }
 
+        console.log('User created with Supabase Auth:', user);
+
         // Store additional user data in the 'users' table
         const { data: newUser, error: newUserError } = await supabase
             .from('users')
@@ -44,6 +46,8 @@ router.post('/signup', async (req, res) => {
             console.error('Error creating user in users table:', newUserError.message);
             return res.status(500).json({ message: `Error creating user in users table: ${newUserError.message}` });
         }
+
+        console.log('User saved in users table:', newUser);
 
         res.status(201).json({ message: 'User created successfully' });
     } catch (error) {
