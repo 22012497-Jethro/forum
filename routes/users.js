@@ -182,7 +182,7 @@ router.post('/update-profile', upload.single('pfp'), async (req, res) => {
     // Check if profile picture is provided
     if (req.file) {
         try {
-            const uploadPath = `user profile/pfp/${Date.now()}-${req.file.originalname}`;
+            const uploadPath = `pfp/${Date.now()}-${req.file.originalname}`;
             const uploadResponse = await supabase
                 .storage
                 .from('user profile')
