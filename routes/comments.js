@@ -33,6 +33,7 @@ router.post('/create', async (req, res) => {
 
         res.status(200).json(data);
     } catch (error) {
+        console.error('Error creating comment:', error);
         res.status(500).send('Error creating comment');
     }
 });
@@ -52,6 +53,7 @@ router.get('/:post_id', async (req, res) => {
 
         res.status(200).json(data);
     } catch (error) {
+        console.error('Error fetching comments:', error);
         res.status(500).send('Error fetching comments');
     }
 });

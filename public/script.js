@@ -250,8 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const commentElement = document.createElement('div');
             commentElement.classList.add('comment');
             commentElement.innerHTML = `
-                <p><strong>${comment.users.username}</strong>:</p>
-                <p>${comment.comment_text}</p>
+                <p><strong>${comment.users.username}</strong>: ${comment.comment_text}</p>
                 <p><small>${new Date(comment.created_at).toLocaleString()}</small></p>
             `;
             commentsList.appendChild(commentElement);
@@ -262,7 +261,6 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handleCommentSubmission(event) {
         event.preventDefault();
 
-        const postId = currentPostId; // Assume currentPostId is set when opening the modal
         const commentText = document.getElementById('comment-text').value;
 
         try {
@@ -271,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ post_id: postId, comment_text: commentText })
+                body: JSON.stringify({ post_id: currentPostId, comment_text: commentText })
             });
 
             if (!response.ok) {
@@ -279,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Fetch and display comments again after adding a new one
-            fetchAndDisplayComments(postId);
+            fetchAndDisplayComments(currentPostId);
             closeModal(); // Close the modal after submission
         } catch (error) {
             console.error('Error creating comment:', error);
@@ -288,10 +286,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event listener for opening the comment modal
     function openCommentModal(postId) {
-        console.log('Opening modal for post ID:', postId); // Debugging line
-        currentPostId = postId; // Set the current post ID
+        currentPostId = postId;
         document.getElementById('comment-modal').style.display = 'block';
-        fetchAndDisplayComments(postId); // Fetch and display comments for the post
+        fetchAndDisplayComments(postId);
     }
 
     // Ensure `openCommentModal` is accessible globally
@@ -313,8 +310,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (addCommentForm) {
         addCommentForm.addEventListener('submit', handleCommentSubmission);
     }
-
-    let currentPostId;
 
     fetchAndDisplayUserData();
     setupThemeSwitch();
