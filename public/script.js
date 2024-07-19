@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Update profile function
-    async function updateProfile(event) {
+     async function updateProfile(event) {
         event.preventDefault();
 
         const formData = new FormData(event.target);
@@ -85,18 +85,31 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchAndDisplayUserProfile();
     }
     
+    // Fetch user profile data for settings page
+    async function fetchAndDisplayUserProfile() {
+        try {
+            const response = await fetch('/users/profile');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const profile = await response.json();
+            console.log('Fetched user profile:', profile); // Debugging line
+            if (profile) {
+                document.getElementById('username').value = profile.username;
+                document.getElementById('email').value = profile.email;
+            }
+        } catch (error) {
+            console.error('Error fetching user profile:', error);
+        }
+    }
+
     // Navigate to settings page
     function goToSettings() {
         window.location.href = '/settings';
     }
 
-    // Back to homepage function
-    document.getElementById('back-to-homepage').addEventListener('click', () => {
-        window.location.href = '/main';
-    });
-
     document.getElementById('settings-button').addEventListener('click', goToSettings);
-
+    
     // Logout function
     async function logout() {
         try {
