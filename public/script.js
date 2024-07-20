@@ -320,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     const postId = window.location.pathname.split('/').pop();
-    
+
     fetchAndDisplayUserData();
     setupThemeSwitch();
     fetchAndDisplayPosts(1);
