@@ -170,6 +170,40 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentPage = 1;
     const postsPerPage = 10;
 
+    async function fetchAndDisplayPost(postId) {
+        try {
+            const response = await fetch(`/posts/${postId}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const post = await response.json();
+            displayPost(post);
+            fetchAndDisplayComments(postId);
+        } catch (error) {
+            console.error('Error fetching post:', error);
+        }
+    }
+
+    function displayPost(post) {
+        const postContainer = document.getElementById('post-container');
+        postContainer.innerHTML = '';
+
+        const postElement = document.createElement('div');
+        postElement.classList.add('post');
+        postElement.innerHTML = `
+            <div class="post-header">
+                <img src="${post.profile_pic || 'default-profile.png'}" alt="Creator's Profile Picture" class="creator-pfp">
+                <span class="post-username">${post.username}</span>
+            </div>
+            <div class="post-details">
+                <h3 class="post-title"><strong>${post.title}</strong></h3>
+                ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
+                <p>${post.caption}</p>
+            </div>
+        `;
+        postContainer.appendChild(postElement);
+    }
+
     // Fetch and display posts
     async function fetchAndDisplayPosts(page) {
         try {
@@ -234,24 +268,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('Network response was not ok');
             }
             const comments = await response.json();
-            displayComments(comments, postId);
+            displayComments(comments);
         } catch (error) {
             console.error('Error fetching comments:', error);
         }
     }
 
-    function displayComments(comments, postId) {
-        const commentsList = document.getElementById(`comments-list-${postId}`);
-        commentsList.innerHTML = '';
+    function displayComments(comments) {
+        const commentsContainer = document.getElementById('comments-container');
+        commentsContainer.innerHTML = '';
 
         comments.forEach(comment => {
             const commentElement = document.createElement('div');
             commentElement.classList.add('comment');
             commentElement.innerHTML = `
-                <p><strong>${comment.users.username}</strong>: ${comment.comment_text}</p>
+                <p><strong>${comment.username}</strong>: ${comment.comment_text}</p>
                 <p><small>${new Date(comment.created_at).toLocaleString()}</small></p>
             `;
-            commentsList.appendChild(commentElement);
+            commentsContainer.appendChild(commentElement);
         });
     }
 
@@ -259,6 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
         event.preventDefault();
 
         const commentText = document.getElementById('comment-text').value;
+        const postId = window.location.pathname.split('/').pop();
 
         try {
             const response = await fetch('/comments/create', {
@@ -266,35 +301,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ post_id: currentPostId, comment_text: commentText })
+                body: JSON.stringify({ post_id: postId, comment_text: commentText })
             });
 
             if (!response.ok) {
                 throw new Error('Error creating comment');
             }
 
-            fetchAndDisplayComments(currentPostId);
-            closeModal();
+            fetchAndDisplayComments(postId);
+            document.getElementById('comment-text').value = '';
         } catch (error) {
             console.error('Error creating comment:', error);
         }
-    }
-
-    function openCommentModal(postId) {
-        currentPostId = postId;
-        document.getElementById('comment-modal').style.display = 'block';
-        fetchAndDisplayComments(postId);
-    }
-
-    window.openCommentModal = openCommentModal;
-
-    function closeModal() {
-        document.getElementById('comment-modal').style.display = 'none';
-    }
-
-    const closeButton = document.querySelector('.close-button');
-    if (closeButton) {
-        closeButton.addEventListener('click', closeModal);
     }
 
     const addCommentForm = document.getElementById('add-comment-form');
@@ -302,8 +320,10 @@ document.addEventListener('DOMContentLoaded', () => {
         addCommentForm.addEventListener('submit', handleCommentSubmission);
     }
 
+    const postId = window.location.pathname.split('/').pop();
+
     fetchAndDisplayUserData();
     setupThemeSwitch();
-    fetchAndDisplayPosts(currentPage);
+    fetchAndDisplayPosts(1);
 
 });

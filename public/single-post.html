@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Post Details</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <nav>
+        <div class="nav-left">
+            <img src="logo-dark.png" alt="ReVibe Logo" id="nav-logo">
+            <h1>ReVibe Forum</h1>
+        </div>
+        <div class="nav-right">
+            <a href="/main"><button id="home-button">Home</button></a>
+            <div class="dropdown">
+                <img src="default-profile.png" alt="Profile Picture" id="profile-pic">
+                <span id="profile-username">Username</span>
+                <div class="dropdown-content">
+                    <p id="settings-button">Settings</p>
+                    <p id="logout-button">Logout</p>
+                </div>
+            </div>
+            <button id="theme-switch">Switch Theme</button>
+        </div>
+    </nav>
+    <section>
+        <div id="post-container" class="post-container">
+            <!-- Post details will be displayed here -->
+        </div>
+        <div id="comments-container" class="comments-container">
+            <!-- Comments will be displayed here -->
+        </div>
+        <div id="add-comment-container">
+            <h3>Add a Comment</h3>
+            <form id="add-comment-form">
+                <textarea id="comment-text" placeholder="Type your comment here..." required></textarea>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </section>
+</body>
+</html>
