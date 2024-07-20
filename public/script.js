@@ -221,7 +221,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Fetch and display a single post
+    let currentPage = 1;
+    const postsPerPage = 10;
+
     async function fetchAndDisplayPost(postId) {
         try {
             const response = await fetch(`/posts/${postId}`);
@@ -236,7 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Display single post
     function displayPost(post) {
         const postContainer = document.getElementById('post-container');
         postContainer.innerHTML = '';
@@ -257,7 +258,61 @@ document.addEventListener('DOMContentLoaded', () => {
         postContainer.appendChild(postElement);
     }
 
-    // Fetch and display comments
+    async function fetchAndDisplayPosts(page) {
+        try {
+            const response = await fetch(`/posts?page=${page}&limit=10`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const posts = await response.json();
+            displayPosts(posts);
+            setupPagination(page);
+        } catch (error) {
+            console.error('Error fetching posts:', error);
+        }
+    }
+
+    function displayPosts(posts) {
+        const postsContainer = document.getElementById('posts-container');
+        postsContainer.innerHTML = '';
+
+        posts.forEach(post => {
+            const postElement = document.createElement('div');
+            postElement.classList.add('post');
+            postElement.innerHTML = `
+                <div class="post-header">
+                    <img src="${post.profile_pic || 'default-profile.png'}" alt="Creator's Profile Picture" class="creator-pfp">
+                    <span class="post-username">${post.username}</span>
+                </div>
+                <div class="post-details">
+                    <h3 class="post-title"><strong>${post.title}</strong></h3>
+                    ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
+                    <p>${post.caption}</p>
+                    <button class="add-comment-button" onclick="openCommentModal('${post.id}')">Add Comment</button>
+                    <div class="comments-list" id="comments-list-${post.id}"></div>
+                </div>
+            `;
+            postsContainer.appendChild(postElement);
+        });
+    }
+
+    function setupPagination(currentPage) {
+        const paginationContainer = document.getElementById('pagination-container');
+        paginationContainer.innerHTML = '';
+
+        for (let i = 1; i <= 10; i++) { // Adjust the total number of pages as needed
+            const pageButton = document.createElement('button');
+            pageButton.textContent = i;
+            if (i === currentPage) {
+                pageButton.disabled = true;
+            }
+            pageButton.onclick = () => fetchAndDisplayPosts(i);
+            paginationContainer.appendChild(pageButton);
+        }
+    }
+
+    let currentPostId;
+
     async function fetchAndDisplayComments(postId) {
         try {
             const response = await fetch(`/comments/${postId}`);
@@ -265,15 +320,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('Network response was not ok');
             }
             const comments = await response.json();
-            displayComments(comments);
+            displayComments(comments, postId);
         } catch (error) {
             console.error('Error fetching comments:', error);
         }
     }
 
-    // Display comments
-    function displayComments(comments) {
-        const commentsContainer = document.getElementById('comments-container');
+    function displayComments(comments, postId) {
+        const commentsContainer = document.getElementById(`comments-list-${postId}`);
         commentsContainer.innerHTML = '';
 
         comments.forEach(comment => {
@@ -287,12 +341,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Handle comment submission
     async function handleCommentSubmission(event) {
         event.preventDefault();
 
         const commentText = document.getElementById('comment-text').value;
-        const postId = window.location.pathname.split('/').pop();
+        const postId = currentPostId;
 
         try {
             const response = await fetch('/comments/create', {
@@ -309,6 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             fetchAndDisplayComments(postId);
             document.getElementById('comment-text').value = '';
+            closeModal();
         } catch (error) {
             console.error('Error creating comment:', error);
         }
@@ -318,7 +372,26 @@ document.addEventListener('DOMContentLoaded', () => {
     if (addCommentForm) {
         addCommentForm.addEventListener('submit', handleCommentSubmission);
     }
-    
+
+    const commentModal = document.getElementById('comment-modal');
+    const closeModalButton = document.querySelector('.close-button');
+
+    function openCommentModal(postId) {
+        currentPostId = postId;
+        commentModal.style.display = 'block';
+    }
+
+    function closeModal() {
+        commentModal.style.display = 'none';
+    }
+
+    closeModalButton.addEventListener('click', closeModal);
+    window.addEventListener('click', (event) => {
+        if (event.target == commentModal) {
+            closeModal();
+        }
+    });
+
     const postId = window.location.pathname.split('/').pop();
 
     fetchAndDisplayUserData();

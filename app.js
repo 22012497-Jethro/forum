@@ -33,6 +33,7 @@ app.get("/posts/:id", (req, res) => res.sendFile(path.join(__dirname, 'public/si
 // Use the posts and users routers
 app.use('/posts', postsRouter);
 app.use('/users', usersRouter);
+app.use('/comments', commentsRouter);
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
