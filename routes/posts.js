@@ -3,6 +3,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const { createClient } = require("@supabase/supabase-js");
+const { deleteImage, uploadImage } = require('../helpers');
 
 const router = express.Router();
 
@@ -128,6 +129,59 @@ router.delete('/:postId', authenticateUser, async (req, res) => {
     } catch (error) {
         res.status(500).send('Error deleting post');
     }
+});
+
+// Fetch post data
+router.get('/:id', async (req, res) => {
+    const postId = req.params.id;
+
+    try {
+        const { data: post, error } = await supabase
+            .from('posts')
+            .select('*')
+            .eq('id', postId)
+            .single();
+
+        if (error) {
+            return res.status(500).send('Error fetching post data');
+        }
+
+        res.json(post);
+    } catch (error) {
+        console.error('Error fetching post data:', error);
+        res.status(500).send('Error fetching post data');
+    }
+});
+
+// Update a post
+router.post('/:id/edit', upload.single('image'), async (req, res) => {
+    const { id } = req.params;
+    const { title, caption } = req.body;
+    let image_url = req.body.image_url;
+
+    if (req.file) {
+        // Delete the old image if a new one is uploaded
+        if (image_url) {
+            await deleteImage(image_url);
+        }
+        // Upload new image
+        const { path, error } = await uploadImage(req.file);
+        if (error) {
+            return res.status(500).json({ message: 'Error uploading image' });
+        }
+        image_url = path;
+    }
+
+    const { data, error } = await supabase
+        .from('posts')
+        .update({ title, caption, image: image_url })
+        .eq('id', id);
+
+    if (error) {
+        return res.status(500).json({ message: 'Error updating post' });
+    }
+
+    res.json(data);
 });
 
 // Fetch posts endpoint
