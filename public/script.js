@@ -132,7 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const posts = await response.json();
             displayPosts(posts);
-            setupPagination(page);
         } catch (error) {
             console.error('Error fetching posts:', error);
         }
@@ -152,8 +151,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function displayPosts(posts, containerId = 'posts-container') {
-        const postsContainer = document.getElementById(containerId);
+    function displayPosts(posts) {
+        const postsContainer = document.getElementById('posts-container');
         postsContainer.innerHTML = '';
 
         posts.forEach(post => {
@@ -169,6 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
                     <p>${post.caption}</p>
                     <button class="add-comment-button" onclick="openCommentModal('${post.id}')">Add Comment</button>
+                    <div class="comments-list" id="comments-list-${post.id}"></div>
                 </div>
             `;
             postsContainer.appendChild(postElement);
@@ -292,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Comment cannot be empty');
                 return;
             }
-    
+
             try {
                 const response = await fetch('/comments/create', {
                     method: 'POST',
@@ -301,11 +301,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     body: JSON.stringify({ post_id: postId, comment_text: commentText })
                 });
-    
+
                 if (!response.ok) {
                     throw new Error('Error creating comment');
                 }
-    
+
                 const commentsContainer = document.getElementById(`comments-list-${postId}`);
                 const comment = await response.json();
                 const commentElement = document.createElement('div');
@@ -322,6 +322,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
     }
+
+    document.querySelector('.close-button').addEventListener('click', () => {
+        document.getElementById('comment-modal').style.display = 'none';
+    });
 
     function setupPagination(currentPage) {
         const paginationContainer = document.getElementById('pagination-container');
