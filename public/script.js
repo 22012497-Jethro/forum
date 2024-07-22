@@ -132,6 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const posts = await response.json();
             displayPosts(posts);
+            setupPagination(page);
         } catch (error) {
             console.error('Error fetching posts:', error);
         }
@@ -172,13 +173,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             postsContainer.appendChild(postElement);
+            fetchAndDisplayComments(post.id);
         });
     }
 
     function displayUserPosts(posts) {
         const userPostsContainer = document.getElementById('user-posts-container');
         userPostsContainer.innerHTML = '';
-
+    
         posts.forEach(post => {
             const postElement = document.createElement('div');
             postElement.classList.add('post');
@@ -188,12 +190,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
                     <p>${post.caption}</p>
                     <p><small>Created at: ${new Date(post.created_at).toLocaleString()}</small></p>
+                    <button class="edit-post-button" onclick="window.location.href='/edit.html?id=${post.id}'">Edit Post</button>
                     <button class="delete-post-button" data-post-id="${post.id}" data-image-url="${post.image}">Delete Post</button>
                 </div>
             `;
             userPostsContainer.appendChild(postElement);
         });
-
+    
         // Attach event listeners to delete buttons
         const deleteButtons = document.querySelectorAll('.delete-post-button');
         deleteButtons.forEach(button => {
@@ -226,106 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-
-    async function fetchAndDisplayComments(postId) {
-        try {
-            const response = await fetch(`/comments/${postId}`);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            const comments = await response.json();
-            displayComments(comments);
-        } catch (error) {
-            console.error('Error fetching comments:', error);
-        }
-    }
-
-    function displayComments(comments) {
-        const commentsContainer = document.getElementById('comments-container');
-        commentsContainer.innerHTML = '';
-
-        comments.forEach(comment => {
-            const commentElement = document.createElement('div');
-            commentElement.classList.add('comment');
-            commentElement.innerHTML = `
-                <p><strong>${comment.username}</strong>: ${comment.comment_text}</p>
-                <p><small>${new Date(comment.created_at).toLocaleString()}</small></p>
-            `;
-            commentsContainer.appendChild(commentElement);
-        });
-    }
-
-    async function handleCommentSubmission(event) {
-        event.preventDefault();
-
-        const commentText = document.getElementById('comment-text').value;
-        const postId = window.location.pathname.split('/').pop();
-
-        try {
-            const response = await fetch('/comments/create', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ post_id: postId, comment_text: commentText })
-            });
-
-            if (!response.ok) {
-                throw new Error('Error creating comment');
-            }
-
-            fetchAndDisplayComments(postId);
-            document.getElementById('comment-text').value = '';
-        } catch (error) {
-            console.error('Error creating comment:', error);
-        }
-    }
-
-    function openCommentModal(postId) {
-        const commentModal = document.getElementById('comment-modal');
-        const commentForm = document.getElementById('add-comment-form');
-        commentModal.style.display = 'block';
-        commentForm.onsubmit = async (event) => {
-            event.preventDefault();
-            const commentText = document.getElementById('comment-text').value;
-            if (commentText.trim() === '') {
-                alert('Comment cannot be empty');
-                return;
-            }
-
-            try {
-                const response = await fetch('/comments/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ post_id: postId, comment_text: commentText })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Error creating comment');
-                }
-
-                const commentsContainer = document.getElementById(`comments-list-${postId}`);
-                const comment = await response.json();
-                const commentElement = document.createElement('div');
-                commentElement.classList.add('comment');
-                commentElement.innerHTML = `
-                    <p><strong>${comment.username}</strong>: ${comment.comment_text}</p>
-                    <p><small>${new Date(comment.created_at).toLocaleString()}</small></p>
-                `;
-                commentsContainer.appendChild(commentElement);
-                document.getElementById('comment-text').value = '';
-                commentModal.style.display = 'none';
-            } catch (error) {
-                console.error('Error creating comment:', error);
-            }
-        };
-    }
-
-    document.querySelector('.close-button').addEventListener('click', () => {
-        document.getElementById('comment-modal').style.display = 'none';
-    });
 
     function setupPagination(currentPage) {
         const paginationContainer = document.getElementById('pagination-container');
@@ -379,27 +282,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const profilePicButton = document.getElementById('profile-pic');
     if (profilePicButton) {
         profilePicButton.addEventListener('click', goToProfile);
-    }
-
-    function openCommentModal(postId) {
-        const modal = document.getElementById('comment-modal');
-        modal.style.display = 'block';
-        modal.setAttribute('data-post-id', postId);
-    }
-
-    function closeCommentModal() {
-        const modal = document.getElementById('comment-modal');
-        modal.style.display = 'none';
-    }
-
-    const addCommentForm = document.getElementById('add-comment-form');
-    if (addCommentForm) {
-        addCommentForm.addEventListener('submit', handleCommentSubmission);
-    }
-
-    const closeModalButton = document.querySelector('.close-button');
-    if (closeModalButton) {
-        closeModalButton.addEventListener('click', closeCommentModal);
     }
 
     // Logout function
