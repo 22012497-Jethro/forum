@@ -5,7 +5,24 @@
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="script.js" defer></script>
 </head>
-<body>
+<body class="main-page light-mode">
+    <nav>
+        <div class="nav-left">
+            <img src="logo-dark.png" alt="ReVibe Logo" id="nav-logo">
+            <h1>ReVibe Forum</h1>
+        </div>
+        <div class="nav-right">
+            <a href="/main"><button id="create-post-button">Create Post</button></a>
+            <div class="dropdown">
+                <img src="default-profile.png" alt="Profile Picture" id="profile-pic">
+                <span id="profile-username">Username</span>
+                <div class="dropdown-content">
+                    <p id="logout-button">Logout</p>
+                </div>
+            </div>
+            <button id="theme-switch">Switch Theme</button>
+        </div>
+    </nav>
     <section>
         <h1>User Settings</h1>
         <form id="settings-form">
