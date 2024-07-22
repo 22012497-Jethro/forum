@@ -26,75 +26,56 @@ const authenticateUser = (req, res, next) => {
 // Apply authentication middleware to the routes
 router.use(authenticateUser);
 
-// Create post endpoint
-router.post("/create", upload.single('image'), async (req, res) => {
-    const { title, caption, category, theme, rooms, room_category } = req.body;
-    const userId = req.session.userId;
-    let imageUrl = null;
+// Update a post
+router.put('/:id', upload.single('image'), async (req, res) => {
+    const { id } = req.params;
+    const { title, caption, category, theme, number_of_rooms, room_category } = req.body;
+    const imageFile = req.file;
 
-    if (req.file) {
-        console.log("Received file:", req.file);
-        try {
-            const uploadResponse = await supabase
-                .storage
-                .from('post-images')
-                .upload(`${Date.now()}-${req.file.originalname}`, req.file.buffer, {
-                    cacheControl: '3600',
-                    upsert: false,
-                });
+    let imageUrl = req.body.current_image_url; // default to the current image URL
 
-            console.log("Upload response:", uploadResponse);
-
-            if (uploadResponse.error) {
-                console.error("Error uploading to Supabase storage:", uploadResponse.error.message);
-                return res.status(500).send("Error uploading image: " + uploadResponse.error.message);
-            }
-
-            const uploadedPath = uploadResponse.data.path;
-
-            console.log("Uploaded Path:", uploadedPath);
-
-            const publicUrlResponse = supabase
-                .storage
-                .from('post-images')
-                .getPublicUrl(uploadedPath);
-
-            console.log("Public URL response:", publicUrlResponse);
-
-            if (publicUrlResponse.error) {
-                console.error("Error generating public URL:", publicUrlResponse.error.message);
-                return res.status(500).send("Error generating public URL: " + publicUrlResponse.error.message);
-            }
-
-            imageUrl = publicUrlResponse.data.publicUrl;
-            console.log("Generated image URL:", imageUrl);
-        } catch (error) {
-            console.error("Supabase storage error:", error.message);
-            return res.status(500).send("Error uploading image: " + error.message);
-        }
-    } else {
-        console.log("No file uploaded");
-    }
-
-    try {
-        const createdAt = new Date().toISOString();
-        console.log("Creating post with data:", { title, caption, image: imageUrl, category, theme, rooms, room_category, user_id: userId, created_at: createdAt });
-
-        const { data, error } = await supabase
-            .from('posts')
-            .insert([{ title, caption, image: imageUrl, category, theme, rooms, room_category, user_id: userId, created_at: createdAt }]);
+    if (imageFile) {
+        // Upload the new image to Supabase Storage
+        const { data, error } = await supabase.storage
+            .from('post-images')
+            .upload(`public/${imageFile.filename}`, imageFile.path);
 
         if (error) {
-            console.error("Error inserting post into database:", error.message);
-            return res.status(500).send("Error creating post: " + error.message);
+            console.error('Error uploading image:', error);
+            return res.status(500).json({ message: 'Error uploading image' });
         }
 
-        console.log("Post created successfully:", data);
-        res.redirect("/main");
-    } catch (err) {
-        console.error("Error creating post:", err.message);
-        res.status(500).send("Internal server error: " + err.message);
+        imageUrl = data.Key;
     }
+
+    const updates = {
+        title,
+        caption,
+        category,
+        theme,
+        number_of_rooms,
+        room_category,
+        image: imageUrl
+    };
+
+    // Remove undefined fields from the updates object
+    Object.keys(updates).forEach(key => {
+        if (updates[key] === undefined) {
+            delete updates[key];
+        }
+    });
+
+    const { error } = await supabase
+        .from('posts')
+        .update(updates)
+        .eq('id', id);
+
+    if (error) {
+        console.error('Error updating post:', error);
+        return res.status(500).json({ message: 'Error updating post' });
+    }
+
+    res.json({ message: 'Post updated successfully' });
 });
 
 // Delete post endpoint
