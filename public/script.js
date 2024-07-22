@@ -54,9 +54,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Update profile function
+    async function updateProfile(event) {
+        event.preventDefault();
+
+        const formData = new FormData(event.target);
+        const response = await fetch('/users/update-profile', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            alert(errorData.message);
+            return;
+        }
+
+        alert('Profile updated successfully');
+        window.location.href = '/main'; // Redirect to main page after successful update
+    }
+
     const signupForm = document.getElementById('signup-form');
     if (signupForm) {
         signupForm.addEventListener('submit', signup);
+    }
+
+    // Fetch user profile data for settings page
+    async function fetchAndDisplayUserProfile() {
+        try {
+            const response = await fetch('/users/profile');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const profile = await response.json();
+            console.log('Fetched user profile:', profile); // Debugging line
+            if (profile) {
+                document.getElementById('username').value = profile.username;
+                document.getElementById('email').value = profile.email;
+            }
+        } catch (error) {
+            console.error('Error fetching user profile:', error);
+        }
     }
 
     // Update profile function
