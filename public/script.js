@@ -152,8 +152,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function displayPosts(posts) {
-        const postsContainer = document.getElementById('posts-container');
+    function displayPosts(posts, containerId = 'posts-container') {
+        const postsContainer = document.getElementById(containerId);
         postsContainer.innerHTML = '';
 
         posts.forEach(post => {
@@ -169,18 +169,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
                     <p>${post.caption}</p>
                     <button class="add-comment-button" onclick="openCommentModal('${post.id}')">Add Comment</button>
-                    <div class="comments-list" id="comments-list-${post.id}"></div>
                 </div>
             `;
             postsContainer.appendChild(postElement);
-            fetchAndDisplayComments(post.id);
         });
     }
 
     function displayUserPosts(posts) {
         const userPostsContainer = document.getElementById('user-posts-container');
         userPostsContainer.innerHTML = '';
-    
+
         posts.forEach(post => {
             const postElement = document.createElement('div');
             postElement.classList.add('post');
@@ -190,13 +188,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
                     <p>${post.caption}</p>
                     <p><small>Created at: ${new Date(post.created_at).toLocaleString()}</small></p>
-                    <button class="edit-post-button" onclick="window.location.href='/edit.html?id=${post.id}'">Edit Post</button>
                     <button class="delete-post-button" data-post-id="${post.id}" data-image-url="${post.image}">Delete Post</button>
                 </div>
             `;
             userPostsContainer.appendChild(postElement);
         });
-    
+
         // Attach event listeners to delete buttons
         const deleteButtons = document.querySelectorAll('.delete-post-button');
         deleteButtons.forEach(button => {
@@ -237,14 +234,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('Network response was not ok');
             }
             const comments = await response.json();
-            displayComments(postId, comments);
+            displayComments(comments);
         } catch (error) {
             console.error('Error fetching comments:', error);
         }
     }
 
-    function displayComments(postId, comments) {
-        const commentsContainer = document.getElementById(`comments-list-${postId}`);
+    function displayComments(comments) {
+        const commentsContainer = document.getElementById('comments-container');
         commentsContainer.innerHTML = '';
 
         comments.forEach(comment => {
@@ -262,15 +259,15 @@ document.addEventListener('DOMContentLoaded', () => {
         event.preventDefault();
 
         const commentText = document.getElementById('comment-text').value;
-        const postId = document.getElementById('comment-modal').getAttribute('data-post-id');
+        const postId = window.location.pathname.split('/').pop();
 
         try {
-            const response = await fetch('/comments', {
+            const response = await fetch('/comments/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ post_id: postId, user_id: 1, comment_text: commentText }) // Replace user_id with the actual user's ID
+                body: JSON.stringify({ post_id: postId, comment_text: commentText })
             });
 
             if (!response.ok) {
@@ -279,10 +276,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
             fetchAndDisplayComments(postId);
             document.getElementById('comment-text').value = '';
-            closeCommentModal();
         } catch (error) {
             console.error('Error creating comment:', error);
         }
+    }
+
+    function openCommentModal(postId) {
+        const commentModal = document.getElementById('comment-modal');
+        const commentForm = document.getElementById('add-comment-form');
+        commentModal.style.display = 'block';
+        commentForm.onsubmit = async (event) => {
+            event.preventDefault();
+            const commentText = document.getElementById('comment-text').value;
+            if (commentText.trim() === '') {
+                alert('Comment cannot be empty');
+                return;
+            }
+    
+            try {
+                const response = await fetch('/comments/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ post_id: postId, comment_text: commentText })
+                });
+    
+                if (!response.ok) {
+                    throw new Error('Error creating comment');
+                }
+    
+                const commentsContainer = document.getElementById(`comments-list-${postId}`);
+                const comment = await response.json();
+                const commentElement = document.createElement('div');
+                commentElement.classList.add('comment');
+                commentElement.innerHTML = `
+                    <p><strong>${comment.username}</strong>: ${comment.comment_text}</p>
+                    <p><small>${new Date(comment.created_at).toLocaleString()}</small></p>
+                `;
+                commentsContainer.appendChild(commentElement);
+                document.getElementById('comment-text').value = '';
+                commentModal.style.display = 'none';
+            } catch (error) {
+                console.error('Error creating comment:', error);
+            }
+        };
     }
 
     function setupPagination(currentPage) {

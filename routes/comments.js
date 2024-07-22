@@ -12,39 +12,34 @@ const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Get comments for a post
-router.get('/:postId', async (req, res) => {
-    const { postId } = req.params;
-
-    const { data: comments, error } = await supabase
-        .from('comments')
-        .select('*')
-        .eq('post_id', postId)
-        .order('created_at', { ascending: true });
-
-    if (error) {
-        console.error('Error fetching comments:', error);
-        return res.status(500).json({ message: 'Error fetching comments' });
-    }
-
-    res.json(comments);
-});
-
-// Add a new comment
-router.post('/', async (req, res) => {
-    const { post_id, user_id, comment_text } = req.body;
+router.post('/create', async (req, res) => {
+    const { post_id, comment_text } = req.body;
+    const { user_id, username } = req.session; // Adjust based on your session setup
 
     const { data, error } = await supabase
         .from('comments')
-        .insert([
-            { post_id, user_id, comment_text }
-        ]);
+        .insert([{ post_id, user_id, comment_text, username }]);
 
     if (error) {
-        console.error('Error adding comment:', error);
-        return res.status(500).json({ message: 'Error adding comment' });
+        return res.status(500).json({ message: 'Error creating comment' });
     }
 
-    res.json({ message: 'Comment added successfully' });
+    res.status(200).json(data[0]);
+});
+
+router.get('/:postId', async (req, res) => {
+    const { postId } = req.params;
+
+    const { data, error } = await supabase
+        .from('comments')
+        .select('*')
+        .eq('post_id', postId);
+
+    if (error) {
+        return res.status(500).json({ message: 'Error fetching comments' });
+    }
+
+    res.status(200).json(data);
 });
 
 module.exports = router;
