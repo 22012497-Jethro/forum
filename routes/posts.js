@@ -153,35 +153,57 @@ router.get('/:id', async (req, res) => {
 });
 
 // Update a post
-router.post('/:id/edit', upload.single('image'), async (req, res) => {
+router.put('/:id', upload.single('image'), async (req, res) => {
     const { id } = req.params;
-    const { title, caption } = req.body;
-    let image_url = req.body.image_url;
+    const { title, caption, category, theme, number_of_rooms, room_category } = req.body;
+    const imageFile = req.file;
 
-    if (req.file) {
-        // Delete the old image if a new one is uploaded
-        if (image_url) {
-            await deleteImage(image_url);
-        }
-        // Upload new image
-        const { path, error } = await uploadImage(req.file);
+    let imageUrl = req.body.current_image_url; // default to the current image URL
+
+    if (imageFile) {
+        // Upload the new image to Supabase Storage
+        const { data, error } = await supabase.storage
+            .from('post-images')
+            .upload(`public/${imageFile.filename}`, imageFile.path);
+
         if (error) {
+            console.error('Error uploading image:', error);
             return res.status(500).json({ message: 'Error uploading image' });
         }
-        image_url = path;
+
+        imageUrl = data.Key;
     }
 
-    const { data, error } = await supabase
+    const updates = {
+        title,
+        caption,
+        category,
+        theme,
+        number_of_rooms,
+        room_category,
+        image: imageUrl
+    };
+
+    // Remove undefined fields from the updates object
+    Object.keys(updates).forEach(key => {
+        if (updates[key] === undefined) {
+            delete updates[key];
+        }
+    });
+
+    const { error } = await supabase
         .from('posts')
-        .update({ title, caption, image: image_url })
+        .update(updates)
         .eq('id', id);
 
     if (error) {
+        console.error('Error updating post:', error);
         return res.status(500).json({ message: 'Error updating post' });
     }
 
-    res.json(data);
+    res.json({ message: 'Post updated successfully' });
 });
+
 
 // Fetch posts endpoint
 router.get('/', async (req, res) => {

@@ -12,11 +12,11 @@
             <h1>ReVibe Forum</h1>
         </div>
         <div class="nav-right">
+            <button id="back-to-homepage" class="btn btn-danger">Back to Homepage</button>
             <div class="dropdown">
                 <img src="default-profile.png" alt="Profile Picture" id="profile-pic">
                 <span id="profile-username">Username</span>
                 <div class="dropdown-content">
-                    <p id="settings-button">Settings</p>
                     <p id="logout-button">Logout</p>
                 </div>
             </div>
@@ -37,6 +37,7 @@
             <div class="form-group">
                 <label for="post-image">Image (optional):</label>
                 <input type="file" id="post-image" name="image" accept="image/*">
+                <img id="current-image" src="" alt="Current Image" style="display: none; width: 100px; height: auto;">
             </div>
             <div class="form-group">
                 <label for="post-category">Category:</label>
@@ -67,7 +68,7 @@
                 <input type="text" id="post-room-category" name="room_category">
             </div>
             <button type="submit">Save Changes</button>
-            <button type="button" id="back-to-homepage">Back to Homepage</button>
+            <button type="button" id="back-to-homepage" class="btn btn-danger">Back to Homepage</button>
         </form>
     </section>
 </body>

@@ -33,12 +33,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('post-theme').value = post.theme || '';
         document.getElementById('post-rooms').value = post.number_of_rooms || 1;
         document.getElementById('post-room-category').value = post.room_category || '';
+        document.getElementById('current-image').src = post.image || '';
+        document.getElementById('current-image').style.display = post.image ? 'block' : 'none';
     }
 
     // Update post function
     async function updatePost(event) {
         event.preventDefault();
-        
+
         const urlParams = new URLSearchParams(window.location.search);
         const postId = urlParams.get('id');
 
@@ -49,16 +51,14 @@ document.addEventListener('DOMContentLoaded', () => {
             category: formData.get('category'),
             theme: formData.get('theme'),
             number_of_rooms: formData.get('rooms'),
-            room_category: formData.get('room_category')
+            room_category: formData.get('room_category'),
+            image: formData.get('image') // only include image if it is provided
         };
 
         try {
             const response = await fetch(`/posts/${postId}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(postDetails)
+                body: formData // send the FormData directly
             });
 
             if (!response.ok) {
