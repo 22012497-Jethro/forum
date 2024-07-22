@@ -98,23 +98,20 @@ router.post("/create", upload.single('image'), async (req, res) => {
 });
 
 // Delete post endpoint
-router.delete('/posts/:id', authenticateUser, async (req, res) => {
-    const postId = req.params.id;
+router.delete('/:postId', authenticateUser, async (req, res) => {
+    const { postId } = req.params;
     const { image_url } = req.body;
 
     try {
-        // Delete the post from the database
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('posts')
             .delete()
-            .eq('id', postId)
-            .eq('user_id', req.session.userId);
+            .eq('id', postId);
 
         if (error) {
             return res.status(500).send('Error deleting post');
         }
 
-        // Delete the image from storage
         if (image_url) {
             const imagePath = image_url.split('/').pop();
             const { error: storageError } = await supabase
