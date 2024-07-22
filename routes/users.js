@@ -243,6 +243,26 @@ router.get("/post-profile", async (req, res) => {
     }
 });
 
+router.get('/user-posts', authenticateUser, async (req, res) => {
+    const userId = req.session.userId;
+    try {
+        const { data, error } = await supabase
+            .from('posts')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            throw error;
+        }
+
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching user posts:', error);
+        res.status(500).send('Error fetching user posts');
+    }
+});
+
 router.post('/logout', (req, res) => {
     req.session.destroy(err => {
         if (err) {

@@ -100,8 +100,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function displayPosts(posts) {
-        const postsContainer = document.getElementById('posts-container');
+    async function fetchAndDisplayUserPosts() {
+        try {
+            const response = await fetch('/users/user-posts');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const posts = await response.json();
+            displayPosts(posts, 'user-posts-container');
+        } catch (error) {
+            console.error('Error fetching user posts:', error);
+        }
+    }
+
+    function displayPosts(posts, containerId = 'posts-container') {
+        const postsContainer = document.getElementById(containerId);
         postsContainer.innerHTML = '';
 
         posts.forEach(post => {
@@ -146,6 +159,10 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = '/main';
     }
 
+    function goToProfile() {
+        window.location.href = '/profile';
+    }
+
     // Ensure the button exists before adding an event listener
     const backToHomepageButton = document.getElementById('back-to-homepage');
     if (backToHomepageButton) {
@@ -160,6 +177,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutButton = document.getElementById('logout-button');
     if (logoutButton) {
         logoutButton.addEventListener('click', logout);
+    }
+
+    const profileButton = document.getElementById('profile-username');
+    if (profileButton) {
+        profileButton.addEventListener('click', goToProfile);
+    }
+
+    const profilePicButton = document.getElementById('profile-pic');
+    if (profilePicButton) {
+        profilePicButton.addEventListener('click', goToProfile);
     }
 
     // Logout function
@@ -203,4 +230,8 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchAndDisplayUserData();
     setupThemeSwitch();
     fetchAndDisplayPosts(1);
+    const path = window.location.pathname;
+    if (path.includes('profile')) {
+        fetchAndDisplayUserPosts();
+    }
 });

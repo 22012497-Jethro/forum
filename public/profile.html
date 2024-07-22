@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Profile</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body class="profile-page light-mode">
+    <nav>
+        <div class="nav-left">
+            <img src="logo-dark.png" alt="ReVibe Logo" id="nav-logo">
+            <h1>ReVibe Forum</h1>
+        </div>
+        <div class="nav-right">
+            <button id="back-to-homepage">Home</button>
+            <div class="dropdown">
+                <img src="default-profile.png" alt="Profile Picture" id="profile-pic">
+                <span id="profile-username">Username</span>
+                <div class="dropdown-content">
+                    <p id="settings-button">Settings</p>
+                    <p id="logout-button">Logout</p>
+                </div>
+            </div>
+            <button id="theme-switch">Switch Theme</button>
+        </div>
+    </nav>
+    <section>
+        <h2 id="profile-header">User Profile</h2>
+        <div id="user-posts-container" class="posts-container">
+            <!-- User posts will be displayed here -->
+        </div>
+    </section>
+</body>
+</html>
