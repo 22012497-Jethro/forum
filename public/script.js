@@ -168,19 +168,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h3 class="post-title"><strong>${post.title}</strong></h3>
                     ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
                     <p>${post.caption}</p>
-                    <button class="add-comment-button" onclick="openCommentModal('${post.id}')">Add Comment</button>
-                    <div class="comments-list" id="comments-list-${post.id}"></div>
                 </div>
             `;
             postsContainer.appendChild(postElement);
-            fetchAndDisplayComments(post.id);
         });
     }
 
     function displayUserPosts(posts) {
         const userPostsContainer = document.getElementById('user-posts-container');
         userPostsContainer.innerHTML = '';
-    
+
         posts.forEach(post => {
             const postElement = document.createElement('div');
             postElement.classList.add('post');
@@ -190,13 +187,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
                     <p>${post.caption}</p>
                     <p><small>Created at: ${new Date(post.created_at).toLocaleString()}</small></p>
-                    <button class="edit-post-button" onclick="window.location.href='/edit.html?id=${post.id}'">Edit Post</button>
                     <button class="delete-post-button" data-post-id="${post.id}" data-image-url="${post.image}">Delete Post</button>
                 </div>
             `;
             userPostsContainer.appendChild(postElement);
         });
-    
+
         // Attach event listeners to delete buttons
         const deleteButtons = document.querySelectorAll('.delete-post-button');
         deleteButtons.forEach(button => {
