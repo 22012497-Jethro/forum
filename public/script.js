@@ -345,7 +345,6 @@ document.addEventListener('DOMContentLoaded', () => {
         event.preventDefault();
 
         const commentText = document.getElementById('comment-text').value;
-        const postId = currentPostId;
 
         try {
             const response = await fetch('/comments/create', {
@@ -353,14 +352,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ post_id: postId, comment_text: commentText })
+                body: JSON.stringify({ post_id: currentPostId, comment_text: commentText })
             });
 
             if (!response.ok) {
                 throw new Error('Error creating comment');
             }
 
-            fetchAndDisplayComments(postId);
+            fetchAndDisplayComments(currentPostId);
             document.getElementById('comment-text').value = '';
             closeModal();
         } catch (error) {
@@ -392,10 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const postId = window.location.pathname.split('/').pop();
-
     fetchAndDisplayUserData();
     setupThemeSwitch();
     fetchAndDisplayPosts(1);
-    fetchAndDisplayPost(postId);
 });
