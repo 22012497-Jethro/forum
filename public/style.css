@@ -335,11 +335,13 @@ section {
 }
 
 button {
-    padding: 0.5rem 1rem;
+    padding: 10px;
     background-color: #333;
     color: white;
     border: none;
+    border-radius: 5px;
     cursor: pointer;
+    font-size: 1em;
 }
 
 button:hover {
@@ -354,4 +356,25 @@ button:hover {
 .dark-mode {
     background-color: #333;
     color: white;
+}
+
+/* Specific styles for settings page */
+section {
+    margin-top: 100px;
+    padding: 20px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+}
+
+#back-to-homepage {
+    margin-top: 10px;
+    background-color: #f44336;
+}
+
+#back-to-homepage:hover {
+    background-color: #d32f2f;
 }
