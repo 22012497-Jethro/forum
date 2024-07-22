@@ -3,7 +3,6 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const { createClient } = require("@supabase/supabase-js");
-const { deleteImage, uploadImage } = require('../helpers');
 
 const router = express.Router();
 
