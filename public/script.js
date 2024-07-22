@@ -86,23 +86,56 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Fetch user profile data for settings page
-    async function fetchAndDisplayUserProfile() {
+    async function fetchAndDisplayPosts(page) {
         try {
-            const response = await fetch('/users/profile');
+            const response = await fetch(`/posts?page=${page}&limit=10`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            const profile = await response.json();
-            console.log('Fetched user profile:', profile); // Debugging line
-            if (profile) {
-                document.getElementById('username').value = profile.username;
-                document.getElementById('email').value = profile.email;
-            }
+            const posts = await response.json();
+            displayPosts(posts);
+            setupPagination(page);
         } catch (error) {
-            console.error('Error fetching user profile:', error);
+            console.error('Error fetching posts:', error);
         }
     }
 
+    function displayPosts(posts) {
+        const postsContainer = document.getElementById('posts-container');
+        postsContainer.innerHTML = '';
+
+        posts.forEach(post => {
+            const postElement = document.createElement('div');
+            postElement.classList.add('post');
+            postElement.innerHTML = `
+                <div class="post-header">
+                    <img src="${post.profile_pic || 'default-profile.png'}" alt="Creator's Profile Picture" class="creator-pfp">
+                    <span class="post-username">${post.username}</span>
+                </div>
+                <div class="post-details">
+                    <h3 class="post-title"><strong>${post.title}</strong></h3>
+                    ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
+                    <p>${post.caption}</p>
+                </div>
+            `;
+            postsContainer.appendChild(postElement);
+        });
+    }
+
+    function setupPagination(currentPage) {
+        const paginationContainer = document.getElementById('pagination-container');
+        paginationContainer.innerHTML = '';
+
+        for (let i = 1; i <= 10; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.textContent = i;
+            if (i === currentPage) {
+                pageButton.disabled = true;
+            }
+            pageButton.onclick = () => fetchAndDisplayPosts(i);
+            paginationContainer.appendChild(pageButton);
+        }
+    }
     // Navigate to settings page
     function goToSettings() {
         window.location.href = '/settings';
@@ -166,140 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
             applyTheme(newTheme);
         });
     }
-
-    // Fetch and display posts
-    async function fetchAndDisplayPosts(page) {
-        try {
-            const response = await fetch(`/posts?page=${page}&limit=10`);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            const posts = await response.json();
-            displayPosts(posts);
-            setupPagination(page);
-        } catch (error) {
-            console.error('Error fetching posts:', error);
-        }
-    }
-
-    // Display posts
-    function displayPosts(posts) {
-        const postsContainer = document.getElementById('posts-container');
-        postsContainer.innerHTML = '';
-
-        posts.forEach(post => {
-            const postElement = document.createElement('div');
-            postElement.classList.add('post');
-            postElement.innerHTML = `
-                <div class="post-header">
-                    <img src="${post.profile_pic || 'default-profile.png'}" alt="Creator's Profile Picture" class="creator-pfp">
-                    <span class="post-username">${post.username}</span>
-                </div>
-                <div class="post-details">
-                    <h3 class="post-title"><strong>${post.title}</strong></h3>
-                    ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
-                    <p>${post.caption}</p>
-                    <button class="add-comment-button" onclick="openCommentModal('${post.id}')">Add Comment</button>
-                    <div class="comments-list" id="comments-list-${post.id}"></div>
-                </div>
-            `;
-            postsContainer.appendChild(postElement);
-        });
-    }
-
-    // Setup pagination
-    function setupPagination(currentPage) {
-        const paginationContainer = document.getElementById('pagination-container');
-        paginationContainer.innerHTML = '';
-
-        for (let i = 1; i <= 10; i++) { // Adjust the total number of pages as needed
-            const pageButton = document.createElement('button');
-            pageButton.textContent = i;
-            if (i === currentPage) {
-                pageButton.disabled = true;
-            }
-            pageButton.onclick = () => fetchAndDisplayPosts(i);
-            paginationContainer.appendChild(pageButton);
-        }
-    }
-
-    async function fetchAndDisplayComments(postId) {
-        try {
-            const response = await fetch(`/comments/${postId}`);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            const comments = await response.json();
-            displayComments(comments, postId);
-        } catch (error) {
-            console.error('Error fetching comments:', error);
-        }
-    }
-
-    function displayComments(comments, postId) {
-        const commentsContainer = document.getElementById(`comments-list-${postId}`);
-        commentsContainer.innerHTML = '';
-
-        comments.forEach(comment => {
-            const commentElement = document.createElement('div');
-            commentElement.classList.add('comment');
-            commentElement.innerHTML = `
-                <p><strong>${comment.username}</strong>: ${comment.comments}</p>
-                <p><small>${new Date(comment.created_at).toLocaleString()}</small></p>
-            `;
-            commentsContainer.appendChild(commentElement);
-        });
-    }
-
-    async function handleCommentSubmission(event) {
-        event.preventDefault();
-
-        const commentText = document.getElementById('comment-text').value;
-
-        try {
-            const response = await fetch('/comments/create', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ post_id: currentPostId, comment: commentText })
-            });
-
-            if (!response.ok) {
-                throw new Error('Error creating comment');
-            }
-
-            fetchAndDisplayComments(currentPostId);
-            document.getElementById('comment-text').value = '';
-            closeModal();
-        } catch (error) {
-            console.error('Error creating comment:', error);
-        }
-    }
-
-    const addCommentForm = document.getElementById('add-comment-form');
-    if (addCommentForm) {
-        addCommentForm.addEventListener('submit', handleCommentSubmission);
-    }
-
-    const commentModal = document.getElementById('comment-modal');
-    const closeModalButton = document.querySelector('.close-button');
-
-    function openCommentModal(postId) {
-        currentPostId = postId;
-        commentModal.style.display = 'block';
-    }
-
-    function closeModal() {
-        commentModal.style.display = 'none';
-    }
-
-    closeModalButton.addEventListener('click', closeModal);
-    window.addEventListener('click', (event) => {
-        if (event.target == commentModal) {
-            closeModal();
-        }
-    });
 
     fetchAndDisplayUserData();
     setupThemeSwitch();

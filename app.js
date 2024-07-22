@@ -4,7 +4,6 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const postsRouter = require('./routes/posts'); // Import the posts router
 const usersRouter = require('./routes/users'); // Import the users router
-const commentsRouter = require('./routes/comments'); // Import the users router
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -33,7 +32,6 @@ app.get("/settings", (req, res) => res.sendFile(path.join(__dirname, 'public/set
 // Use the posts and users routers
 app.use('/posts', postsRouter);
 app.use('/users', usersRouter);
-app.use('/comments', commentsRouter);
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
