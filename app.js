@@ -29,7 +29,6 @@ app.get("/signup", (req, res) => res.sendFile(path.join(__dirname, 'public/signu
 app.get("/main", (req, res) => res.sendFile(path.join(__dirname, 'public/main.html')));
 app.get("/post", (req, res) => res.sendFile(path.join(__dirname, 'public/post.html')));
 app.get("/settings", (req, res) => res.sendFile(path.join(__dirname, 'public/settings.html')));
-app.get("/posts/:id", (req, res) => res.sendFile(path.join(__dirname, 'public/single-post.html'))); // Route for single post view
 
 // Use the posts and users routers
 app.use('/posts', postsRouter);

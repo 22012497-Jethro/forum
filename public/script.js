@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Fetch and display posts
-    async function fetchAndDisplayPosts(page = 1) {
+    async function fetchAndDisplayPosts(page) {
         try {
             const response = await fetch(`/posts?page=${page}&limit=10`);
             if (!response.ok) {
@@ -196,9 +196,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="post-username">${post.username}</span>
                 </div>
                 <div class="post-details">
-                    <h3 class="post-title"><strong><a href="/posts/${post.id}">${post.title}</a></strong></h3>
+                    <h3 class="post-title"><strong>${post.title}</strong></h3>
                     ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
                     <p>${post.caption}</p>
+                    <button class="add-comment-button" onclick="openCommentModal('${post.id}')">Add Comment</button>
+                    <div class="comments-list" id="comments-list-${post.id}"></div>
                 </div>
             `;
             postsContainer.appendChild(postElement);
@@ -221,98 +223,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    let currentPage = 1;
-    const postsPerPage = 10;
-
-    async function fetchAndDisplayPost(postId) {
-        try {
-            const response = await fetch(`/posts/${postId}`);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            const post = await response.json();
-            displayPost(post);
-            fetchAndDisplayComments(postId);
-        } catch (error) {
-            console.error('Error fetching post:', error);
-        }
-    }
-
-    function displayPost(post) {
-        const postContainer = document.getElementById('post-container');
-        postContainer.innerHTML = '';
-
-        const postElement = document.createElement('div');
-        postElement.classList.add('post');
-        postElement.innerHTML = `
-            <div class="post-header">
-                <img src="${post.profile_pic || 'default-profile.png'}" alt="Creator's Profile Picture" class="creator-pfp">
-                <span class="post-username">${post.username}</span>
-            </div>
-            <div class="post-details">
-                <h3 class="post-title"><strong>${post.title}</strong></h3>
-                ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
-                <p>${post.caption}</p>
-            </div>
-        `;
-        postContainer.appendChild(postElement);
-    }
-
-    async function fetchAndDisplayPosts(page) {
-        try {
-            const response = await fetch(`/posts?page=${page}&limit=10`);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            const posts = await response.json();
-            displayPosts(posts);
-            setupPagination(page);
-        } catch (error) {
-            console.error('Error fetching posts:', error);
-        }
-    }
-
-    function displayPosts(posts) {
-        const postsContainer = document.getElementById('posts-container');
-        postsContainer.innerHTML = '';
-
-        posts.forEach(post => {
-            const postElement = document.createElement('div');
-            postElement.classList.add('post');
-            postElement.innerHTML = `
-                <div class="post-header">
-                    <img src="${post.profile_pic || 'default-profile.png'}" alt="Creator's Profile Picture" class="creator-pfp">
-                    <span class="post-username">${post.username}</span>
-                </div>
-                <div class="post-details">
-                    <h3 class="post-title"><strong>${post.title}</strong></h3>
-                    ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
-                    <p>${post.caption}</p>
-                    <button class="add-comment-button" onclick="openCommentModal('${post.id}')">Add Comment</button>
-                    <div class="comments-list" id="comments-list-${post.id}"></div>
-                </div>
-            `;
-            postsContainer.appendChild(postElement);
-        });
-    }
-
-    function setupPagination(currentPage) {
-        const paginationContainer = document.getElementById('pagination-container');
-        paginationContainer.innerHTML = '';
-
-        for (let i = 1; i <= 10; i++) { // Adjust the total number of pages as needed
-            const pageButton = document.createElement('button');
-            pageButton.textContent = i;
-            if (i === currentPage) {
-                pageButton.disabled = true;
-            }
-            pageButton.onclick = () => fetchAndDisplayPosts(i);
-            paginationContainer.appendChild(pageButton);
-        }
-    }
-
-    let currentPostId;
-
     async function fetchAndDisplayComments(postId) {
         try {
             const response = await fetch(`/comments/${postId}`);
@@ -334,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const commentElement = document.createElement('div');
             commentElement.classList.add('comment');
             commentElement.innerHTML = `
-                <p><strong>${comment.username}</strong>: ${comment.comment_text}</p>
+                <p><strong>${comment.username}</strong>: ${comment.comments}</p>
                 <p><small>${new Date(comment.created_at).toLocaleString()}</small></p>
             `;
             commentsContainer.appendChild(commentElement);
@@ -352,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ post_id: currentPostId, comment_text: commentText })
+                body: JSON.stringify({ post_id: currentPostId, comment: commentText })
             });
 
             if (!response.ok) {
