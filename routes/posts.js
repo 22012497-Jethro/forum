@@ -97,6 +97,42 @@ router.post("/create", upload.single('image'), async (req, res) => {
     }
 });
 
+// Delete post endpoint
+router.delete('/posts/:id', authenticateUser, async (req, res) => {
+    const postId = req.params.id;
+    const { image_url } = req.body;
+
+    try {
+        // Delete the post from the database
+        const { data, error } = await supabase
+            .from('posts')
+            .delete()
+            .eq('id', postId)
+            .eq('user_id', req.session.userId);
+
+        if (error) {
+            return res.status(500).send('Error deleting post');
+        }
+
+        // Delete the image from storage
+        if (image_url) {
+            const imagePath = image_url.split('/').pop();
+            const { error: storageError } = await supabase
+                .storage
+                .from('post-images')
+                .remove([imagePath]);
+
+            if (storageError) {
+                return res.status(500).send('Error deleting image');
+            }
+        }
+
+        res.sendStatus(204);
+    } catch (error) {
+        res.status(500).send('Error deleting post');
+    }
+});
+
 // Fetch posts endpoint
 router.get('/', async (req, res) => {
     const { page = 1, limit = 10 } = req.query;

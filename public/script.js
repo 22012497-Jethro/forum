@@ -100,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Fetch and display user posts
     async function fetchAndDisplayUserPosts() {
         try {
             const response = await fetch('/users/user-posts');
@@ -138,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayUserPosts(posts) {
         const userPostsContainer = document.getElementById('user-posts-container');
         userPostsContainer.innerHTML = '';
-    
+
         posts.forEach(post => {
             const postElement = document.createElement('div');
             postElement.classList.add('post');
@@ -148,10 +149,43 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
                     <p>${post.caption}</p>
                     <p><small>Created at: ${new Date(post.created_at).toLocaleString()}</small></p>
+                    <button class="delete-post-button" data-post-id="${post.id}" data-image-url="${post.image}">Delete Post</button>
                 </div>
             `;
             userPostsContainer.appendChild(postElement);
         });
+
+        // Attach event listeners to delete buttons
+        const deleteButtons = document.querySelectorAll('.delete-post-button');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', handleDeletePost);
+        });
+    }
+
+    async function handleDeletePost(event) {
+        const postId = event.target.getAttribute('data-post-id');
+        const imageUrl = event.target.getAttribute('data-image-url');
+
+        if (confirm('Are you sure you want to delete this post?')) {
+            try {
+                const response = await fetch(`/posts/${postId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ image_url: imageUrl })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error deleting post');
+                }
+
+                alert('Post deleted successfully');
+                fetchAndDisplayUserPosts(); // Refresh the posts
+            } catch (error) {
+                console.error('Error deleting post:', error);
+            }
+        }
     }
 
     function setupPagination(currentPage) {
