@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('Network response was not ok');
             }
             const posts = await response.json();
-            displayPosts(posts, 'user-posts-container');
+            displayUserPosts(posts);
         } catch (error) {
             console.error('Error fetching user posts:', error);
         }
@@ -132,6 +132,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             postsContainer.appendChild(postElement);
+        });
+    }
+
+    function displayUserPosts(posts) {
+        const userPostsContainer = document.getElementById('user-posts-container');
+        userPostsContainer.innerHTML = '';
+    
+        posts.forEach(post => {
+            const postElement = document.createElement('div');
+            postElement.classList.add('post');
+            postElement.innerHTML = `
+                <div class="post-details">
+                    <h3 class="post-title"><strong>${post.title}</strong></h3>
+                    ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
+                    <p>${post.caption}</p>
+                    <p><small>Created at: ${new Date(post.created_at).toLocaleString()}</small></p>
+                </div>
+            `;
+            userPostsContainer.appendChild(postElement);
         });
     }
 
@@ -230,8 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchAndDisplayUserData();
     setupThemeSwitch();
     fetchAndDisplayPosts(1);
-    const path = window.location.pathname;
-    if (path.includes('profile')) {
+    if (window.location.pathname === '/profile') {
         fetchAndDisplayUserPosts();
     }
 });
