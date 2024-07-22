@@ -1,53 +1,82 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const editForm = document.getElementById('edit-post-form');
-    const postId = new URLSearchParams(window.location.search).get('id');
+    // Back to homepage function
+    function goToHomePage() {
+        window.location.href = '/main';
+    }
 
-    // Fetch post data and populate the form
+    const backToHomepageButton = document.getElementById('back-to-homepage');
+    if (backToHomepageButton) {
+        backToHomepageButton.addEventListener('click', goToHomePage);
+    }
+
+    // Fetch post data and populate form
     async function fetchPostData() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const postId = urlParams.get('id');
+
         try {
             const response = await fetch(`/posts/${postId}`);
-            const post = await response.json();
-
-            document.getElementById('post-id').value = post.id;
-            document.getElementById('title').value = post.title;
-            document.getElementById('caption').value = post.caption;
-            if (post.image) {
-                document.getElementById('image-preview').src = post.image;
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
             }
+            const post = await response.json();
+            populateForm(post);
         } catch (error) {
             console.error('Error fetching post data:', error);
         }
     }
 
-    // Handle form submission
-    editForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
+    function populateForm(post) {
+        document.getElementById('post-title').value = post.title;
+        document.getElementById('post-caption').value = post.caption;
+        document.getElementById('post-category').value = post.category;
+        document.getElementById('post-theme').value = post.theme || '';
+        document.getElementById('post-rooms').value = post.number_of_rooms || 1;
+        document.getElementById('post-room-category').value = post.room_category || '';
+    }
 
-        const formData = new FormData(editForm);
-        formData.append('post_id', postId);
+    // Update post function
+    async function updatePost(event) {
+        event.preventDefault();
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const postId = urlParams.get('id');
+
+        const formData = new FormData(event.target);
+        const postDetails = {
+            title: formData.get('title'),
+            caption: formData.get('caption'),
+            category: formData.get('category'),
+            theme: formData.get('theme'),
+            number_of_rooms: formData.get('rooms'),
+            room_category: formData.get('room_category')
+        };
 
         try {
-            const response = await fetch(`/posts/${postId}/edit`, {
-                method: 'POST',
-                body: formData
+            const response = await fetch(`/posts/${postId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(postDetails)
             });
 
-            if (response.ok) {
-                alert('Post updated successfully');
-                window.location.href = '/profile';
-            } else {
-                alert('Error updating post');
+            if (!response.ok) {
+                throw new Error('Error updating post');
             }
+
+            alert('Post updated successfully');
+            window.location.href = '/profile';
         } catch (error) {
             console.error('Error updating post:', error);
+            alert('Error updating post');
         }
-    });
+    }
 
-    // Handle cancel button
-    document.getElementById('cancel-edit-button').addEventListener('click', () => {
-        window.location.href = '/profile';
-    });
+    const editPostForm = document.getElementById('edit-post-form');
+    if (editPostForm) {
+        editPostForm.addEventListener('submit', updatePost);
+    }
 
-    // Fetch the post data to populate the form
     fetchPostData();
 });
