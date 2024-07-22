@@ -152,8 +152,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function displayPosts(posts, containerId = 'posts-container') {
-        const postsContainer = document.getElementById(containerId);
+    function displayPosts(posts) {
+        const postsContainer = document.getElementById('posts-container');
         postsContainer.innerHTML = '';
 
         posts.forEach(post => {
@@ -168,9 +168,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h3 class="post-title"><strong>${post.title}</strong></h3>
                     ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
                     <p>${post.caption}</p>
+                    <button class="add-comment-button" onclick="openCommentModal('${post.id}')">Add Comment</button>
+                    <div class="comments-list" id="comments-list-${post.id}"></div>
                 </div>
             `;
             postsContainer.appendChild(postElement);
+            fetchAndDisplayComments(post.id);
         });
     }
 
@@ -227,6 +230,61 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function fetchAndDisplayComments(postId) {
+        try {
+            const response = await fetch(`/comments/${postId}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const comments = await response.json();
+            displayComments(postId, comments);
+        } catch (error) {
+            console.error('Error fetching comments:', error);
+        }
+    }
+
+    function displayComments(postId, comments) {
+        const commentsContainer = document.getElementById(`comments-list-${postId}`);
+        commentsContainer.innerHTML = '';
+
+        comments.forEach(comment => {
+            const commentElement = document.createElement('div');
+            commentElement.classList.add('comment');
+            commentElement.innerHTML = `
+                <p><strong>${comment.username}</strong>: ${comment.comment_text}</p>
+                <p><small>${new Date(comment.created_at).toLocaleString()}</small></p>
+            `;
+            commentsContainer.appendChild(commentElement);
+        });
+    }
+
+    async function handleCommentSubmission(event) {
+        event.preventDefault();
+
+        const commentText = document.getElementById('comment-text').value;
+        const postId = document.getElementById('comment-modal').getAttribute('data-post-id');
+
+        try {
+            const response = await fetch('/comments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ post_id: postId, user_id: 1, comment_text: commentText }) // Replace user_id with the actual user's ID
+            });
+
+            if (!response.ok) {
+                throw new Error('Error creating comment');
+            }
+
+            fetchAndDisplayComments(postId);
+            document.getElementById('comment-text').value = '';
+            closeCommentModal();
+        } catch (error) {
+            console.error('Error creating comment:', error);
+        }
+    }
+
     function setupPagination(currentPage) {
         const paginationContainer = document.getElementById('pagination-container');
         paginationContainer.innerHTML = '';
@@ -279,6 +337,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const profilePicButton = document.getElementById('profile-pic');
     if (profilePicButton) {
         profilePicButton.addEventListener('click', goToProfile);
+    }
+
+    function openCommentModal(postId) {
+        const modal = document.getElementById('comment-modal');
+        modal.style.display = 'block';
+        modal.setAttribute('data-post-id', postId);
+    }
+
+    function closeCommentModal() {
+        const modal = document.getElementById('comment-modal');
+        modal.style.display = 'none';
+    }
+
+    const addCommentForm = document.getElementById('add-comment-form');
+    if (addCommentForm) {
+        addCommentForm.addEventListener('submit', handleCommentSubmission);
+    }
+
+    const closeModalButton = document.querySelector('.close-button');
+    if (closeModalButton) {
+        closeModalButton.addEventListener('click', closeCommentModal);
     }
 
     // Logout function
