@@ -29,15 +29,15 @@ nav {
     padding: 10px 20px;
     background-color: #333;
     color: white;
-    width: 100%;
+    position: fixed; /* Fixes the navbar at the top */
     top: 0;
-    left: 0;
+    width: 100%;
     z-index: 1000;
 }
 
 /* Ensure content below the navbar is not hidden */
 body.main-page {
-    padding-top: 70px; /* Adjust this value based on the height of your navbar */
+    padding-top: 120px; /* Adjust this value based on the height of your navbar */
 }
 
 .nav-left, .nav-right {
