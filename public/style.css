@@ -268,10 +268,12 @@ section {
     max-width: 1200px;
 }
 
-#posts-container {
-    display: flex;
-    flex-direction: column; /* Changed to column for vertical stacking */
-    gap: 20px;
+.post-container {
+    height: 500px; /* Adjust height as needed */
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #ccc; /* Optional: for visual separation */
+    background-color: #f9f9f9; /* Optional: background color */
 }
 
 .post {
@@ -356,25 +358,4 @@ button:hover {
 .dark-mode {
     background-color: #333;
     color: white;
-}
-
-/* Specific styles for settings page */
-section {
-    margin-top: 100px;
-    padding: 20px;
-    text-align: center;
-}
-
-h1 {
-    font-size: 1.5em;
-    margin-bottom: 20px;
-}
-
-#back-to-homepage {
-    margin-top: 10px;
-    background-color: #f44336;
-}
-
-#back-to-homepage:hover {
-    background-color: #d32f2f;
 }
