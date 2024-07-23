@@ -193,11 +193,22 @@ document.addEventListener('DOMContentLoaded', () => {
             userPostsContainer.appendChild(postElement);
         });
 
+        // Attach event listeners to edit buttons
+        const editButtons = document.querySelectorAll('.edit-post-button');
+        editButtons.forEach(button => {
+            button.addEventListener('click', handleEditPost);
+        });
+
         // Attach event listeners to delete buttons
         const deleteButtons = document.querySelectorAll('.delete-post-button');
         deleteButtons.forEach(button => {
             button.addEventListener('click', handleDeletePost);
         });
+    }
+
+    function handleEditPost(event) {
+        const postId = event.target.getAttribute('data-post-id');
+        window.location.href = `/edit.html?postId=${postId}`;
     }
 
     async function handleDeletePost(event) {
@@ -224,6 +235,66 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Error deleting post:', error);
             }
         }
+    }
+
+    async function fetchPostDetails(postId) {
+        try {
+            const response = await fetch(`/posts/${postId}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const post = await response.json();
+
+            // Fill the form with post details
+            document.getElementById('edit-post-id').value = post.id;
+            document.getElementById('edit-post-title').value = post.title;
+            document.getElementById('edit-post-caption').value = post.caption;
+            document.getElementById('edit-post-image').value = post.image;
+        } catch (error) {
+            console.error('Error fetching post details:', error);
+        }
+    }
+
+    async function updatePost(event) {
+        event.preventDefault();
+
+        const postId = document.getElementById('edit-post-id').value;
+        const title = document.getElementById('edit-post-title').value;
+        const caption = document.getElementById('edit-post-caption').value;
+        const image = document.getElementById('edit-post-image').value;
+
+        try {
+            const response = await fetch(`/posts/${postId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ title, caption, image })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message);
+            }
+
+            alert('Post updated successfully');
+            window.location.href = '/profile'; // Redirect to profile page after successful update
+        } catch (error) {
+            console.error('Error updating post:', error);
+            alert(error.message); // Display error message to the user
+        }
+    }
+
+    const editPostForm = document.getElementById('edit-post-form');
+    if (editPostForm) {
+        editPostForm.addEventListener('submit', updatePost);
+    }
+
+    // Check if on edit.html page and load post details
+    const urlParams = new URLSearchParams(window.location.search);
+    const postId = urlParams.get('postId');
+    if (postId) {
+        fetchPostDetails(postId);
     }
 
     function setupPagination(currentPage) {
