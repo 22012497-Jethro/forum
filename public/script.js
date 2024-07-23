@@ -187,7 +187,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
                     <p>${post.caption}</p>
                     <p><small>Created at: ${new Date(post.created_at).toLocaleString()}</small></p>
-                    <button class="delete-post-button" data-post-id="${post.id}" data-image-url="${post.image}">Delete Post</button>
+                    <div class="post-actions">
+                        <button class="edit-post-button" data-post-id="${post.id}">Edit Post</button>
+                        <button class="delete-post-button" data-post-id="${post.id}" data-image-url="${post.image}">Delete Post</button>
+                    </div>
                 </div>
             `;
             userPostsContainer.appendChild(postElement);
@@ -210,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const postId = event.target.getAttribute('data-post-id');
         window.location.href = `/edit.html?postId=${postId}`;
     }
-    
+
     async function handleDeletePost(event) {
         const postId = event.target.getAttribute('data-post-id');
         const imageUrl = event.target.getAttribute('data-image-url');
