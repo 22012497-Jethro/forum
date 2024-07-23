@@ -35,7 +35,7 @@ nav {
 
 /* Ensure content below the navbar is not hidden */
 body.main-page {
-    padding-top: 20px; /* Adjust this value based on the height of your navbar */
+    padding-top: 70px; /* Adjust this value based on the height of your navbar */
 }
 
 .nav-left, .nav-right {
@@ -419,4 +419,55 @@ button:hover {
 
 .delete-post-button:hover {
     background-color: #da190b;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+    }
+
+    .nav-left, .nav-right {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .nav-right {
+        margin-top: 10px;
+    }
+
+    #theme-switch, #create-post-button {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 10px;
+    }
+
+    .post {
+        width: 90%;
+    }
+}
+
+@media (max-width: 480px) {
+    nav {
+        flex-direction: column;
+    }
+
+    .nav-left, .nav-right {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .nav-right {
+        margin-top: 10px;
+    }
+
+    #theme-switch, #create-post-button {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 10px;
+    }
+
+    .post {
+        width: 100%;
+    }
 }
