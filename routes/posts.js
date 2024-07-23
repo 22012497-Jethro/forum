@@ -26,19 +26,21 @@ const authenticateUser = (req, res, next) => {
 // Apply authentication middleware to the routes
 router.use(authenticateUser);
 
-// Update a post
-router.put('/:id', upload.single('image'), async (req, res) => {
-    const { id } = req.params;
-    const { title, caption, category, theme, number_of_rooms, room_category } = req.body;
+// Create a new post
+router.post('/create', upload.single('image'), async (req, res) => {
+    const { title, caption, category, theme, rooms, room_category } = req.body;
     const imageFile = req.file;
+    const userId = req.session.userId; // Assuming user ID is stored in session
 
-    let imageUrl = req.body.current_image_url; // default to the current image URL
+    let imageUrl = '';
 
     if (imageFile) {
-        // Upload the new image to Supabase Storage
+        // Upload the image to Supabase Storage
         const { data, error } = await supabase.storage
             .from('post-images')
-            .upload(`public/${imageFile.filename}`, imageFile.path);
+            .upload(`public/${imageFile.originalname}`, imageFile.buffer, {
+                contentType: imageFile.mimetype
+            });
 
         if (error) {
             console.error('Error uploading image:', error);
@@ -48,34 +50,28 @@ router.put('/:id', upload.single('image'), async (req, res) => {
         imageUrl = data.Key;
     }
 
-    const updates = {
+    const post = {
         title,
         caption,
         category,
         theme,
-        number_of_rooms,
+        rooms,
         room_category,
-        image: imageUrl
+        image: imageUrl,
+        user_id: userId,
+        created_at: new Date().toISOString()
     };
 
-    // Remove undefined fields from the updates object
-    Object.keys(updates).forEach(key => {
-        if (updates[key] === undefined) {
-            delete updates[key];
-        }
-    });
-
-    const { error } = await supabase
+    const { data, error } = await supabase
         .from('posts')
-        .update(updates)
-        .eq('id', id);
+        .insert(post);
 
     if (error) {
-        console.error('Error updating post:', error);
-        return res.status(500).json({ message: 'Error updating post' });
+        console.error('Error creating post:', error);
+        return res.status(500).json({ message: 'Error creating post' });
     }
 
-    res.json({ message: 'Post updated successfully' });
+    res.json({ message: 'Post created successfully', post: data[0] });
 });
 
 // Delete post endpoint
