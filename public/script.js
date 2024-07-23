@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const postId = event.target.getAttribute('data-post-id');
         window.location.href = `/edit.html?postId=${postId}`;
     }
-
+    
     async function handleDeletePost(event) {
         const postId = event.target.getAttribute('data-post-id');
         const imageUrl = event.target.getAttribute('data-image-url');
