@@ -26,53 +26,77 @@ const authenticateUser = (req, res, next) => {
 // Apply authentication middleware to the routes
 router.use(authenticateUser);
 
-// Create a new post
-router.post('/create', upload.single('image'), async (req, res) => {
+// Create post endpoint
+router.post("/create", upload.single('image'), async (req, res) => {
     const { title, caption, category, theme, rooms, room_category } = req.body;
-    const imageFile = req.file;
-    const userId = req.session.userId; // Assuming user ID is stored in session
+    const userId = req.session.userId;
+    let imageUrl = null;
 
-    let imageUrl = '';
+    if (req.file) {
+        console.log("Received file:", req.file);
+        try {
+            const uploadResponse = await supabase
+                .storage
+                .from('post-images')
+                .upload(`${Date.now()}-${req.file.originalname}`, req.file.buffer, {
+                    cacheControl: '3600',
+                    upsert: false,
+                });
 
-    if (imageFile) {
-        // Upload the image to Supabase Storage
-        const { data, error } = await supabase.storage
-            .from('post-images')
-            .upload(`public/${imageFile.originalname}`, imageFile.buffer, {
-                contentType: imageFile.mimetype
-            });
+            console.log("Upload response:", uploadResponse);
+
+            if (uploadResponse.error) {
+                console.error("Error uploading to Supabase storage:", uploadResponse.error.message);
+                return res.status(500).send("Error uploading image: " + uploadResponse.error.message);
+            }
+
+            const uploadedPath = uploadResponse.data.path;
+
+            console.log("Uploaded Path:", uploadedPath);
+
+            const publicUrlResponse = supabase
+                .storage
+                .from('post-images')
+                .getPublicUrl(uploadedPath);
+
+            console.log("Public URL response:", publicUrlResponse);
+
+            if (publicUrlResponse.error) {
+                console.error("Error generating public URL:", publicUrlResponse.error.message);
+                return res.status(500).send("Error generating public URL: " + publicUrlResponse.error.message);
+            }
+
+            imageUrl = publicUrlResponse.data.publicUrl;
+            console.log("Generated image URL:", imageUrl);
+        } catch (error) {
+            console.error("Supabase storage error:", error.message);
+            return res.status(500).send("Error uploading image: " + error.message);
+        }
+    } else {
+        console.log("No file uploaded");
+    }
+
+    try {
+        const createdAt = new Date().toISOString();
+        console.log("Creating post with data:", { title, caption, image: imageUrl, category, theme, rooms, room_category, user_id: userId, created_at: createdAt });
+
+        const { data, error } = await supabase
+            .from('posts')
+            .insert([{ title, caption, image: imageUrl, category, theme, rooms, room_category, user_id: userId, created_at: createdAt }]);
 
         if (error) {
-            console.error('Error uploading image:', error);
-            return res.status(500).json({ message: 'Error uploading image' });
+            console.error("Error inserting post into database:", error.message);
+            return res.status(500).send("Error creating post: " + error.message);
         }
 
-        imageUrl = data.Key;
+        console.log("Post created successfully:", data);
+        res.redirect("/main");
+    } catch (err) {
+        console.error("Error creating post:", err.message);
+        res.status(500).send("Internal server error: " + err.message);
     }
-
-    const post = {
-        title,
-        caption,
-        category,
-        theme,
-        rooms,
-        room_category,
-        image: imageUrl,
-        user_id: userId,
-        created_at: new Date().toISOString()
-    };
-
-    const { data, error } = await supabase
-        .from('posts')
-        .insert(post);
-
-    if (error) {
-        console.error('Error creating post:', error);
-        return res.status(500).json({ message: 'Error creating post' });
-    }
-
-    res.json({ message: 'Post created successfully', post: data[0] });
 });
+
 
 // Delete post endpoint
 router.delete('/:postId', authenticateUser, async (req, res) => {
