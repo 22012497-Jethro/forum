@@ -230,7 +230,7 @@ section {
     background-color: #f0f0f0;
     display: flex;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 10px;
 }
 
 /* Add styles for creator's profile picture */
@@ -264,6 +264,16 @@ section {
     margin-top: 10px;
 }
 
+/* Adjust body height and flex direction for main page */
+body.main-page {
+    background-image: none;
+    height: auto;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    padding-top: 60px; /* height of the navbar */
+}
+
 /* Recent posts section styling */
 .recent-posts-section {
     text-align: center;
@@ -274,7 +284,7 @@ section {
     flex-direction: column;
 }
 
-.recent-posts-section h2 {
+.recent-posts-section h3 {
     margin: 0 0 20px 0;
 }
 
@@ -285,6 +295,7 @@ section {
     padding: 10px;
     border: 1px solid #ccc; /* Optional: for visual separation */
     background-color: #f9f9f9; /* Optional: background color */
+    max-height: 500px; /* Adjust this height as needed */
 }
 
 /* Individual post styling */
