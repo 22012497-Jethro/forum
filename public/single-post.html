@@ -4,6 +4,7 @@
     <title>Post Details</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="script.js" defer></script>
+    <script src="comments.js" defer></script> <!-- Include the new comments script -->
 </head>
 <body>
     <nav>
@@ -33,10 +34,11 @@
         </div>
         <div id="add-comment-container">
             <h3>Add a Comment</h3>
-            <form id="add-comment-form">
-                <textarea id="comment-text" placeholder="Type your comment here..." required></textarea>
-                <button type="submit">Submit</button>
+            <form id="comment-form">
+                <textarea id="comment-text" placeholder="Add a comment..."></textarea>
+                <button type="submit">Post Comment</button>
             </form>
+            <div id="comments-section"></div>
         </div>
     </section>
 </body>
