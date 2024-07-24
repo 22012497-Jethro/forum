@@ -98,26 +98,35 @@ router.post("/create", upload.single('image'), async (req, res) => {
 });
 
 // Delete post endpoint
-// Get a single post by ID
-router.get('/:post_id', async (req, res) => {
-    const { post_id } = req.params;
+router.delete('/:postId', authenticateUser, async (req, res) => {
+    const { postId } = req.params;
+    const { image_url } = req.body;
 
     try {
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('posts')
-            .select('*')
-            .eq('id', post_id)
-            .single();
+            .delete()
+            .eq('id', postId);
 
         if (error) {
-            console.error('Error fetching post:', error);
-            return res.status(500).json({ message: 'Error fetching post' });
+            return res.status(500).send('Error deleting post');
         }
 
-        res.status(200).json(data);
+        if (image_url) {
+            const imagePath = image_url.split('/').pop();
+            const { error: storageError } = await supabase
+                .storage
+                .from('post-images')
+                .remove([imagePath]);
+
+            if (storageError) {
+                return res.status(500).send('Error deleting image');
+            }
+        }
+
+        res.sendStatus(204);
     } catch (error) {
-        console.error('Internal server error:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).send('Error deleting post');
     }
 });
 

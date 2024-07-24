@@ -45,6 +45,10 @@ function loadPost() {
     fetch(`/posts/${postId}`)
         .then(response => response.json())
         .then(post => {
+            if (!post) {
+                console.error('No post found');
+                return;
+            }
             const postElement = document.getElementById('post-container');
             postElement.innerHTML = `
                 <h1>${post.title || 'No title'}</h1>
