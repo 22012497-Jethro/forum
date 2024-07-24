@@ -32,6 +32,7 @@ app.get("/post", (req, res) => res.sendFile(path.join(__dirname, 'public/post.ht
 app.get("/edit", (req, res) => res.sendFile(path.join(__dirname, 'public/edit.html')));
 app.get("/settings", (req, res) => res.sendFile(path.join(__dirname, 'public/settings.html')));
 app.get("/profile", (req, res) => res.sendFile(path.join(__dirname, 'public/profile.html')));
+app.get("/single-post", (req, res) => res.sendFile(path.join(__dirname, 'public/single-post.html')));
 
 // Use the posts and users routers
 app.use('/posts', postsRouter);
