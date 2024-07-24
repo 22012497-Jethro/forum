@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fetch post data and populate form
     async function fetchPostData() {
         const urlParams = new URLSearchParams(window.location.search);
-        const postId = urlParams.get('id');
+        const postId = urlParams.get('postId');
 
         try {
             const response = await fetch(`/posts/${postId}`);
@@ -33,8 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('post-theme').value = post.theme || '';
         document.getElementById('post-rooms').value = post.number_of_rooms || 1;
         document.getElementById('post-room-category').value = post.room_category || '';
-        document.getElementById('current-image').src = post.image || '';
-        document.getElementById('current-image').style.display = post.image ? 'block' : 'none';
+        if (post.image) {
+            document.getElementById('current-image').src = post.image;
+            document.getElementById('current-image').style.display = 'block';
+        } else {
+            document.getElementById('current-image').style.display = 'none';
+        }
     }
 
     // Update post function
@@ -42,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         event.preventDefault();
 
         const urlParams = new URLSearchParams(window.location.search);
-        const postId = urlParams.get('id');
+        const postId = urlParams.get('postId');
 
         const formData = new FormData(event.target);
         const postDetails = {
