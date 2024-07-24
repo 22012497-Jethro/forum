@@ -155,24 +155,27 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayPosts(posts) {
         const postsContainer = document.getElementById('posts-container');
         postsContainer.innerHTML = '';
-
+    
         posts.forEach(post => {
             const postElement = document.createElement('div');
             postElement.classList.add('post');
             postElement.innerHTML = `
                 <div class="post-header">
                     <img src="${post.profile_pic || 'default-profile.png'}" alt="Creator's Profile Picture" class="creator-pfp">
-                    <span class="post-username">${post.username}</span>
+                    <h2 class="post-title"><a href="/post/${post.id}">${post.title}</a></h2>
                 </div>
-                <div class="post-details">
-                    <h3 class="post-title"><strong>${post.title}</strong></h3>
-                    ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
-                    <p>${post.caption}</p>
+                <div class="post-content">
+                    ${post.content}
+                </div>
+                <div class="post-footer">
+                    <span class="post-date">${new Date(post.created_at).toLocaleDateString()}</span>
+                    <span class="post-author">by ${post.author}</span>
                 </div>
             `;
             postsContainer.appendChild(postElement);
         });
     }
+    
 
     function displayUserPosts(posts) {
         const userPostsContainer = document.getElementById('user-posts-container');
