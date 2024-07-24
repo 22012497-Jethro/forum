@@ -51,9 +51,15 @@ function loadPost() {
             }
             const postElement = document.getElementById('post-container');
             postElement.innerHTML = `
-                <h1>${post.title || 'No title'}</h1>
-                <p>${post.caption || 'No caption'}</p>
-                <img src="${post.image || 'default-image.png'}" alt="${post.title || 'No title'}" />
+                <div class="post-header">
+                    <img src="${post.profile_pic || 'default-profile.png'}" alt="Creator's Profile Picture" class="creator-pfp">
+                    <span class="post-username">${post.username}</span>
+                </div>
+                <div class="post-details">
+                    <h1>${post.title || 'No title'}</h1>
+                    ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
+                    <p>${post.caption || 'No caption'}</p>
+                </div>
             `;
         })
         .catch(error => console.error('Error loading post:', error));
