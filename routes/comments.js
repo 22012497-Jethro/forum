@@ -7,9 +7,6 @@ const supabaseUrl = "https://fudsrzbhqpmryvmxgced.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1ZHNyemJocXBtcnl2bXhnY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM5MjE3OTQsImV4cCI6MjAyOTQ5Nzc5NH0.6UMbzoD8J1BQl01h6NSyZAHVhrWerUcD5VVGuBwRcag";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Middleware to verify user authentication
-const authenticateUser = require('../middleware/authenticateUser');
-
 // Add a comment
 router.post('/addComment', async (req, res) => {
     const { user_id, post_id, comment } = req.body;
