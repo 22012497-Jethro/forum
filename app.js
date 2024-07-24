@@ -22,15 +22,6 @@ app.use(session({
     cookie: { secure: false } // Set to true if using HTTPS
 }));
 
-// Middleware to pass session error message to the views
-app.use((req, res, next) => {
-    if (req.session.errorMessage) {
-        res.locals.errorMessage = req.session.errorMessage;
-        delete req.session.errorMessage;
-    }
-    next();
-});
-
 // Serve static files for the frontend
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, 'public/index.html')));
 app.get("/login", (req, res) => res.sendFile(path.join(__dirname, 'public/login.html')));

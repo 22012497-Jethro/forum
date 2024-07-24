@@ -84,8 +84,7 @@ router.post("/login", async (req, res) => {
 
     if (!email || !password) {
         console.log("Missing fields in login request");
-        req.session.errorMessage = 'All fields are required';
-        return res.redirect('/login');
+        return res.status(400).send("All fields are required");
     }
 
     try {
@@ -96,8 +95,7 @@ router.post("/login", async (req, res) => {
 
         if (error) {
             console.error("Error during login:", error);
-            req.session.errorMessage = 'Invalid email or password';
-            return res.redirect('/login');
+            return res.status(400).send("Invalid email or password");
         }
 
         console.log("Login successful:", data);
@@ -109,17 +107,8 @@ router.post("/login", async (req, res) => {
         res.redirect(`/main?email=${encodeURIComponent(email)}`);
     } catch (err) {
         console.error("Error during login:", err);
-        req.session.errorMessage = 'Internal server error: ' + err.message;
-        res.redirect('/login');
+        res.status(500).send("Internal server error: " + err.message);
     }
-});
-
-router.use((req, res, next) => {
-    if (req.session.errorMessage) {
-        res.locals.errorMessage = req.session.errorMessage;
-        delete req.session.errorMessage;
-    }
-    next();
 });
 
 // Fetch user profile data
