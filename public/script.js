@@ -162,20 +162,17 @@ document.addEventListener('DOMContentLoaded', () => {
             postElement.innerHTML = `
                 <div class="post-header">
                     <img src="${post.profile_pic || 'default-profile.png'}" alt="Creator's Profile Picture" class="creator-pfp">
-                    <h2 class="post-title"><a href="/post/${post.id}">${post.title}</a></h2>
+                    <span class="post-username">${post.username}</span>
                 </div>
-                <div class="post-content">
-                    ${post.content}
-                </div>
-                <div class="post-footer">
-                    <span class="post-date">${new Date(post.created_at).toLocaleDateString()}</span>
-                    <span class="post-author">by ${post.author}</span>
+                <div class="post-details">
+                    <h3 class="post-title"><strong><a href="/post/${post.id}">${post.title}</a></strong></h3>
+                    ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
+                    <p>${post.caption}</p>
                 </div>
             `;
             postsContainer.appendChild(postElement);
         });
     }
-    
 
     function displayUserPosts(posts) {
         const userPostsContainer = document.getElementById('user-posts-container');
