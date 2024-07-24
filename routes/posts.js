@@ -132,26 +132,29 @@ router.delete('/:postId', authenticateUser, async (req, res) => {
 });
 
 // Fetch post data
-router.get('/:id', async (req, res) => {
-    const postId = req.params.id;
+router.get('/:post_id', async (req, res) => {
+    const { post_id } = req.params;
 
     try {
-        const { data: post, error } = await supabase
+        const { data, error } = await supabase
             .from('posts')
             .select('*')
-            .eq('id', postId)
+            .eq('id', post_id)
             .single();
 
         if (error) {
-            return res.status(500).send('Error fetching post data');
+            console.error('Error fetching post:', error);
+            return res.status(500).json({ message: 'Error fetching post' });
         }
 
-        res.json(post);
+        res.status(200).json(data);
     } catch (error) {
-        console.error('Error fetching post data:', error);
-        res.status(500).send('Error fetching post data');
+        console.error('Internal server error:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+module.exports = router;
 
 // Update a post
 router.put('/:id', upload.single('image'), async (req, res) => {

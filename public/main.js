@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', (event) => {
     loadPosts();
 
-    // Add click event to posts to navigate to the post detail page
     document.getElementById('posts-container').addEventListener('click', (event) => {
         const postElement = event.target.closest('.post');
         if (postElement) {

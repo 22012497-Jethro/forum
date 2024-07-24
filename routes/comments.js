@@ -11,30 +11,47 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const authenticateUser = require('../middleware/authenticateUser');
 
 // Route to add a comment
-router.post('/addComment', authenticateUser, async (req, res) => {
+router.post('/addComment', async (req, res) => {
     const { user_id, post_id, comment } = req.body;
-    const { data, error } = await supabase
-        .from('comments')
-        .insert([{ user_id, post_id, comment, created_at: new Date() }]);
 
-    if (error) {
-        return res.status(400).json({ error: error.message });
+    try {
+        const { data, error } = await supabase
+            .from('comments')
+            .insert([{ user_id, post_id, comment, created_at: new Date().toISOString() }]);
+
+        if (error) {
+            console.error('Error adding comment:', error);
+            return res.status(500).json({ message: 'Error adding comment' });
+        }
+
+        res.status(201).json(data);
+    } catch (error) {
+        console.error('Internal server error:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
-    res.status(201).json(data);
 });
 
-// Route to get comments for a specific post
+// Get comments for a post
 router.get('/', async (req, res) => {
     const { post_id } = req.query;
-    const { data, error } = await supabase
-        .from('comments')
-        .select('*')
-        .eq('post_id', post_id);
 
-    if (error) {
-        return res.status(400).json({ error: error.message });
+    try {
+        const { data, error } = await supabase
+            .from('comments')
+            .select('*')
+            .eq('post_id', post_id)
+            .order('created_at', { ascending: true });
+
+        if (error) {
+            console.error('Error fetching comments:', error);
+            return res.status(500).json({ message: 'Error fetching comments' });
+        }
+
+        res.status(200).json(data);
+    } catch (error) {
+        console.error('Internal server error:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
-    res.status(200).json(data);
 });
 
 module.exports = router;
