@@ -183,47 +183,55 @@ router.put('/:id', upload.single('image'), async (req, res) => {
 });
 
 // Get all posts with pagination
-router.get('/', async (req, res) => {
-    const { page = 1, limit = 10 } = req.query;
-    const start = (page - 1) * limit;
-    const end = start + limit - 1;
+router.put('/:id', upload.single('image'), async (req, res) => {
+    const { id } = req.params;
+    const { title, caption, category, theme, number_of_rooms, room_category } = req.body;
+    const imageFile = req.file;
 
-    try {
-        const { data: posts, error } = await supabase
-            .from('posts')
-            .select('id, title, caption, user_id, created_at, category, theme, rooms, room_category, image')
-            .order('created_at', { ascending: false })
-            .range(start, end);
+    let imageUrl = req.body.current_image_url; // default to the current image URL
+
+    if (imageFile) {
+        // Upload the new image to Supabase Storage
+        const { data, error } = await supabase.storage
+            .from('post-images')
+            .upload(`public/${imageFile.filename}`, imageFile.path);
 
         if (error) {
-            return res.status(500).send('Error fetching posts');
+            console.error('Error uploading image:', error);
+            return res.status(500).json({ message: 'Error uploading image' });
         }
 
-        const userIds = posts.map(post => post.user_id);
-        const { data: users, error: userError } = await supabase
-            .from('users')
-            .select('id, username, pfp')
-            .in('id', userIds);
-
-        if (userError) {
-            return res.status(500).send('Error fetching users');
-        }
-
-        const postsWithUsernames = posts.map(post => {
-            const user = users.find(user => user.id === post.user_id);
-            return { 
-                ...post, 
-                username: user ? user.username : 'Unknown', 
-                profile_pic: user ? user.pfp : 'default-profile.png' 
-            };
-        });
-
-        console.log(postsWithUsernames); // Log the fetched data for debugging
-
-        res.json(postsWithUsernames);
-    } catch (error) {
-        res.status(500).send('Error fetching posts');
+        imageUrl = data.Key;
     }
+
+    const updates = {
+        title,
+        caption,
+        category,
+        theme,
+        number_of_rooms,
+        room_category,
+        image: imageUrl
+    };
+
+    // Remove undefined fields from the updates object
+    Object.keys(updates).forEach(key => {
+        if (updates[key] === undefined) {
+            delete updates[key];
+        }
+    });
+
+    const { error } = await supabase
+        .from('posts')
+        .update(updates)
+        .eq('id', id);
+
+    if (error) {
+        console.error('Error updating post:', error);
+        return res.status(500).json({ message: 'Error updating post' });
+    }
+
+    res.json({ message: 'Post updated successfully' });
 });
 
 // Fetch posts endpoint
