@@ -183,23 +183,47 @@ router.put('/:id', upload.single('image'), async (req, res) => {
     res.json({ message: 'Post updated successfully' });
 });
 
-// Get all posts
+// Get all posts with pagination
 router.get('/', async (req, res) => {
+    const { page = 1, limit = 10 } = req.query;
+    const start = (page - 1) * limit;
+    const end = start + limit - 1;
+
     try {
-        const { data, error } = await supabase
+        const { data: posts, error } = await supabase
             .from('posts')
-            .select('*')
-            .order('created_at', { ascending: false });
+            .select('id, title, caption, user_id, created_at, category, theme, rooms, room_category, image')
+            .order('created_at', { ascending: false })
+            .range(start, end);
 
         if (error) {
-            console.error('Error fetching posts:', error);
-            return res.status(500).json({ message: 'Error fetching posts' });
+            return res.status(500).send('Error fetching posts');
         }
 
-        res.status(200).json(data);
+        const userIds = posts.map(post => post.user_id);
+        const { data: users, error: userError } = await supabase
+            .from('users')
+            .select('id, username, pfp')
+            .in('id', userIds);
+
+        if (userError) {
+            return res.status(500).send('Error fetching users');
+        }
+
+        const postsWithUsernames = posts.map(post => {
+            const user = users.find(user => user.id === post.user_id);
+            return { 
+                ...post, 
+                username: user ? user.username : 'Unknown', 
+                profile_pic: user ? user.pfp : 'default-profile.png' 
+            };
+        });
+
+        console.log(postsWithUsernames); // Log the fetched data for debugging
+
+        res.json(postsWithUsernames);
     } catch (error) {
-        console.error('Internal server error:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).send('Error fetching posts');
     }
 });
 
