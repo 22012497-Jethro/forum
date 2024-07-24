@@ -10,7 +10,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // Middleware to verify user authentication
 const authenticateUser = require('../middleware/authenticateUser');
 
-// Route to add a comment
+// Add a comment
 router.post('/addComment', async (req, res) => {
     const { user_id, post_id, comment } = req.body;
 
