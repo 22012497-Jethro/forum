@@ -1,70 +1,52 @@
-document.addEventListener('DOMContentLoaded', (event) => {
-    loadPost();
-    loadComments();
+document.addEventListener('DOMContentLoaded', async () => {
+    const params = new URLSearchParams(window.location.search);
+    const postId = params.get('id');
 
-    document.getElementById('comment-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const commentText = document.getElementById('comment-text').value;
-        const postId = getPostId();
-        const userId = getUserId();
-
-        if (commentText.trim() === "") {
-            alert("Comment cannot be empty.");
-            return;
-        }
-
-        const response = await fetch('/comments/addComment', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ user_id: userId, post_id: postId, comment: commentText }),
-        });
-
-        if (response.ok) {
-            const newComment = await response.json();
-            displayComment(newComment[0]); // Assuming the response is an array with the new comment as the first element
-            document.getElementById('comment-text').value = ''; // Clear the comment form
-        } else {
-            console.error('Failed to add comment');
-        }
-    });
+    if (postId) {
+        const post = await fetchPost(postId);
+        displayPost(post);
+    }
 });
 
-function getPostId() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('post_id');
+async function fetchPost(id) {
+    // Replace with your Supabase project URL and key
+    const supabaseUrl = "https://fudsrzbhqpmryvmxgced.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1ZHNyemJocXBtcnl2bXhnY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM5MjE3OTQsImV4cCI6MjAyOTQ5Nzc5NH0.6UMbzoD8J1BQl01h6NSyZAHVhrWerUcD5VVGuBwRcag";
+
+    const { createClient } = supabase;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    let { data: post, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+    if (error) {
+        console.error('Error fetching post:', error);
+        return null;
+    }
+    console.log('Fetched post:', post); // Debugging line
+    return post;
 }
 
-function getUserId() {
-    return document.getElementById('profile-username').dataset.userId;
-}
-
-function loadPost() {
-    const postId = getPostId();
-    fetch(`/posts/${postId}`)
-        .then(response => response.json())
-        .then(post => {
-            const postElement = document.getElementById('post-container');
-            postElement.innerHTML = `<h1>${post.title}</h1><p>${post.caption}</p><img src="${post.image}" alt="${post.title}" />`;
-        })
-        .catch(error => console.error('Error loading post:', error));
-}
-
-async function loadComments() {
-    const postId = getPostId();
-    const response = await fetch(`/comments?post_id=${postId}`);
-    const comments = await response.json();
-    comments.forEach(comment => displayComment(comment));
-}
-
-function displayComment(comment) {
-    const commentsSection = document.getElementById('comments-section');
-    const commentElement = document.createElement('div');
-    commentElement.classList.add('comment');
-    commentElement.innerHTML = `
-        <p>${comment.comment}</p>
-        <small>By User ${comment.user_id} on ${new Date(comment.created_at).toLocaleString()}</small>
+function displayPost(post) {
+    const postContainer = document.getElementById('post-container');
+    if (!post) {
+        postContainer.innerHTML = '<p>Post not found</p>';
+        return;
+    }
+    postContainer.innerHTML = `
+        <div class="post">
+            <div class="post-header">
+                <img src="${post.profile_pic || 'default-profile.png'}" alt="Creator's Profile Picture" class="creator-pfp">
+                <span class="post-username">${post.username}</span>
+            </div>
+            <div class="post-details">
+                <h3 class="post-title"><strong>${post.title}</strong></h3>
+                ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
+                <p>${post.caption}</p>
+            </div>
+        </div>
     `;
-    commentsSection.appendChild(commentElement);
 }
