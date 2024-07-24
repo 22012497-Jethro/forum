@@ -46,7 +46,11 @@ function loadPost() {
         .then(response => response.json())
         .then(post => {
             const postElement = document.getElementById('post-container');
-            postElement.innerHTML = `<h1>${post.title}</h1><p>${post.caption}</p><img src="${post.image}" alt="${post.title}" />`;
+            postElement.innerHTML = `
+                <h1>${post.title || 'No title'}</h1>
+                <p>${post.caption || 'No caption'}</p>
+                <img src="${post.image || 'default-image.png'}" alt="${post.title || 'No title'}" />
+            `;
         })
         .catch(error => console.error('Error loading post:', error));
 }

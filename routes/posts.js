@@ -98,6 +98,7 @@ router.post("/create", upload.single('image'), async (req, res) => {
 });
 
 // Delete post endpoint
+// Get a single post by ID
 router.get('/:post_id', async (req, res) => {
     const { post_id } = req.params;
 
