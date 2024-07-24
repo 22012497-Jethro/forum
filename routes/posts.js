@@ -97,7 +97,6 @@ router.post("/create", upload.single('image'), async (req, res) => {
     }
 });
 
-
 // Delete post endpoint
 router.delete('/:postId', authenticateUser, async (req, res) => {
     const { postId } = req.params;

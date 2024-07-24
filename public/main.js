@@ -24,8 +24,8 @@ function loadPosts() {
                 postElement.classList.add('post');
                 postElement.setAttribute('data-post-id', post.id);
                 postElement.innerHTML = `
-                    <h4 class="post-title"><a href="/post.html?post_id=${post.id}">${post.title}</a></h4>
-                    <p class="post-content">${post.content}</p>
+                    <h4 class="post-title"><a href="/single-post.html?post_id=${post.id}">${post.title}</a></h4>
+                    <p class="post-content">${post.caption}</p>
                 `;
                 postsContainer.appendChild(postElement);
             });
