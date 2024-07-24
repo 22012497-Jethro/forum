@@ -27,6 +27,7 @@ app.get("/", (req, res) => res.sendFile(path.join(__dirname, 'public/index.html'
 app.get("/login", (req, res) => res.sendFile(path.join(__dirname, 'public/login.html')));
 app.get("/signup", (req, res) => res.sendFile(path.join(__dirname, 'public/signup.html')));
 app.get("/main", (req, res) => res.sendFile(path.join(__dirname, 'public/main.html')));
+app.get('/create-post', (req, res) => res.sendFile(path.join(__dirname, 'public', 'create-post.html')));
 app.get("/post", (req, res) => res.sendFile(path.join(__dirname, 'public/post.html')));
 app.get("/edit", (req, res) => res.sendFile(path.join(__dirname, 'public/edit.html')));
 app.get("/settings", (req, res) => res.sendFile(path.join(__dirname, 'public/settings.html')));
