@@ -122,7 +122,7 @@ router.get("/user-profile", async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('users')
-            .select('username, pfp')
+            .select('username, email, pfp')
             .eq('id', userId)
             .single();
 
@@ -141,12 +141,10 @@ router.get("/user-profile", async (req, res) => {
 // Update user profile route
 router.post('/update-profile', upload.single('pfp'), async (req, res) => {
     const { username, email } = req.body;
-    const userId = req.session.userId; // Assuming you store user ID in the session
+    const userId = req.session.userId;
     let updatedFields = {};
 
-    // Check if username is provided
     if (username) {
-        // Check if username is already taken
         const { data: usernameData, error: usernameError } = await supabase
             .from('users')
             .select('username')
@@ -163,9 +161,7 @@ router.post('/update-profile', upload.single('pfp'), async (req, res) => {
         updatedFields.username = username;
     }
 
-    // Check if email is provided
     if (email) {
-        // Check if email is already taken
         const { data: emailData, error: emailError } = await supabase
             .from('users')
             .select('email')
@@ -182,11 +178,10 @@ router.post('/update-profile', upload.single('pfp'), async (req, res) => {
         updatedFields.email = email;
     }
 
-    // Check if profile picture is provided
     if (req.file) {
         try {
             const uploadPath = `pfp/${Date.now()}-${req.file.originalname}`;
-            const uploadResponse = await supabase
+            const { data: uploadData, error: uploadError } = await supabase
                 .storage
                 .from('user profile')
                 .upload(uploadPath, req.file.buffer, {
@@ -194,26 +189,25 @@ router.post('/update-profile', upload.single('pfp'), async (req, res) => {
                     upsert: false,
                 });
 
-            if (uploadResponse.error) {
+            if (uploadError) {
                 return res.status(500).json({ message: 'Error uploading profile picture' });
             }
 
-            const publicUrlResponse = supabase
+            const { publicUrl } = supabase
                 .storage
                 .from('user profile')
                 .getPublicUrl(uploadPath);
 
-            if (publicUrlResponse.error) {
+            if (publicUrl.error) {
                 return res.status(500).json({ message: 'Error generating profile picture URL' });
             }
 
-            updatedFields.pfp = publicUrlResponse.data.publicUrl;
+            updatedFields.pfp = publicUrl.publicUrl;
         } catch (error) {
             return res.status(500).json({ message: 'Error uploading profile picture' });
         }
     }
 
-    // Update user data in Supabase
     const { data, error } = await supabase
         .from('users')
         .update(updatedFields)
