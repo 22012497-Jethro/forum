@@ -95,7 +95,8 @@ router.post("/login", async (req, res) => {
 
         if (error) {
             console.error("Error during login:", error);
-            return res.status(400).send("Invalid email or password");
+            req.session.errorMessage = 'Invalid email or password';
+            return res.redirect('/login');
         }
 
         console.log("Login successful:", data);
@@ -109,6 +110,14 @@ router.post("/login", async (req, res) => {
         console.error("Error during login:", err);
         res.status(500).send("Internal server error: " + err.message);
     }
+});
+
+router.use((req, res, next) => {
+    if (req.session.errorMessage) {
+        res.locals.errorMessage = req.session.errorMessage;
+        delete req.session.errorMessage;
+    }
+    next();
 });
 
 // Fetch user profile data
