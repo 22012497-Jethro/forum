@@ -4,7 +4,7 @@
     <title>Post Details</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="script.js" defer></script>
-    <script src="comments.js" defer></script> <!-- Include the new comments script -->
+    <script src="comment.js" defer></script> <!-- Include the renamed comment script -->
 </head>
 <body>
     <nav>
@@ -16,7 +16,7 @@
             <a href="/main"><button id="home-button">Home</button></a>
             <div class="dropdown">
                 <img src="default-profile.png" alt="Profile Picture" id="profile-pic">
-                <span id="profile-username">Username</span>
+                <span id="profile-username" data-user-id="1">Username</span>
                 <div class="dropdown-content">
                     <p id="settings-button">Settings</p>
                     <p id="logout-button">Logout</p>

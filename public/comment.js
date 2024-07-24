@@ -8,6 +8,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const postId = getPostId();
         const userId = getUserId();
 
+        if (commentText.trim() === "") {
+            alert("Comment cannot be empty.");
+            return;
+        }
+
         const response = await fetch('/comments/addComment', {
             method: 'POST',
             headers: {
@@ -28,25 +33,25 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 function getPostId() {
     // Function to retrieve the current post ID from the URL or page context
-    // Replace with your actual implementation
-    return 1; // Example post ID
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('post_id');
 }
 
 function getUserId() {
     // Function to retrieve the current user ID from the session or page context
-    // Replace with your actual implementation
-    return 1; // Example user ID
+    return document.getElementById('profile-username').dataset.userId;
 }
 
 function loadPost() {
     // Function to load the post content dynamically
-    // Replace with your actual implementation
-    const post = {
-        title: 'Sample Post',
-        content: 'This is a sample post content.'
-    };
-    const postElement = document.getElementById('post-container');
-    postElement.innerHTML = `<h1>${post.title}</h1><p>${post.content}</p>`;
+    const postId = getPostId();
+    fetch(`/posts/${postId}`)
+        .then(response => response.json())
+        .then(post => {
+            const postElement = document.getElementById('post-container');
+            postElement.innerHTML = `<h1>${post.title}</h1><p>${post.content}</p>`;
+        })
+        .catch(error => console.error('Error loading post:', error));
 }
 
 async function loadComments() {
@@ -60,6 +65,9 @@ function displayComment(comment) {
     const commentsSection = document.getElementById('comments-section');
     const commentElement = document.createElement('div');
     commentElement.classList.add('comment');
-    commentElement.textContent = comment.comment;
+    commentElement.innerHTML = `
+        <p>${comment.comment}</p>
+        <small>By User ${comment.user_id} on ${new Date(comment.created_at).toLocaleString()}</small>
+    `;
     commentsSection.appendChild(commentElement);
 }
