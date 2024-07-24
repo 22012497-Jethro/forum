@@ -84,7 +84,8 @@ router.post("/login", async (req, res) => {
 
     if (!email || !password) {
         console.log("Missing fields in login request");
-        return res.status(400).send("All fields are required");
+        req.session.errorMessage = 'All fields are required';
+        return res.redirect('/login');
     }
 
     try {
@@ -108,7 +109,8 @@ router.post("/login", async (req, res) => {
         res.redirect(`/main?email=${encodeURIComponent(email)}`);
     } catch (err) {
         console.error("Error during login:", err);
-        res.status(500).send("Internal server error: " + err.message);
+        req.session.errorMessage = 'Internal server error: ' + err.message;
+        res.redirect('/login');
     }
 });
 
