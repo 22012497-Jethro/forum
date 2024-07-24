@@ -1,78 +1,44 @@
-document.addEventListener('DOMContentLoaded', (event) => {
-    loadPost();
-    loadComments();
-
-    document.getElementById('comment-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const commentText = document.getElementById('comment-text').value;
-        const postId = getPostId();
-        const userId = getUserId();
-
-        if (commentText.trim() === "") {
-            alert("Comment cannot be empty.");
-            return;
-        }
-
-        const response = await fetch('/comments/addComment', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ user_id: userId, post_id: postId, comment: commentText }),
-        });
-
-        if (response.ok) {
-            const newComment = await response.json();
-            displayComment(newComment[0]); // Assuming the response is an array with the new comment as the first element
-            document.getElementById('comment-text').value = ''; // Clear the comment form
-        } else {
-            console.error('Failed to add comment');
-        }
-    });
-});
-
-function getPostId() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('post_id');
-}
-
-function getUserId() {
-    return document.getElementById('profile-username').dataset.userId;
-}
-
-function loadPost() {
-    const postId = getPostId();
-    fetch(`/posts/${postId}`)
-        .then(response => response.json())
-        .then(post => {
-            if (!post) {
-                console.error('No post found');
-                return;
-            }
-            const postElement = document.getElementById('post-container');
-            postElement.innerHTML = `
-                <h1>${post.title || 'No title'}</h1>
-                <p>${post.caption || 'No caption'}</p>
-                <img src="${post.image || 'default-image.png'}" alt="${post.title || 'No title'}" />
-            `;
-        })
-        .catch(error => console.error('Error loading post:', error));
-}
-
-async function loadComments() {
-    const postId = getPostId();
-    const response = await fetch(`/comments?post_id=${postId}`);
-    const comments = await response.json();
-    comments.forEach(comment => displayComment(comment));
-}
-
-function displayComment(comment) {
-    const commentsSection = document.getElementById('comments-section');
-    const commentElement = document.createElement('div');
-    commentElement.classList.add('comment');
-    commentElement.innerHTML = `
-        <p>${comment.comment}</p>
-        <small>By User ${comment.user_id} on ${new Date(comment.created_at).toLocaleString()}</small>
-    `;
-    commentsSection.appendChild(commentElement);
-}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Post Details</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="single-post.js" defer></script> <!-- Ensure this is correct -->
+</head>
+<body>
+    <nav>
+        <div class="nav-left">
+            <img src="logo-dark.png" alt="ReVibe Logo" id="nav-logo">
+            <h1>ReVibe Forum</h1>
+        </div>
+        <div class="nav-right">
+            <a href="/main"><button id="home-button">Home</button></a>
+            <div class="dropdown">
+                <img src="default-profile.png" alt="Profile Picture" id="profile-pic">
+                <span id="profile-username" data-user-id="1">Username</span>
+                <div class="dropdown-content">
+                    <p id="settings-button">Settings</p>
+                    <p id="logout-button">Logout</p>
+                </div>
+            </div>
+            <button id="theme-switch">Switch Theme</button>
+        </div>
+    </nav>
+    <section>
+        <div id="post-container" class="post-container">
+            <!-- Post details will be displayed here -->
+        </div>
+        <div id="comments-container" class="comments-container">
+            <h3>Comments</h3>
+            <div id="comments-section"></div>
+        </div>
+        <div id="add-comment-container">
+            <h3>Add a Comment</h3>
+            <form id="comment-form">
+                <textarea id="comment-text" placeholder="Add a comment..."></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </section>
+</body>
+</html>
