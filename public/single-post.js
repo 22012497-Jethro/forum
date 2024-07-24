@@ -76,3 +76,26 @@ function displayComment(comment) {
     `;
     commentsSection.appendChild(commentElement);
 }
+
+function applyTheme(theme) {
+    document.body.className = theme;
+    const logo = document.getElementById('nav-logo');
+    logo.src = theme === 'dark-mode' ? 'logo-light.png' : 'logo-dark.png';
+    localStorage.setItem('theme', theme);
+}
+
+function setupThemeSwitch() {
+    const themeSwitch = document.getElementById('theme-switch');
+    const savedTheme = localStorage.getItem('theme') || 'light-mode';
+    applyTheme(savedTheme);
+
+    themeSwitch.addEventListener('click', () => {
+        const newTheme = document.body.classList.contains('light-mode') ? 'dark-mode' : 'light-mode';
+        applyTheme(newTheme);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetchAndDisplayUserData();
+    setupThemeSwitch();
+});
