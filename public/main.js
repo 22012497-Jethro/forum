@@ -26,6 +26,7 @@ function loadPosts() {
                 postElement.innerHTML = `
                     <h4 class="post-title"><a href="/single-post.html?post_id=${post.id}">${post.title}</a></h4>
                     <p class="post-content">${post.caption}</p>
+                    <img src="${post.image}" alt="${post.title}" />
                 `;
                 postsContainer.appendChild(postElement);
             });
