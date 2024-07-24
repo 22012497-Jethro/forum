@@ -56,9 +56,9 @@ function loadPost() {
                     <span class="post-username">${post.username}</span>
                 </div>
                 <div class="post-details">
-                    <h1>${post.title || 'No title'}</h1>
+                    <h3 class="post-title"><strong>${post.title}</strong></h3>
                     ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
-                    <p>${post.caption || 'No caption'}</p>
+                    <p>${post.caption}</p>
                 </div>
             `;
         })
