@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="post-username">${post.username}</span>
                 </div>
                 <div class="post-details">
-                    <h3 class="post-title"><strong><a href="/post/${post.id}">${post.title}</a></strong></h3>
+                    <h3 class="post-title"><strong><a href="single-post.html?id=${post.id}">${post.title}</a></strong></h3>
                     ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
                     <p>${post.caption}</p>
                 </div>
