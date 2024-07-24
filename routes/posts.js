@@ -183,6 +183,25 @@ router.put('/:id', upload.single('image'), async (req, res) => {
     res.json({ message: 'Post updated successfully' });
 });
 
+// Get all posts
+router.get('/', async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('posts')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Error fetching posts:', error);
+            return res.status(500).json({ message: 'Error fetching posts' });
+        }
+
+        res.status(200).json(data);
+    } catch (error) {
+        console.error('Internal server error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
 // Fetch posts endpoint
 router.get('/', async (req, res) => {
@@ -271,6 +290,5 @@ router.get('/:post_id', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
-
 
 module.exports = router;
