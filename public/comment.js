@@ -32,18 +32,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
 });
 
 function getPostId() {
-    // Function to retrieve the current post ID from the URL or page context
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('post_id');
 }
 
 function getUserId() {
-    // Function to retrieve the current user ID from the session or page context
     return document.getElementById('profile-username').dataset.userId;
 }
 
 function loadPost() {
-    // Function to load the post content dynamically
     const postId = getPostId();
     fetch(`/posts/${postId}`)
         .then(response => response.json())
