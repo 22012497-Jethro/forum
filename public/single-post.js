@@ -84,7 +84,6 @@ function displayComment(comment) {
     `;
     commentsSection.appendChild(commentElement);
 }
-``
 
 document.addEventListener('DOMContentLoaded', () => {
     // Event listeners for navigation bar
