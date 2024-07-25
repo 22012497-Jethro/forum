@@ -315,7 +315,7 @@ router.get('/:post_id', async (req, res) => {
             return res.status(500).json({ message: 'Error fetching post' });
         }
 
-        console.log('Fetched Post:', data); // Add this line
+        console.log('Fetched Post:', data); // Add this line to verify data
         res.status(200).json(data);
     } catch (error) {
         console.error('Internal server error:', error);
