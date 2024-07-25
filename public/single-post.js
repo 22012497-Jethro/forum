@@ -42,11 +42,11 @@ function getUserId() {
 
 function loadPost() {
     const postId = getPostId();
-    console.log('Post ID:', postId); // Log the post ID
+    console.log('Post ID:', postId); // Log the post ID for debugging
     fetch(`/posts/${postId}`)
         .then(response => response.json())
         .then(post => {
-            console.log('Post Data:', post); // Log the post data
+            console.log('Post Data:', post); // Log the post data for debugging
             if (!post) {
                 console.error('No post found');
                 return;
