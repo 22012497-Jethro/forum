@@ -42,9 +42,11 @@ function getUserId() {
 
 function loadPost() {
     const postId = getPostId();
+    console.log('Post ID:', postId); // Log the post ID
     fetch(`/posts/${postId}`)
         .then(response => response.json())
         .then(post => {
+            console.log('Post Data:', post); // Log the post data
             if (!post) {
                 console.error('No post found');
                 return;
@@ -53,12 +55,12 @@ function loadPost() {
             postElement.innerHTML = `
                 <div class="post-header">
                     <img src="${post.profile_pic || 'default-profile.png'}" alt="Creator's Profile Picture" class="creator-pfp">
-                    <span class="post-username">${post.username}</span>
+                    <span class="post-username">${post.username || 'Unknown'}</span>
                 </div>
                 <div class="post-details">
-                    <h3 class="post-title"><strong>${post.title}</strong></h3>
+                    <h1>${post.title || 'No title'}</h1>
                     ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
-                    <p>${post.caption}</p>
+                    <p>${post.caption || 'No caption'}</p>
                 </div>
             `;
         })
@@ -82,6 +84,7 @@ function displayComment(comment) {
     `;
     commentsSection.appendChild(commentElement);
 }
+``
 
 document.addEventListener('DOMContentLoaded', () => {
     // Event listeners for navigation bar
