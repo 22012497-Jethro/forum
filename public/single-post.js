@@ -1,163 +1,31 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('DOM fully loaded and parsed');
-    await fetchAndDisplayPost();
-    await loadComments();
-
-    document.getElementById('comment-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const commentText = document.getElementById('comment-text').value;
-        const postId = getPostId();
-        const userId = getUserId();
-
-        if (commentText.trim() === "") {
-            alert("Comment cannot be empty.");
-            return;
-        }
-
-        try {
-            console.log('Adding comment:', { user_id: userId, post_id: postId, comment: commentText });
-            const response = await fetch('/comments/addComment', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ user_id: userId, post_id: postId, comment: commentText }),
-            });
-
-            if (response.ok) {
-                const newComment = await response.json();
-                console.log('New comment added:', newComment);
-                displayComment(newComment[0]); // Assuming the response is an array with the new comment
-                document.getElementById('comment-text').value = ""; // Clear the comment form
-            } else {
-                console.error('Failed to add comment');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    });
-
-    // Event listeners for navigation bar
-    const settingsButton = document.getElementById('settings-button');
-    if (settingsButton) {
-        settingsButton.addEventListener('click', () => {
-            window.location.href = '/settings';
-        });
+    const postId = new URLSearchParams(window.location.search).get('id');
+    if (!postId) {
+        document.body.innerHTML = '<h1>Post ID is missing!</h1>';
+        return;
     }
-
-    const logoutButton = document.getElementById('logout-button');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', async () => {
-            try {
-                const response = await fetch('/users/logout', {
-                    method: 'POST',
-                    credentials: 'same-origin'
-                });
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                window.location.href = '/login';
-            } catch (error) {
-                console.error('Error logging out:', error);
-            }
-        });
-    }
-
-    const profileButton = document.getElementById('profile-username');
-    if (profileButton) {
-        profileButton.addEventListener('click', () => {
-            window.location.href = '/profile';
-        });
-    }
-
-    const profilePicButton = document.getElementById('profile-pic');
-    if (profilePicButton) {
-        profilePicButton.addEventListener('click', () => {
-            window.location.href = '/profile';
-        });
-    }
-
-    // Theme switch functions
-    setupThemeSwitch();
-    fetchAndDisplayUserData();
-});
-
-async function fetchAndDisplayPost() {
-    const postId = getPostId();
-    console.log('Fetching post with ID:', postId); // Log the post ID for debugging
 
     try {
         const response = await fetch(`/posts/${postId}`);
         if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const post = await response.json();
-        displayPost(post);
-    } catch (error) {
-        console.error('Error fetching post:', error);
-    }
-}
-
-function displayPost(post) {
-    console.log('Post Data:', post); // Log the post data for debugging
-    const postElement = document.getElementById('post-container');
-    postElement.innerHTML = `
-        <div class="post-header">
-            <img src="${post.author_pfp || 'default-profile.png'}" alt="Creator's Profile Picture">
-            <span class="post-username">${post.author || 'Unknown'}</span>
-        </div>
-        <div class="post-details">
-            <h3>${post.title || 'No title'}</h3>
-            <p>${post.caption || 'No caption'}</p>
-            ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
-        </div>
-    `;
-}
-
-function getPostId() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('postId');
-}
-
-const getUserId = () => {
-    // Placeholder for actual user ID logic
-    return 'User1';
-};
-
-const loadComments = async () => {
-    const postId = getPostId();
-    console.log('Loading comments for post ID:', postId); // Log the post ID for debugging
-    try {
-        const response = await fetch(`/comments?post_id=${postId}`);
-        if (!response.ok) {
-            console.error('Failed to load comments');
+            document.body.innerHTML = '<h1>Post not found!</h1>';
             return;
         }
+        const post = await response.json();
 
-        const comments = await response.json();
-        console.log('Comments Data:', comments); // Log the comments data for debugging
-        const commentsContainer = document.getElementById('comments-container');
-        commentsContainer.innerHTML = comments.map(comment => `
-            <div class="comment">
-                <p>${comment.comment}</p>
-                <small>By ${comment.author}</small>
-            </div>
-        `).join('');
+        document.getElementById('title').innerText = post.title;
+        document.getElementById('caption').innerText = post.caption;
+        document.getElementById('image').src = post.image;
+        document.getElementById('category').innerText = post.category;
+        document.getElementById('theme').innerText = post.theme;
+        document.getElementById('rooms').innerText = post.rooms;
+        document.getElementById('room_category').innerText = post.room_category;
+        document.getElementById('created_at').innerText = new Date(post.created_at).toLocaleString();
     } catch (error) {
-        console.error('Error loading comments:', error);
+        console.error('Error fetching post data:', error);
+        document.body.innerHTML = '<h1>There was an error fetching the post data.</h1>';
     }
-};
-
-const displayComment = (comment) => {
-    console.log('Displaying comment:', comment); // Log the comment being displayed
-    const commentsContainer = document.getElementById('comments-container');
-    commentsContainer.insertAdjacentHTML('beforeend', `
-        <div class="comment">
-            <p>${comment.comment}</p>
-            <small>By ${comment.author}</small>
-        </div>
-    `);
-};
+});
 
 function setupThemeSwitch() {
     const themeSwitch = document.getElementById('theme-switch');
