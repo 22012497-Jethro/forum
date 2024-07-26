@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         const response = await fetch(`/posts/${postId}`);
-        console.log(`Fetch response status: ${response.status}`); // Log response status
+        console.log(`Fetch response status: ${response.status}`);
 
         if (!response.ok) {
             document.body.innerHTML = `<h1>Post not found! Status: ${response.status}</h1>`;
@@ -16,11 +16,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const post = await response.json();
-        console.log(`Post fetched successfully: ${JSON.stringify(post)}`); // Log the fetched post data
+        console.log(`Post fetched successfully: ${JSON.stringify(post)}`);
 
         document.getElementById('title').innerText = post.title;
         document.getElementById('caption').innerText = post.caption;
-        document.getElementById('image').src = post.image;
+        document.getElementById('image').src = post.image || 'default-image.png';
         document.getElementById('category').innerText = post.category;
         document.getElementById('theme').innerText = post.theme;
         document.getElementById('rooms').innerText = post.rooms;
@@ -60,7 +60,7 @@ async function fetchAndDisplayUserData() {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log('Fetched user data:', data); // Debugging line
+        console.log('Fetched user data:', data);
         if (data) {
             document.getElementById('profile-username').textContent = data.username;
             document.getElementById('profile-pic').src = data.pfp || 'default-profile.png';
