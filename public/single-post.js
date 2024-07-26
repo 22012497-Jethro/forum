@@ -23,8 +23,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
         if (response.ok) {
             const newComment = await response.json();
-            displayComment(newComment[0]); // Assuming the response is an array with the new comment as the first element
-            document.getElementById('comment-text').value = ''; // Clear the comment form
+            displayComment(newComment[0]); // Assuming the response is an array with the new comment
+            document.getElementById('comment-text').value = ""; // Clear the comment form
         } else {
             console.error('Failed to add comment');
         }
@@ -37,52 +37,55 @@ function getPostId() {
 }
 
 function getUserId() {
-    return document.getElementById('profile-username').dataset.userId;
+    return document.getElementById('profile-username').dataset.userid;
 }
 
-function loadPost() {
+async function loadPost() {
     const postId = getPostId();
     console.log('Post ID:', postId); // Log the post ID for debugging
-    fetch(`/posts/${postId}`)
-        .then(response => response.json())
-        .then(post => {
-            console.log('Post Data:', post); // Log the post data for debugging
-            if (!post) {
-                console.error('No post found');
-                return;
-            }
-            const postElement = document.getElementById('post-container');
-            postElement.innerHTML = `
-                <div class="post-header">
-                    <img src="${post.profile_pic || 'default-profile.png'}" alt="Creator's Profile Picture" class="creator-pfp">
-                    <span class="post-username">${post.username || 'Unknown'}</span>
-                </div>
-                <div class="post-details">
-                    <h1>${post.title || 'No title'}</h1>
-                    ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
-                    <p>${post.caption || 'No caption'}</p>
-                </div>
-            `;
-        })
-        .catch(error => console.error('Error loading post:', error));
+    const response = await fetch(`/posts/${postId}`);
+    const post = await response.json();
+
+    if (!post) {
+        console.error('No post found');
+        return;
+    }
+
+    console.log('Post Data:', post); // Log the post data for debugging
+    const postElement = document.getElementById('post-container');
+    postElement.innerHTML = `
+        <div class="post-header">
+            <img src="${post.author_pfp || 'default-profile.png'}" alt="Creator's Profile Picture">
+            <span class="post-username">${post.author || 'Unknown'}</span>
+        </div>
+        <div class="post-details">
+            <h3>${post.title || 'No title'}</h3>
+            <p>${post.caption || 'No caption'}</p>
+        </div>
+    `;
 }
 
 async function loadComments() {
     const postId = getPostId();
     const response = await fetch(`/comments?post_id=${postId}`);
     const comments = await response.json();
-    comments.forEach(comment => displayComment(comment));
+    const commentsContainer = document.getElementById('comments-container');
+    commentsContainer.innerHTML = comments.map(comment => `
+        <div class="comment">
+            <p>${comment.text}</p>
+            <small>By ${comment.author}</small>
+        </div>
+    `).join('');
 }
 
 function displayComment(comment) {
-    const commentsSection = document.getElementById('comments-section');
-    const commentElement = document.createElement('div');
-    commentElement.classList.add('comment');
-    commentElement.innerHTML = `
-        <p>${comment.comment}</p>
-        <small>By User ${comment.user_id} on ${new Date(comment.created_at).toLocaleString()}</small>
-    `;
-    commentsSection.appendChild(commentElement);
+    const commentsContainer = document.getElementById('comments-container');
+    commentsContainer.insertAdjacentHTML('beforeend', `
+        <div class="comment">
+            <p>${comment.text}</p>
+            <small>By ${comment.author}</small>
+        </div>
+    `);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
