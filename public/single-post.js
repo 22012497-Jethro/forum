@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         const response = await fetch(`/posts/${postId}`);
+        console.log(`Fetch response status: ${response.status}`); // Log response status
+
         if (!response.ok) {
             document.body.innerHTML = `<h1>Post not found! Status: ${response.status}</h1>`;
             console.error(`Failed to fetch post. Status: ${response.status}, StatusText: ${response.statusText}`);

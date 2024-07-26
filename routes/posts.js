@@ -309,8 +309,13 @@ router.get('/:id', async (req, res) => {
         .eq('id', id)
         .single();
 
-    if (error || !post) {
+    if (error) {
         console.error(`Error fetching post: ${error.message}`); // Log any errors
+        return res.status(500).json({ message: 'Error fetching post data!' });
+    }
+
+    if (!post) {
+        console.error('Post not found'); // Log if post not found
         return res.status(404).json({ message: 'Post not found!' });
     }
 
