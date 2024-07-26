@@ -309,8 +309,10 @@ router.get('/:id', async (req, res) => {
         .single();
 
     if (error || !post) {
+        console.error('Error fetching post:', error);
         return res.status(404).json({ error: 'Post not found' });
     }
+    console.log('Post fetched successfully:', post);
     res.json(post);
 });
 

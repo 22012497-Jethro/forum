@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
+            console.log('Adding comment:', { user_id: userId, post_id: postId, comment: commentText });
             const response = await fetch('/comments/addComment', {
                 method: 'POST',
                 headers: {
@@ -25,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 const newComment = await response.json();
+                console.log('New comment added:', newComment);
                 displayComment(newComment[0]); // Assuming the response is an array with the new comment
                 document.getElementById('comment-text').value = ""; // Clear the comment form
             } else {
@@ -76,6 +78,7 @@ const loadPost = async () => {
 
 const loadComments = async () => {
     const postId = getPostId();
+    console.log('Loading comments for post ID:', postId); // Log the post ID for debugging
     try {
         const response = await fetch(`/comments?post_id=${postId}`);
         if (!response.ok) {
@@ -98,6 +101,7 @@ const loadComments = async () => {
 };
 
 const displayComment = (comment) => {
+    console.log('Displaying comment:', comment); // Log the comment being displayed
     const commentsContainer = document.getElementById('comments-container');
     commentsContainer.insertAdjacentHTML('beforeend', `
         <div class="comment">
