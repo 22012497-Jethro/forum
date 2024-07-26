@@ -297,6 +297,17 @@ section {
     margin: 20px auto;
 }
 
+/* Styling the single post container */
+.single-post-container {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    margin: 40px auto;
+    max-width: 800px;
+    text-align: left;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     nav {
@@ -318,7 +329,7 @@ section {
         margin-top: 10px;
     }
 
-    .post {
+    .post, .single-post-container {
         width: 90%;
     }
 }
@@ -343,7 +354,7 @@ section {
         margin-top: 10px;
     }
 
-    .post {
+    .post, .single-post-container {
         width: 100%;
     }
 }
