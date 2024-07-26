@@ -302,6 +302,7 @@ router.get("/user-profile", async (req, res) => {
 // Get a single post by ID
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
+    console.log(`Fetching post with ID: ${id}`); // Log the post ID being fetched
     const { data: post, error } = await supabase
         .from('posts')
         .select('*')
@@ -309,9 +310,11 @@ router.get('/:id', async (req, res) => {
         .single();
 
     if (error || !post) {
+        console.error(`Error fetching post: ${error.message}`); // Log any errors
         return res.status(404).json({ message: 'Post not found!' });
     }
 
+    console.log(`Post fetched successfully: ${JSON.stringify(post)}`); // Log the fetched post data
     res.json(post);
 });
 

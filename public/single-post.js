@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const postId = new URLSearchParams(window.location.search).get('id');
     if (!postId) {
         document.body.innerHTML = '<h1>Post ID is missing!</h1>';
+        console.error('Post ID is missing from the URL');
         return;
     }
 
@@ -9,9 +10,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const response = await fetch(`/posts/${postId}`);
         if (!response.ok) {
             document.body.innerHTML = `<h1>Post not found! Status: ${response.status}</h1>`;
+            console.error(`Failed to fetch post. Status: ${response.status}, StatusText: ${response.statusText}`);
             return;
         }
         const post = await response.json();
+        console.log(`Post fetched successfully: ${JSON.stringify(post)}`); // Log the fetched post data
 
         document.getElementById('title').innerText = post.title;
         document.getElementById('caption').innerText = post.caption;
@@ -25,6 +28,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Error fetching post data:', error);
         document.body.innerHTML = '<h1>There was an error fetching the post data.</h1>';
     }
+
+    setupThemeSwitch(); // Initialize theme switcher
+    fetchAndDisplayUserData(); // Fetch and display user data
 });
 
 function setupThemeSwitch() {
