@@ -36,6 +36,50 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Error:', error);
         }
     });
+
+    // Event listeners for navigation bar
+    const settingsButton = document.getElementById('settings-button');
+    if (settingsButton) {
+        settingsButton.addEventListener('click', () => {
+            window.location.href = '/settings';
+        });
+    }
+
+    const logoutButton = document.getElementById('logout-button');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/users/logout', {
+                    method: 'POST',
+                    credentials: 'same-origin'
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                window.location.href = '/login';
+            } catch (error) {
+                console.error('Error logging out:', error);
+            }
+        });
+    }
+
+    const profileButton = document.getElementById('profile-username');
+    if (profileButton) {
+        profileButton.addEventListener('click', () => {
+            window.location.href = '/profile';
+        });
+    }
+
+    const profilePicButton = document.getElementById('profile-pic');
+    if (profilePicButton) {
+        profilePicButton.addEventListener('click', () => {
+            window.location.href = '/profile';
+        });
+    }
+
+    // Theme switch functions
+    setupThemeSwitch();
+    fetchAndDisplayUserData();
 });
 
 async function fetchAndDisplayPost() {
@@ -65,30 +109,14 @@ function displayPost(post) {
         <div class="post-details">
             <h3>${post.title || 'No title'}</h3>
             <p>${post.caption || 'No caption'}</p>
+            ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
         </div>
     `;
 }
 
-async function fetchPostDetails() {
-    const postId = getPostId();
-    console.log('Fetching post with ID:', postId); // Log the post ID for debugging
-
-    try {
-        const response = await fetch(`/posts/${postId}`);
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const post = await response.json();
-        displayPost(post);
-    } catch (error) {
-        console.error('Error fetching post details:', error);
-    }
-}
-
-const urlParams = new URLSearchParams(window.location.search);
-const postId = urlParams.get('postId');
-if (postId) {
-    fetchPostDetails(postId);
+function getPostId() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('postId');
 }
 
 const getUserId = () => {
@@ -131,90 +159,37 @@ const displayComment = (comment) => {
     `);
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Event listeners for navigation bar
-    const settingsButton = document.getElementById('settings-button');
-    if (settingsButton) {
-        settingsButton.addEventListener('click', () => {
-            window.location.href = '/settings';
-        });
-    }
+function setupThemeSwitch() {
+    const themeSwitch = document.getElementById('theme-switch');
+    const savedTheme = localStorage.getItem('theme') || 'light-mode';
+    applyTheme(savedTheme);
 
-    const logoutButton = document.getElementById('logout-button');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', async () => {
-            try {
-                const response = await fetch('/users/logout', {
-                    method: 'POST',
-                    credentials: 'same-origin'
-                });
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                window.location.href = '/login';
-            } catch (error) {
-                console.error('Error logging out:', error);
-            }
-        });
-    }
-
-    const profileButton = document.getElementById('profile-username');
-    if (profileButton) {
-        profileButton.addEventListener('click', () => {
-            window.location.href = '/profile';
-        });
-    }
-
-    const profilePicButton = document.getElementById('profile-pic');
-    if (profilePicButton) {
-        profilePicButton.addEventListener('click', () => {
-            window.location.href = '/profile';
-        });
-    }
-
-    // Theme switch functions
-    function applyTheme(theme) {
-        document.body.className = theme;
-        const logo = document.getElementById('nav-logo');
-        logo.src = theme === 'dark-mode' ? 'logo-light.png' : 'logo-dark.png';
-        localStorage.setItem('theme', theme);
-    }
-
-    function setupThemeSwitch() {
-        const themeSwitch = document.getElementById('theme-switch');
-        const savedTheme = localStorage.getItem('theme') || 'light-mode';
-        applyTheme(savedTheme);
-
-        themeSwitch.addEventListener('click', () => {
-            const newTheme = document.body.classList.contains('light-mode') ? 'dark-mode' : 'light-mode';
-            applyTheme(newTheme);
-        });
-    }
-
-    setupThemeSwitch();
-
-    // Fetch user profile data
-    async function fetchAndDisplayUserData() {
-        try {
-            const response = await fetch('/users/user-profile');
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            const data = await response.json();
-            console.log('Fetched user data:', data); // Debugging line
-            if (data) {
-                document.getElementById('profile-username').textContent = data.username;
-                document.getElementById('profile-pic').src = data.pfp || 'default-profile.png';
-            }
-        } catch (error) {
-            console.error('Error fetching user data:', error);
-        }
-    }
-
-    fetchAndDisplayUserData();
-
-    document.addEventListener('DOMContentLoaded', () => {
-        fetchAndDisplayUserData();
-        setupThemeSwitch();
+    themeSwitch.addEventListener('click', () => {
+        const newTheme = document.body.classList.contains('light-mode') ? 'dark-mode' : 'light-mode';
+        applyTheme(newTheme);
     });
-});
+}
+
+function applyTheme(theme) {
+    document.body.className = theme;
+    const logo = document.getElementById('nav-logo');
+    logo.src = theme === 'dark-mode' ? 'logo-light.png' : 'logo-dark.png';
+    localStorage.setItem('theme', theme);
+}
+
+async function fetchAndDisplayUserData() {
+    try {
+        const response = await fetch('/users/user-profile');
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log('Fetched user data:', data); // Debugging line
+        if (data) {
+            document.getElementById('profile-username').textContent = data.username;
+            document.getElementById('profile-pic').src = data.pfp || 'default-profile.png';
+        }
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+    }
+}

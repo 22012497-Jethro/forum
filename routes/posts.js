@@ -302,18 +302,22 @@ router.get("/user-profile", async (req, res) => {
 // Get a single post by ID
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
-    const { data: post, error } = await supabase
-        .from('posts')
-        .select('*')
-        .eq('id', id)
-        .single();
+    try {
+        const { data: post, error } = await supabase
+            .from('posts')
+            .select('*')
+            .eq('id', id)
+            .single();
 
-    if (error || !post) {
+        if (error) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+
+        res.json(post);
+    } catch (error) {
         console.error('Error fetching post:', error);
-        return res.status(404).json({ error: 'Post not found' });
+        res.status(500).json({ error: 'Internal server error' });
     }
-    console.log('Post fetched successfully:', post);
-    res.json(post);
 });
 
 module.exports = router;
