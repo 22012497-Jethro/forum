@@ -1,4 +1,5 @@
-document.addEventListener('DOMContentLoaded', (event) => {
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM fully loaded and parsed');
     loadPost();
     loadComments();
 
@@ -13,73 +14,89 @@ document.addEventListener('DOMContentLoaded', (event) => {
             return;
         }
 
-        const response = await fetch('/comments/addComment', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ user_id: userId, post_id: postId, comment: commentText }),
-        });
+        try {
+            const response = await fetch('/comments/addComment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ user_id: userId, post_id: postId, comment: commentText }),
+            });
 
-        if (response.ok) {
-            const newComment = await response.json();
-            displayComment(newComment[0]); // Assuming the response is an array with the new comment
-            document.getElementById('comment-text').value = ""; // Clear the comment form
-        } else {
-            console.error('Failed to add comment');
+            if (response.ok) {
+                const newComment = await response.json();
+                displayComment(newComment[0]); // Assuming the response is an array with the new comment
+                document.getElementById('comment-text').value = ""; // Clear the comment form
+            } else {
+                console.error('Failed to add comment');
+            }
+        } catch (error) {
+            console.error('Error:', error);
         }
     });
 });
 
-function getPostId() {
+const getPostId = () => {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('post_id');
-}
+};
 
-function getUserId() {
+const getUserId = () => {
     // Placeholder for actual user ID logic
     return 'User1';
-}
+};
 
-async function loadPost() {
+const loadPost = async () => {
     const postId = getPostId();
     console.log('Post ID:', postId); // Log the post ID for debugging
-    const response = await fetch(`/posts/${postId}`);
-    const post = await response.json();
+    try {
+        const response = await fetch(`/posts/${postId}`);
+        if (!response.ok) {
+            console.error('No post found');
+            return;
+        }
 
-    if (!post) {
-        console.error('No post found');
-        return;
+        const post = await response.json();
+        console.log('Post Data:', post); // Log the post data for debugging
+        const postElement = document.getElementById('post-container');
+        postElement.innerHTML = `
+            <div class="post-header">
+                <img src="${post.author_pfp || 'default-profile.png'}" alt="Creator's Profile Picture">
+                <span class="post-username">${post.author || 'Unknown'}</span>
+            </div>
+            <div class="post-details">
+                <h3>${post.title || 'No title'}</h3>
+                <p>${post.caption || 'No caption'}</p>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error loading post:', error);
     }
+};
 
-    console.log('Post Data:', post); // Log the post data for debugging
-    const postElement = document.getElementById('post-container');
-    postElement.innerHTML = `
-        <div class="post-header">
-            <img src="${post.author_pfp || 'default-profile.png'}" alt="Creator's Profile Picture">
-            <span class="post-username">${post.author || 'Unknown'}</span>
-        </div>
-        <div class="post-details">
-            <h3>${post.title || 'No title'}</h3>
-            <p>${post.caption || 'No caption'}</p>
-        </div>
-    `;
-}
-
-async function loadComments() {
+const loadComments = async () => {
     const postId = getPostId();
-    const response = await fetch(`/comments?post_id=${postId}`);
-    const comments = await response.json();
-    const commentsContainer = document.getElementById('comments-container');
-    commentsContainer.innerHTML = comments.map(comment => `
-        <div class="comment">
-            <p>${comment.comment}</p>
-            <small>By ${comment.author}</small>
-        </div>
-    `).join('');
-}
+    try {
+        const response = await fetch(`/comments?post_id=${postId}`);
+        if (!response.ok) {
+            console.error('Failed to load comments');
+            return;
+        }
 
-function displayComment(comment) {
+        const comments = await response.json();
+        const commentsContainer = document.getElementById('comments-container');
+        commentsContainer.innerHTML = comments.map(comment => `
+            <div class="comment">
+                <p>${comment.comment}</p>
+                <small>By ${comment.author}</small>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error loading comments:', error);
+    }
+};
+
+const displayComment = (comment) => {
     const commentsContainer = document.getElementById('comments-container');
     commentsContainer.insertAdjacentHTML('beforeend', `
         <div class="comment">
@@ -87,7 +104,7 @@ function displayComment(comment) {
             <small>By ${comment.author}</small>
         </div>
     `);
-}
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     // Event listeners for navigation bar
