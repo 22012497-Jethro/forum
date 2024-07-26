@@ -1,7 +1,7 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     console.log('DOM fully loaded and parsed');
-    fetchPostData();
-    loadComments();
+    await fetchAndDisplayPost();
+    await loadComments();
 
     document.getElementById('comment-form').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -38,9 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-async function fetchPostData() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const postId = urlParams.get('postId');
+async function fetchAndDisplayPost() {
+    const postId = getPostId();
+    console.log('Fetching post with ID:', postId); // Log the post ID for debugging
 
     try {
         const response = await fetch(`/posts/${postId}`);
@@ -50,7 +50,7 @@ async function fetchPostData() {
         const post = await response.json();
         displayPost(post);
     } catch (error) {
-        console.error('Error fetching post data:', error);
+        console.error('Error fetching post:', error);
     }
 }
 
@@ -71,7 +71,7 @@ function displayPost(post) {
 
 const getPostId = () => {
     const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('post_id');
+    return urlParams.get('postId');
 };
 
 const getUserId = () => {
