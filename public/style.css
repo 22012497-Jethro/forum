@@ -307,6 +307,8 @@ section {
     max-width: 800px;
     text-align: left;
     color: #333; /* Ensure text is visible */
+    position: relative; /* Ensure position for z-index */
+    z-index: 10; /* Make sure it's above other content */
 }
 
 /* Responsive adjustments */

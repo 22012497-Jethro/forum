@@ -8,8 +8,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         const response = await fetch(`/posts/${postId}`);
-        console.log(`Fetch response status: ${response.status}`);
-
         if (!response.ok) {
             document.body.innerHTML = `<h1>Post not found! Status: ${response.status}</h1>`;
             console.error(`Failed to fetch post. Status: ${response.status}, StatusText: ${response.statusText}`);
@@ -29,8 +27,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('created_at').innerText = new Date(post.created_at).toLocaleString();
 
         // Display the user who posted
-        document.getElementById('post-username').innerText = post.user.username;
-        document.getElementById('post-profile-pic').src = post.user.pfp || 'default-profile.png';
+        const userResponse = await fetch(`/users/${post.user_id}`);
+        if (userResponse.ok) {
+            const user = await userResponse.json();
+            document.getElementById('post-username').innerText = user.username;
+            document.getElementById('post-profile-pic').src = user.pfp || 'default-profile.png';
+        }
     } catch (error) {
         console.error('Error fetching post data:', error);
         document.body.innerHTML = '<h1>There was an error fetching the post data.</h1>';
@@ -38,46 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     setupThemeSwitch(); // Initialize theme switcher
     fetchAndDisplayUserData(); // Fetch and display logged-in user data
-
-    // Event listeners for navigation bar
-    const settingsButton = document.getElementById('settings-button');
-    if (settingsButton) {
-        settingsButton.addEventListener('click', () => {
-            window.location.href = '/settings';
-        });
-    }
-
-    const logoutButton = document.getElementById('logout-button');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', async () => {
-            try {
-                const response = await fetch('/users/logout', {
-                    method: 'POST',
-                    credentials: 'same-origin'
-                });
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                window.location.href = '/login';
-            } catch (error) {
-                console.error('Error logging out:', error);
-            }
-        });
-    }
-
-    const profileButton = document.getElementById('profile-username');
-    if (profileButton) {
-        profileButton.addEventListener('click', () => {
-            window.location.href = '/profile';
-        });
-    }
-
-    const profilePicButton = document.getElementById('profile-pic');
-    if (profilePicButton) {
-        profilePicButton.addEventListener('click', () => {
-            window.location.href = '/profile';
-        });
-    }
 });
 
 function setupThemeSwitch() {
@@ -113,4 +75,44 @@ async function fetchAndDisplayUserData() {
     } catch (error) {
         console.error('Error fetching user data:', error);
     }
+}
+
+// Event listeners for navigation bar
+const settingsButton = document.getElementById('settings-button');
+if (settingsButton) {
+    settingsButton.addEventListener('click', () => {
+        window.location.href = '/settings';
+    });
+}
+
+const logoutButton = document.getElementById('logout-button');
+if (logoutButton) {
+    logoutButton.addEventListener('click', async () => {
+        try {
+            const response = await fetch('/users/logout', {
+                method: 'POST',
+                credentials: 'same-origin'
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            window.location.href = '/login';
+        } catch (error) {
+            console.error('Error logging out:', error);
+        }
+    });
+}
+
+const profileButton = document.getElementById('profile-username');
+if (profileButton) {
+    profileButton.addEventListener('click', () => {
+        window.location.href = '/profile';
+    });
+}
+
+const profilePicButton = document.getElementById('profile-pic');
+if (profilePicButton) {
+    profilePicButton.addEventListener('click', () => {
+        window.location.href = '/profile';
+    });
 }
