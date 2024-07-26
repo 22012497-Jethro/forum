@@ -26,13 +26,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('rooms').innerText = post.rooms;
         document.getElementById('room_category').innerText = post.room_category;
         document.getElementById('created_at').innerText = new Date(post.created_at).toLocaleString();
+
+        // Display user who posted
+        document.getElementById('post-username').innerText = post.user.username;
+        document.getElementById('post-profile-pic').src = post.user.pfp || 'default-profile.png';
     } catch (error) {
         console.error('Error fetching post data:', error);
         document.body.innerHTML = '<h1>There was an error fetching the post data.</h1>';
     }
 
     setupThemeSwitch(); // Initialize theme switcher
-    fetchAndDisplayUserData(); // Fetch and display user data
+    fetchAndDisplayUserData(); // Fetch and display logged-in user data
 });
 
 function setupThemeSwitch() {

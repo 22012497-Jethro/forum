@@ -302,7 +302,7 @@ router.get("/user-profile", async (req, res) => {
 // Get a single post by ID
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
-    console.log(`Fetching post with ID: ${id}`); // Log the post ID being fetched
+    console.log(`Fetching post with ID: ${id}`);
     const { data: post, error } = await supabase
         .from('posts')
         .select('*')
@@ -310,16 +310,30 @@ router.get('/:id', async (req, res) => {
         .single();
 
     if (error) {
-        console.error(`Error fetching post: ${error.message}`); // Log any errors
+        console.error(`Error fetching post: ${error.message}`);
         return res.status(500).json({ message: 'Error fetching post data!' });
     }
 
     if (!post) {
-        console.error('Post not found'); // Log if post not found
+        console.error('Post not found');
         return res.status(404).json({ message: 'Post not found!' });
     }
 
-    console.log(`Post fetched successfully: ${JSON.stringify(post)}`); // Log the fetched post data
+    // Fetch the user who posted
+    const { data: user, error: userError } = await supabase
+        .from('users')
+        .select('username, pfp')
+        .eq('id', post.user_id)
+        .single();
+
+    if (userError) {
+        console.error(`Error fetching user: ${userError.message}`);
+        return res.status(500).json({ message: 'Error fetching user data!' });
+    }
+
+    post.user = user;
+
+    console.log(`Post fetched successfully: ${JSON.stringify(post)}`);
     res.json(post);
 });
 
