@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         const response = await fetch(`/posts/${postId}`);
         if (!response.ok) {
-            document.body.innerHTML = '<h1>Post not found!</h1>';
+            document.body.innerHTML = `<h1>Post not found! Status: ${response.status}</h1>`;
             return;
         }
         const post = await response.json();
