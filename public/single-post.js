@@ -37,7 +37,8 @@ function getPostId() {
 }
 
 function getUserId() {
-    return document.getElementById('profile-username').dataset.userid;
+    // Placeholder for actual user ID logic
+    return 'User1';
 }
 
 async function loadPost() {

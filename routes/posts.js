@@ -300,27 +300,18 @@ router.get("/user-profile", async (req, res) => {
 });
 
 // Get a single post by ID
-router.get('/:post_id', async (req, res) => {
-    const { post_id } = req.params;
+router.get('/:id', async (req, res) => {
+    const { id } = req.params;
+    const { data: post, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('id', id)
+        .single();
 
-    try {
-        const { data, error } = await supabase
-            .from('posts')
-            .select('*')
-            .eq('id', post_id)
-            .single();
-
-        if (error) {
-            console.error('Error fetching post:', error);
-            return res.status(500).json({ message: 'Error fetching post' });
-        }
-
-        console.log('Fetched Post:', data);
-        res.status(200).json(data);
-    } catch (error) {
-        console.error('Internal server error:', error);
-        res.status(500).json({ message: 'Internal server error' });
+    if (error) {
+        return res.status(404).json({ error: 'Post not found' });
     }
+    res.json(post);
 });
 
 module.exports = router;

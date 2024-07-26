@@ -10,45 +10,29 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // Add a comment
 router.post('/addComment', async (req, res) => {
     const { user_id, post_id, comment } = req.body;
+    const { data: newComment, error } = await supabase
+        .from('comments')
+        .insert([{ user_id, post_id, comment, created_at: new Date().toISOString() }])
+        .single();
 
-    try {
-        const { data, error } = await supabase
-            .from('comments')
-            .insert([{ user_id, post_id, comment, created_at: new Date().toISOString() }]);
-
-        if (error) {
-            console.error('Error adding comment:', error);
-            return res.status(500).json({ message: 'Error adding comment' });
-        }
-
-        res.status(201).json(data);
-    } catch (error) {
-        console.error('Internal server error:', error);
-        res.status(500).json({ message: 'Internal server error' });
+    if (error) {
+        return res.status(500).json({ error: 'Failed to add comment' });
     }
+    res.json([newComment]);
 });
 
-// Get comments for a post
 router.get('/', async (req, res) => {
-    const { post_id } = req.query;
+    const postId = parseInt(req.query.post_id, 10);
+    const { data: comments, error } = await supabase
+        .from('comments')
+        .select('*')
+        .eq('post_id', postId)
+        .order('created_at', { ascending: true });
 
-    try {
-        const { data, error } = await supabase
-            .from('comments')
-            .select('*')
-            .eq('post_id', post_id)
-            .order('created_at', { ascending: true });
-
-        if (error) {
-            console.error('Error fetching comments:', error);
-            return res.status(500).json({ message: 'Error fetching comments' });
-        }
-
-        res.status(200).json(data);
-    } catch (error) {
-        console.error('Internal server error:', error);
-        res.status(500).json({ message: 'Internal server error' });
+    if (error) {
+        return res.status(500).json({ error: 'Failed to fetch comments' });
     }
+    res.json(comments);
 });
 
 module.exports = router;
