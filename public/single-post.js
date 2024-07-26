@@ -84,6 +84,7 @@ const loadComments = async () => {
         }
 
         const comments = await response.json();
+        console.log('Comments Data:', comments); // Log the comments data for debugging
         const commentsContainer = document.getElementById('comments-container');
         commentsContainer.innerHTML = comments.map(comment => `
             <div class="comment">
