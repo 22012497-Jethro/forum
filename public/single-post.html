@@ -1,9 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Post Details</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="single-post.js"></script> <!-- Ensure this is correct -->
+    <link rel="stylesheet" href="style.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const postId = new URLSearchParams(window.location.search).get('id');
+            if (!postId) {
+                document.body.innerHTML = '<h1>Post ID is missing!</h1>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/posts/${postId}`);
+                if (!response.ok) {
+                    document.body.innerHTML = '<h1>Post not found!</h1>';
+                    return;
+                }
+                const post = await response.json();
+
+                document.getElementById('title').innerText = post.title;
+                document.getElementById('caption').innerText = post.caption;
+                document.getElementById('image').src = post.image;
+                document.getElementById('category').innerText = post.category;
+                document.getElementById('theme').innerText = post.theme;
+                document.getElementById('rooms').innerText = post.rooms;
+                document.getElementById('room_category').innerText = post.room_category;
+                document.getElementById('created_at').innerText = new Date(post.created_at).toLocaleString();
+            } catch (error) {
+                console.error('Error fetching post data:', error);
+                document.body.innerHTML = '<h1>There was an error fetching the post data.</h1>';
+            }
+        });
+    </script>
 </head>
 <body>
     <nav>
@@ -24,21 +54,15 @@
             <button id="theme-switch">Switch Theme</button>
         </div>
     </nav>
-    <section>
-        <div id="post-container" class="post-container">
-            <!-- Post details will be displayed here -->
-        </div>
-        <div id="comments-container" class="comments-container">
-            <h3>Comments</h3>
-            <div id="comments-section"></div>
-        </div>
-        <div id="add-comment-container">
-            <h3>Add a Comment</h3>
-            <form id="comment-form">
-                <textarea id="comment-text" placeholder="Add a comment..."></textarea>
-                <button type="submit">Post Comment</button>
-            </form>
-        </div>
-    </section>
+
+    <h1 id="title"></h1>
+    <img id="image" alt="Post Image">
+    <p id="caption"></p>
+    <p>Category: <span id="category"></span></p>
+    <p>Theme: <span id="theme"></span></p>
+    <p>Rooms: <span id="rooms"></span></p>
+    <p>Room Category: <span id="room_category"></span></p>
+    <p>Created at: <span id="created_at"></span></p>
+    <a href="/">Back to Home</a>
 </body>
 </html>
