@@ -308,7 +308,7 @@ router.get('/:id', async (req, res) => {
         .eq('id', id)
         .single();
 
-    if (error) {
+    if (error || !post) {
         return res.status(404).json({ error: 'Post not found' });
     }
     res.json(post);

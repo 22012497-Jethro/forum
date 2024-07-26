@@ -13,8 +13,7 @@ router.get('/', async (req, res) => {
     const { data: comments, error } = await supabase
         .from('comments')
         .select('*')
-        .eq('post_id', postId)
-        .order('created_at', { ascending: true });
+        .eq('post_id', postId);
 
     if (error) {
         return res.status(500).json({ error: 'Failed to fetch comments' });
@@ -27,7 +26,7 @@ router.post('/addComment', async (req, res) => {
     const { user_id, post_id, comment } = req.body;
     const { data: newComment, error } = await supabase
         .from('comments')
-        .insert([{ user_id, post_id, comment, created_at: new Date().toISOString() }])
+        .insert([{ user_id, post_id, comment }])
         .single();
 
     if (error) {
