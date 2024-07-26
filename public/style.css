@@ -8,17 +8,19 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     flex-direction: column;
 }
 
 /* Section styling */
 section {
     text-align: center;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.9);
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    width: 90%;
+    max-width: 800px;
 }
 
 /* Navbar styling */
@@ -166,7 +168,7 @@ button {
 
 .dark-mode section {
     color: white;
-    background-color: rgba(50, 50, 50, 0.8); /* Adjust background color for better contrast */
+    background-color: rgba(50, 50, 50, 0.9); /* Adjust background color for better contrast */
 }
 
 .dark-mode .dropdown-content p:hover {
@@ -230,7 +232,6 @@ section {
 
 /* Debugging styles */
 .post-header {
-    background-color: #f0f0f0;
     display: flex;
     align-items: center;
     margin-bottom: 10px;
@@ -238,8 +239,8 @@ section {
 
 /* Add styles for creator's profile picture */
 .creator-pfp {
-    height: 40px;
-    width: 40px;
+    height: 50px;
+    width: 50px;
     border-radius: 50%;
     margin-right: 10px;
 }
@@ -247,14 +248,15 @@ section {
 /* Add styles for post username */
 .post-username {
     font-weight: bold;
+    font-size: 1.2em;
     margin-left: 10px;
     color: #333; /* Default text color */
 }
 
 /* Add styles for post title */
 .post-title {
-    margin-top: 10px;
-    font-size: 1.5em;
+    margin-top: 20px;
+    font-size: 2em;
     color: #333; /* Default text color */
 }
 
@@ -262,166 +264,16 @@ section {
 .post-image {
     max-width: 100%;
     height: auto;
-    max-height: 200px; /* Ensure the image doesn't exceed 200px in height */
+    max-height: 400px; /* Ensure the image doesn't exceed 400px in height */
     width: auto; /* Ensure the image doesn't exceed 100% of the container width */
-    margin-top: 10px;
-}
-
-/* Adjust body height and flex direction for main page */
-body.main-page {
-    background-image: none;
-    height: auto;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-    padding-top: 60px; /* height of the navbar */
-}
-
-/* Recent posts section styling */
-.recent-posts-section {
-    text-align: center;
-    margin: 20px auto;
-    max-width: 1200px;
-    height: calc(100vh - 120px); /* Adjust based on navbar and other heights */
-    display: flex;
-    flex-direction: column;
-}
-
-.recent-posts-section h3 {
-    margin: 0 0 20px 0;
-}
-
-/* Container for posts */
-.post-container {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 10px;
-    border: 1px solid #ccc; /* Optional: for visual separation */
-    background-color: #f9f9f9; /* Optional: background color */
-    max-height: 500px; /* Adjust this height as needed */
-}
-
-/* Individual post styling */
-.post {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    border: 1px solid #ccc;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    border-radius: 5px;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    width: 100%;
-}
-
-.post-header img {
-    height: 40px;
-    width: 40px;
-    border-radius: 50%;
-    margin-right: 10px;
-}
-
-.username {
-    font-weight: bold;
-    margin-left: 10px;
-}
-
-.post-content img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin: 10px 0;
-}
-
-.post-details h3 {
-    margin: 0;
-    font-size: 1.2em;
-}
-
-.post-details p {
-    margin: 0.2em 0;
-    color: #555;
-}
-
-.post-details small {
-    color: #888;
-}
-
-.pagination-container {
-    display: flex;
-    justify-content: center;
     margin-top: 20px;
 }
 
-.pagination-container button {
-    padding: 10px 20px;
-    margin: 0 5px;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.pagination-container button[disabled] {
-    background-color: #ddd;
-    cursor: not-allowed;
-}
-
-button {
-    padding: 10px;
-    background-color: #333;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-}
-
-button:hover {
-    background-color: #555;
-}
-
-.light-mode {
-    background-color: white;
-    color: black;
-}
-
-.dark-mode {
-    background-color: #333;
-    color: white;
-}
-
-.post-actions {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    margin-top: 10px;
-}
-
-.edit-post-button, .delete-post-button {
-    padding: 5px 10px;
-    border: none;
-    cursor: pointer;
-    border-radius: 3px;
-    color: white;
-}
-
-.edit-post-button {
-    background-color: #4CAF50;
-}
-
-.edit-post-button:hover {
-    background-color: #45a049;
-}
-
-.delete-post-button {
-    background-color: #f44336;
-}
-
-.delete-post-button:hover {
-    background-color: #da190b;
+/* Add styles for post content */
+.post-content p {
+    font-size: 1.1em;
+    color: #555;
+    margin: 10px 0;
 }
 
 /* Responsive adjustments */
