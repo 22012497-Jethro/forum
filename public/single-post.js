@@ -73,7 +73,7 @@ async function loadComments() {
     const commentsContainer = document.getElementById('comments-container');
     commentsContainer.innerHTML = comments.map(comment => `
         <div class="comment">
-            <p>${comment.text}</p>
+            <p>${comment.comment}</p>
             <small>By ${comment.author}</small>
         </div>
     `).join('');
@@ -83,7 +83,7 @@ function displayComment(comment) {
     const commentsContainer = document.getElementById('comments-container');
     commentsContainer.insertAdjacentHTML('beforeend', `
         <div class="comment">
-            <p>${comment.text}</p>
+            <p>${comment.comment}</p>
             <small>By ${comment.author}</small>
         </div>
     `);
