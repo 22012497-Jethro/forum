@@ -50,11 +50,13 @@ const getUserId = () => {
 
 const loadPost = async () => {
     const postId = getPostId(); // assume this function returns the correct postId
-    console.log(`Loading post with ID: ${postId}`);
+    console.log(`Loading post with ID: ${postId}`); // <--- Add this log statement
   
     try {
       const response = await fetch(`/api/posts/${postId}`); // assume this is the correct API endpoint
+      console.log('Response:', response); // <--- Add this log statement
       const postData = await response.json();
+      console.log('Post data:', postData); // <--- Add this log statement
   
       if (!postData) {
         console.error(`No post found with ID: ${postId}`);
