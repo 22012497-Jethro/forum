@@ -49,32 +49,35 @@ const getUserId = () => {
 };
 
 const loadPost = async () => {
-    const postId = getPostId();
-    console.log('Post ID:', postId); // Log the post ID for debugging
+    const postId = getPostId(); // assume this function returns the correct postId
+    console.log(`Loading post with ID: ${postId}`);
+  
     try {
-        const response = await fetch(`/posts/${postId}`);
-        if (!response.ok) {
-            console.error('No post found');
-            return;
-        }
-
-        const post = await response.json();
-        console.log('Post Data:', post); // Log the post data for debugging
-        const postElement = document.getElementById('post-container');
-        postElement.innerHTML = `
-            <div class="post-header">
-                <img src="${post.author_pfp || 'default-profile.png'}" alt="Creator's Profile Picture">
-                <span class="post-username">${post.author || 'Unknown'}</span>
-            </div>
-            <div class="post-details">
-                <h3>${post.title || 'No title'}</h3>
-                <p>${post.caption || 'No caption'}</p>
-            </div>
-        `;
+      const response = await fetch(`/api/posts/${postId}`); // assume this is the correct API endpoint
+      const postData = await response.json();
+  
+      if (!postData) {
+        console.error(`No post found with ID: ${postId}`);
+        return;
+      }
+  
+      console.log(`Post data:`, postData);
+  
+      // Update HTML elements with post data
+      const postTitleElement = document.getElementById('post-title');
+      postTitleElement.textContent = postData.title;
+  
+      const postContentElement = document.getElementById('post-content');
+      postContentElement.textContent = postData.content;
+  
+      const postAuthorElement = document.getElementById('post-author');
+      postAuthorElement.textContent = postData.author;
+  
+      // Add any other HTML elements you need to update with post data
     } catch (error) {
-        console.error('Error loading post:', error);
+      console.error(`Error loading post: ${error}`);
     }
-};
+  };
 
 const loadComments = async () => {
     const postId = getPostId();
