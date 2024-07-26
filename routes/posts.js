@@ -303,6 +303,8 @@ router.get("/user-profile", async (req, res) => {
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
     console.log(`Fetching post with ID: ${id}`);
+
+    // Fetch the post data
     const { data: post, error } = await supabase
         .from('posts')
         .select('*')
@@ -319,7 +321,7 @@ router.get('/:id', async (req, res) => {
         return res.status(404).json({ message: 'Post not found!' });
     }
 
-    // Fetch the user who posted
+    // Fetch the user data based on user_id in the post
     const { data: user, error: userError } = await supabase
         .from('users')
         .select('username, pfp')
@@ -331,6 +333,7 @@ router.get('/:id', async (req, res) => {
         return res.status(500).json({ message: 'Error fetching user data!' });
     }
 
+    // Add user data to the post object
     post.user = user;
 
     console.log(`Post fetched successfully: ${JSON.stringify(post)}`);

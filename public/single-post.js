@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const post = await response.json();
         console.log(`Post fetched successfully: ${JSON.stringify(post)}`);
 
+        // Populate the post details
         document.getElementById('title').innerText = post.title;
         document.getElementById('caption').innerText = post.caption;
         document.getElementById('image').src = post.image || 'default-image.png';
@@ -27,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('room_category').innerText = post.room_category;
         document.getElementById('created_at').innerText = new Date(post.created_at).toLocaleString();
 
-        // Display user who posted
+        // Display the user who posted
         document.getElementById('post-username').innerText = post.user.username;
         document.getElementById('post-profile-pic').src = post.user.pfp || 'default-profile.png';
     } catch (error) {
