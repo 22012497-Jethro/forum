@@ -69,10 +69,27 @@ function displayPost(post) {
     `;
 }
 
-const getPostId = () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('postId');
-};
+async function fetchPostDetails() {
+    const postId = getPostId();
+    console.log('Fetching post with ID:', postId); // Log the post ID for debugging
+
+    try {
+        const response = await fetch(`/posts/${postId}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const post = await response.json();
+        displayPost(post);
+    } catch (error) {
+        console.error('Error fetching post details:', error);
+    }
+}
+
+const urlParams = new URLSearchParams(window.location.search);
+const postId = urlParams.get('postId');
+if (postId) {
+    fetchPostDetails(postId);
+}
 
 const getUserId = () => {
     // Placeholder for actual user ID logic
