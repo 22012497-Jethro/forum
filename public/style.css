@@ -264,7 +264,7 @@ section {
 .post-image {
     max-width: 100%;
     height: auto;
-    max-height: 400px; /* Ensure the image doesn't exceed 400px in height */
+    max-height: 300px; /* Ensure the image doesn't exceed 300px in height */
     width: auto; /* Ensure the image doesn't exceed 100% of the container width */
     margin-top: 20px;
 }
@@ -274,6 +274,25 @@ section {
     font-size: 1.1em;
     color: #555;
     margin: 10px 0;
+}
+
+/* Styling the recent posts section */
+.recent-posts-section {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    margin-top: 20px;
+    width: 100%;
+}
+
+/* Styling individual posts */
+.post {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    padding: 15px;
 }
 
 /* Responsive adjustments */
