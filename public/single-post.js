@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM fully loaded and parsed');
-    loadPost();
+    fetchPostData();
     loadComments();
 
     document.getElementById('comment-form').addEventListener('submit', async (e) => {
@@ -38,6 +38,37 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+async function fetchPostData() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const postId = urlParams.get('postId');
+
+    try {
+        const response = await fetch(`/posts/${postId}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const post = await response.json();
+        displayPost(post);
+    } catch (error) {
+        console.error('Error fetching post data:', error);
+    }
+}
+
+function displayPost(post) {
+    console.log('Post Data:', post); // Log the post data for debugging
+    const postElement = document.getElementById('post-container');
+    postElement.innerHTML = `
+        <div class="post-header">
+            <img src="${post.author_pfp || 'default-profile.png'}" alt="Creator's Profile Picture">
+            <span class="post-username">${post.author || 'Unknown'}</span>
+        </div>
+        <div class="post-details">
+            <h3>${post.title || 'No title'}</h3>
+            <p>${post.caption || 'No caption'}</p>
+        </div>
+    `;
+}
+
 const getPostId = () => {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('post_id');
@@ -47,39 +78,6 @@ const getUserId = () => {
     // Placeholder for actual user ID logic
     return 'User1';
 };
-
-const loadPost = async () => {
-    const postId = getPostId(); // assume this function returns the correct postId
-    console.log(`Loading post with ID: ${postId}`); // <--- Add this log statement
-  
-    try {
-      const response = await fetch(`/api/posts/${postId}`); // assume this is the correct API endpoint
-      console.log('Response:', response); // <--- Add this log statement
-      const postData = await response.json();
-      console.log('Post data:', postData); // <--- Add this log statement
-  
-      if (!postData) {
-        console.error(`No post found with ID: ${postId}`);
-        return;
-      }
-  
-      console.log(`Post data:`, postData);
-  
-      // Update HTML elements with post data
-      const postTitleElement = document.getElementById('post-title');
-      postTitleElement.textContent = postData.title;
-  
-      const postContentElement = document.getElementById('post-content');
-      postContentElement.textContent = postData.content;
-  
-      const postAuthorElement = document.getElementById('post-author');
-      postAuthorElement.textContent = postData.author;
-  
-      // Add any other HTML elements you need to update with post data
-    } catch (error) {
-      console.error(`Error loading post: ${error}`);
-    }
-  };
 
 const loadComments = async () => {
     const postId = getPostId();
