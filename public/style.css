@@ -299,7 +299,7 @@ section {
 
 /* Styling the single post container */
 .single-post-container {
-    background-color: rgba(255, 255, 255, 0.95); /* Increased opacity for better visibility */
+    background-color: rgba(255, 255, 255, 1); /* Set background color to white */
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5); /* Increased shadow for better visibility */
