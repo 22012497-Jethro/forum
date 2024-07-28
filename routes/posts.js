@@ -347,7 +347,7 @@ router.get('/:id/comments', async (req, res) => {
     try {
         const { data: comments, error } = await supabase
             .from('comments')
-            .select('text, created_at, user_id')
+            .select('comments, created_at, user_id')
             .eq('post_id', id)
             .order('created_at', { ascending: true });
 

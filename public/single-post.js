@@ -66,7 +66,7 @@ async function fetchAndDisplayComments(postId) {
             commentElement.className = 'comment';
             commentElement.innerHTML = `
                 <p><strong>${comment.username}</strong> (${new Date(comment.created_at).toLocaleString()}):</p>
-                <p>${comment.text}</p>
+                <p>${comment.comments}</p>
             `;
             commentsContainer.appendChild(commentElement);
         });
