@@ -29,13 +29,14 @@
     </section>
     <section class="recent-posts-section">
         <h3>Recent Posts</h3>
-        <!-- div id="filter-functions">
-            <input type="text" id="search-box" placeholder="Search...">
-            <button id="filter-button">Filter</button>
-        </div !-->
         <div id="filter-controls">
             <input type="text" id="filter-title" placeholder="Filter by title">
-            <input type="text" id="filter-category" placeholder="Filter by category">
+            <select id="filter-category">
+                <option value="">Select category</option>
+                <option value="Design">Design</option>
+                <option value="Furniture">Furniture</option>
+                <option value="Decoration">Decoration</option>
+            </select>
             <button id="filter-button">Filter</button>
         </div>
         <div id="posts-container" class="post-container">

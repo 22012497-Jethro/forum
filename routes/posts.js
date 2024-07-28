@@ -244,7 +244,7 @@ router.get('/', async (req, res) => {
     }
 
     if (category) {
-        query = query.ilike('category', `%${category}%`);
+        query = query.eq('category', category);
     }
 
     try {
