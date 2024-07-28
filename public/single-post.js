@@ -1,4 +1,4 @@
-ddocument.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const postId = new URLSearchParams(window.location.search).get('id');
     if (!postId) {
         document.body.innerHTML = '<h1>Post ID is missing!</h1>';
@@ -16,29 +16,15 @@ ddocument.addEventListener('DOMContentLoaded', async () => {
         const post = await response.json();
         console.log(`Post fetched successfully: ${JSON.stringify(post)}`);
 
-        // Create a container div with the single-post-container class
-        const container = document.createElement('div');
-        container.className = 'single-post-container';
-
-        // Populate the post details inside the container
-        container.innerHTML = `
-            <h1 id="title">${post.title}</h1>
-            <img id="image" src="${post.image || 'default-image.png'}" alt="Post Image">
-            <p id="caption">${post.caption}</p>
-            <p>Category: <span id="category">${post.category}</span></p>
-            <p>Theme: <span id="theme">${post.theme}</span></p>
-            <p>Rooms: <span id="rooms">${post.rooms}</span></p>
-            <p>Room Category: <span id="room_category">${post.room_category}</span></p>
-            <p>Created at: <span id="created_at">${new Date(post.created_at).toLocaleString()}</span></p>
-            <div class="user-info">
-                <img id="post-profile-pic" src="default-profile.png" alt="Profile Picture">
-                <span id="post-username">Username</span>
-            </div>
-            <a href="index.html">Back to Home</a>
-        `;
-
-        // Append the container to the body
-        document.body.appendChild(container);
+        // Populate the post details
+        document.getElementById('title').innerText = post.title;
+        document.getElementById('caption').innerText = post.caption;
+        document.getElementById('image').src = post.image || 'default-image.png';
+        document.getElementById('category').innerText = post.category;
+        document.getElementById('theme').innerText = post.theme;
+        document.getElementById('rooms').innerText = post.rooms;
+        document.getElementById('room_category').innerText = post.room_category;
+        document.getElementById('created_at').innerText = new Date(post.created_at).toLocaleString();
 
         // Display the user who posted
         const userResponse = await fetch(`/users/${post.user_id}`);
@@ -55,7 +41,6 @@ ddocument.addEventListener('DOMContentLoaded', async () => {
     setupThemeSwitch(); // Initialize theme switcher
     fetchAndDisplayUserData(); // Fetch and display logged-in user data
 });
-
 
 function setupThemeSwitch() {
     const themeSwitch = document.getElementById('theme-switch');
