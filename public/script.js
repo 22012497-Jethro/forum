@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error disliking post:', error);
         }
-    }
+    }    
 
     function displayUserPosts(posts) {
         const userPostsContainer = document.getElementById('user-posts-container');
