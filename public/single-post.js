@@ -50,57 +50,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
-async function fetchAndDisplayComments(postId) {
-    try {
-        const response = await fetch(`/posts/${postId}/comments`);
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const comments = await response.json();
-        console.log('Fetched comments:', comments);
-
-        const commentsContainer = document.getElementById('comments-container');
-        commentsContainer.innerHTML = '';
-        comments.forEach(comment => {
-            const commentElement = document.createElement('div');
-            commentElement.className = 'comment';
-            commentElement.innerHTML = `
-                <p><strong>${comment.username}</strong> (${new Date(comment.created_at).toLocaleString()}):</p>
-                <p>${comment.text}</p>
-            `;
-            commentsContainer.appendChild(commentElement);
-        });
-    } catch (error) {
-        console.error('Error fetching comments:', error);
-    }
-}
-
-async function postComment(postId) {
-    const commentText = document.getElementById('comment-text').value;
-    if (!commentText) {
-        return;
-    }
-
-    try {
-        const response = await fetch(`/posts/${postId}/comments`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ text: commentText })
-        });
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        // Clear the comment box and refresh comments
-        document.getElementById('comment-text').value = '';
-        await fetchAndDisplayComments(postId);
-    } catch (error) {
-        console.error('Error posting comment:', error);
-    }
-}
-
 function setupThemeSwitch() {
     const themeSwitch = document.getElementById('theme-switch');
     const savedTheme = localStorage.getItem('theme') || 'light-mode';
@@ -189,5 +138,56 @@ function setupDropdown() {
         profilePicButton.addEventListener('click', () => {
             window.location.href = '/profile';
         });
+    }
+}
+
+async function fetchAndDisplayComments(postId) {
+    try {
+        const response = await fetch(`/posts/${postId}/comments`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const comments = await response.json();
+        console.log('Fetched comments:', comments);
+
+        const commentsContainer = document.getElementById('comments-container');
+        commentsContainer.innerHTML = '';
+        comments.forEach(comment => {
+            const commentElement = document.createElement('div');
+            commentElement.className = 'comment';
+            commentElement.innerHTML = `
+                <p><strong>${comment.username}</strong> (${new Date(comment.created_at).toLocaleString()}):</p>
+                <p>${comment.text}</p>
+            `;
+            commentsContainer.appendChild(commentElement);
+        });
+    } catch (error) {
+        console.error('Error fetching comments:', error);
+    }
+}
+
+async function postComment(postId) {
+    const commentText = document.getElementById('comment-text').value;
+    if (!commentText) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/posts/${postId}/comments`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ text: commentText })
+        });
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        // Clear the comment box and refresh comments
+        document.getElementById('comment-text').value = '';
+        await fetchAndDisplayComments(postId);
+    } catch (error) {
+        console.error('Error posting comment:', error);
     }
 }
