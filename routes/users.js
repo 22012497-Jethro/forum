@@ -1,6 +1,7 @@
 const express = require("express");
 const multer = require('multer');
 const { createClient } = require('@supabase/supabase-js');
+const authenticateUser = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
@@ -16,15 +17,6 @@ const defaultRole = 'User';
 // Configure multer for profile picture uploads
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-
-// Middleware to check if the user is authenticated
-const authenticateUser = (req, res, next) => {
-    if (req.session && req.session.userId) {
-        next();
-    } else {
-        res.status(401).send('Unauthorized');
-    }
-};
 
 // Signup route
 router.post('/signup', async (req, res) => {
