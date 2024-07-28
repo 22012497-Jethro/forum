@@ -393,7 +393,7 @@ router.post('/:id/comments', async (req, res) => {
         const createdAt = new Date().toISOString();
         const { data, error } = await supabase
             .from('comments')
-            .insert([{ post_id: id, text, user_id: userId, created_at: createdAt }]);
+            .insert([{ post_id: id, comments: text, user_id: userId, created_at: createdAt }]);
 
         if (error) {
             return res.status(500).send('Error posting comment');
