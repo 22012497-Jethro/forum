@@ -36,6 +36,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     setupThemeSwitch(); // Initialize theme switcher
     fetchAndDisplayUserData(); // Fetch and display logged-in user data
+
+    setupDropdown(); // Initialize dropdown functionality
 });
 
 function setupThemeSwitch() {
@@ -73,42 +75,58 @@ async function fetchAndDisplayUserData() {
     }
 }
 
-// Event listeners for navigation bar
-const settingsButton = document.getElementById('settings-button');
-if (settingsButton) {
-    settingsButton.addEventListener('click', () => {
-        window.location.href = '/settings';
-    });
-}
+function setupDropdown() {
+    const profilePic = document.getElementById('profile-pic');
+    const dropdownContent = document.querySelector('.dropdown-content');
 
-const logoutButton = document.getElementById('logout-button');
-if (logoutButton) {
-    logoutButton.addEventListener('click', async () => {
-        try {
-            const response = await fetch('/users/logout', {
-                method: 'POST',
-                credentials: 'same-origin'
-            });
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+    profilePic.addEventListener('click', () => {
+        dropdownContent.classList.toggle('show');
+    });
+
+    window.onclick = function(event) {
+        if (!event.target.matches('#profile-pic') && !event.target.matches('#profile-username')) {
+            if (dropdownContent.classList.contains('show')) {
+                dropdownContent.classList.remove('show');
             }
-            window.location.href = '/login';
-        } catch (error) {
-            console.error('Error logging out:', error);
         }
-    });
-}
+    };
 
-const profileButton = document.getElementById('profile-username');
-if (profileButton) {
-    profileButton.addEventListener('click', () => {
-        window.location.href = '/profile';
-    });
-}
+    const settingsButton = document.getElementById('settings-button');
+    if (settingsButton) {
+        settingsButton.addEventListener('click', () => {
+            window.location.href = '/settings';
+        });
+    }
 
-const profilePicButton = document.getElementById('profile-pic');
-if (profilePicButton) {
-    profilePicButton.addEventListener('click', () => {
-        window.location.href = '/profile';
-    });
+    const logoutButton = document.getElementById('logout-button');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/users/logout', {
+                    method: 'POST',
+                    credentials: 'same-origin'
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                window.location.href = '/login';
+            } catch (error) {
+                console.error('Error logging out:', error);
+            }
+        });
+    }
+
+    const profileButton = document.getElementById('profile-username');
+    if (profileButton) {
+        profileButton.addEventListener('click', () => {
+            window.location.href = '/profile';
+        });
+    }
+
+    const profilePicButton = document.getElementById('profile-pic');
+    if (profilePicButton) {
+        profilePicButton.addEventListener('click', () => {
+            window.location.href = '/profile';
+        });
+    }
 }
