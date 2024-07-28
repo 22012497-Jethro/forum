@@ -29,6 +29,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Display the user who posted
         document.getElementById('post-username').innerText = post.user.username;
         document.getElementById('post-profile-pic').src = post.user.pfp || 'default-profile.png';
+
+        // Fetch and display comments
+        await fetchAndDisplayComments(postId);
     } catch (error) {
         console.error('Error fetching post data:', error);
         document.body.innerHTML = '<h1>There was an error fetching the post data.</h1>';
@@ -38,7 +41,65 @@ document.addEventListener('DOMContentLoaded', async () => {
     fetchAndDisplayUserData(); // Fetch and display logged-in user data
 
     setupDropdown(); // Initialize dropdown functionality
+
+    // Handle comment form submission
+    const commentForm = document.getElementById('comment-form');
+    commentForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        await postComment(postId);
+    });
 });
+
+async function fetchAndDisplayComments(postId) {
+    try {
+        const response = await fetch(`/posts/${postId}/comments`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const comments = await response.json();
+        console.log('Fetched comments:', comments);
+
+        const commentsContainer = document.getElementById('comments-container');
+        commentsContainer.innerHTML = '';
+        comments.forEach(comment => {
+            const commentElement = document.createElement('div');
+            commentElement.className = 'comment';
+            commentElement.innerHTML = `
+                <p><strong>${comment.username}</strong> (${new Date(comment.created_at).toLocaleString()}):</p>
+                <p>${comment.text}</p>
+            `;
+            commentsContainer.appendChild(commentElement);
+        });
+    } catch (error) {
+        console.error('Error fetching comments:', error);
+    }
+}
+
+async function postComment(postId) {
+    const commentText = document.getElementById('comment-text').value;
+    if (!commentText) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/posts/${postId}/comments`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ text: commentText })
+        });
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        // Clear the comment box and refresh comments
+        document.getElementById('comment-text').value = '';
+        await fetchAndDisplayComments(postId);
+    } catch (error) {
+        console.error('Error posting comment:', error);
+    }
+}
 
 function setupThemeSwitch() {
     const themeSwitch = document.getElementById('theme-switch');

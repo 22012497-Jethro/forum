@@ -340,4 +340,63 @@ router.get('/:id', async (req, res) => {
     res.json(post);
 });
 
+router.get('/:postId/comments', async (req, res) => {
+    const { postId } = req.params;
+    try {
+        const { data: comments, error } = await supabase
+            .from('comments')
+            .select('id, text, created_at, user_id')
+            .eq('post_id', postId)
+            .order('created_at', { ascending: true });
+
+        if (error) {
+            return res.status(500).json({ error: error.message });
+        }
+
+        // Fetch user details for each comment
+        const userIds = comments.map(comment => comment.user_id);
+        const { data: users, error: userError } = await supabase
+            .from('users')
+            .select('id, username')
+            .in('id', userIds);
+
+        if (userError) {
+            return res.status(500).json({ error: userError.message });
+        }
+
+        const commentsWithUsernames = comments.map(comment => {
+            const user = users.find(user => user.id === comment.user_id);
+            return { 
+                ...comment, 
+                username: user ? user.username : 'Unknown' 
+            };
+        });
+
+        res.json(commentsWithUsernames);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Post a comment
+router.post('/:postId/comments', async (req, res) => {
+    const { postId } = req.params;
+    const { text } = req.body;
+    const userId = req.session.userId; // Make sure user is authenticated
+
+    try {
+        const { data, error } = await supabase
+            .from('comments')
+            .insert([{ text, post_id: postId, user_id: userId }]);
+
+        if (error) {
+            return res.status(500).json({ error: error.message });
+        }
+
+        res.status(201).json(data);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = router;
