@@ -406,4 +406,44 @@ router.post('/:id/comments', async (req, res) => {
     }
 });
 
+// Like a post
+router.post('/:postId/like', authenticateUser, async (req, res) => {
+    const { postId } = req.params;
+    const userId = req.session.userId;
+
+    try {
+        const { data, error } = await supabase
+            .from('likes')
+            .insert([{ post_id: postId, user_id: userId }]);
+
+        if (error) {
+            return res.status(500).send('Error liking post');
+        }
+
+        res.status(200).json({ message: 'Post liked successfully' });
+    } catch (error) {
+        res.status(500).send('Error liking post');
+    }
+});
+
+// Dislike a post
+router.post('/:postId/dislike', authenticateUser, async (req, res) => {
+    const { postId } = req.params;
+    const userId = req.session.userId;
+
+    try {
+        const { data, error } = await supabase
+            .from('dislikes')
+            .insert([{ post_id: postId, user_id: userId }]);
+
+        if (error) {
+            return res.status(500).send('Error disliking post');
+        }
+
+        res.status(200).json({ message: 'Post disliked successfully' });
+    } catch (error) {
+        res.status(500).send('Error disliking post');
+    }
+});
+
 module.exports = router;

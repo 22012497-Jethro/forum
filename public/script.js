@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayPosts(posts) {
         const postsContainer = document.getElementById('posts-container');
         postsContainer.innerHTML = '';
-
+    
         posts.forEach(post => {
             const postElement = document.createElement('div');
             postElement.classList.add('post');
@@ -169,9 +169,67 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image">` : ''}
                     <p>${post.caption}</p>
                 </div>
+                <div class="post-actions">
+                    <button class="like-post-button" data-post-id="${post.id}">Like</button>
+                    <button class="dislike-post-button" data-post-id="${post.id}">Dislike</button>
+                </div>
             `;
             postsContainer.appendChild(postElement);
         });
+    
+        // Attach event listeners to like buttons
+        const likeButtons = document.querySelectorAll('.like-post-button');
+        likeButtons.forEach(button => {
+            button.addEventListener('click', handleLikePost);
+        });
+    
+        // Attach event listeners to dislike buttons
+        const dislikeButtons = document.querySelectorAll('.dislike-post-button');
+        dislikeButtons.forEach(button => {
+            button.addEventListener('click', handleDislikePost);
+        });
+    }
+
+    async function handleLikePost(event) {
+        const postId = event.target.getAttribute('data-post-id');
+        try {
+            const response = await fetch(`/posts/${postId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+    
+            if (!response.ok) {
+                throw new Error('Error liking post');
+            }
+    
+            alert('Post liked successfully');
+            fetchAndDisplayPosts(1); // Refresh the posts
+        } catch (error) {
+            console.error('Error liking post:', error);
+        }
+    }
+    
+    async function handleDislikePost(event) {
+        const postId = event.target.getAttribute('data-post-id');
+        try {
+            const response = await fetch(`/posts/${postId}/dislike`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+    
+            if (!response.ok) {
+                throw new Error('Error disliking post');
+            }
+    
+            alert('Post disliked successfully');
+            fetchAndDisplayPosts(1); // Refresh the posts
+        } catch (error) {
+            console.error('Error disliking post:', error);
+        }
     }
 
     function displayUserPosts(posts) {
