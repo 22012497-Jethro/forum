@@ -5,18 +5,19 @@
     <title>Post Details</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <script src="single-post.js"></script>
 </head>
-<body class="main-page">
+<body class="main-page light-mode">
     <nav>
         <div class="nav-left">
             <img src="logo-dark.png" alt="ReVibe Logo" id="nav-logo">
             <h1>ReVibe Forum</h1>
         </div>
         <div class="nav-right">
-            <a href="/main"><button id="home-button">Home</button></a>
+            <a href="/create-post"><button id="create-post-button">Create Post</button></a>
             <div class="dropdown">
                 <img src="default-profile.png" alt="Profile Picture" id="profile-pic">
-                <span id="profile-username" data-user-id="1">Username</span>
+                <span id="profile-username">Username</span>
                 <div class="dropdown-content">
                     <p id="settings-button">Settings</p>
                     <p id="logout-button">Logout</p>
@@ -25,9 +26,8 @@
             <button id="theme-switch">Switch Theme</button>
         </div>
     </nav>
-
     <section class="single-post-container">
-        <div class="post-container">
+        <div class="post-header">
             <img src="default-profile.png" alt="Profile Picture" id="post-profile-pic" class="creator-pfp">
             <span id="post-username" class="post-username">Username</span>
         </div>
@@ -43,7 +43,5 @@
         </div>
         <a href="/" class="back-button">Back to Home</a>
     </section>
-
-    <script src="single-post.js"></script>
 </body>
 </html>
