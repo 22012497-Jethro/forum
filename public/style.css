@@ -10,6 +10,7 @@ body {
     align-items: center;
     min-height: 100vh;
     flex-direction: column;
+    overflow-x: hidden;
 }
 
 /* Section styling */
@@ -22,6 +23,7 @@ section {
     width: 90%;
     max-width: 800px;
     color: white; /* Ensure text color is white */
+    margin-top: 100px; /* Ensure there is enough space below the navbar */
 }
 
 /* Navbar styling */
@@ -40,7 +42,7 @@ nav {
 
 /* Ensure content below the navbar is not hidden */
 body.main-page {
-    padding-top: 120px; /* Adjust this value based on the height of your navbar */
+    padding-top: 70px; /* Adjust this value based on the height of your navbar */
 }
 
 .nav-left, .nav-right {
@@ -211,7 +213,6 @@ body.main-page {
     flex-direction: column;
     justify-content: flex-start;
     align-items: stretch;
-    padding-top: 60px; /* height of the navbar */
 }
 
 nav h1 {
