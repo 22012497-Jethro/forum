@@ -244,7 +244,7 @@ router.get('/', async (req, res) => {
     }
 
     if (category) {
-        query = query.eq('category', category); // Changed to use eq for exact match
+        query = query.eq('category', category); // Ensure exact match
     }
 
     try {
