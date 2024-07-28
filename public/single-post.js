@@ -27,24 +27,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('created_at').innerText = new Date(post.created_at).toLocaleString();
 
         // Display the user who posted
-        const supabaseUrl = "https://fudsrzbhqpmryvmxgced.supabase.co";
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1ZHNyemJocXBtcnl2bXhnY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM5MjE3OTQsImV4cCI6MjAyOTQ5Nzc5NH0.6UMbzoD8J1BQl01h6NSyZAHVhrWerUcD5VVGuBwRcag";
-        const supabase = createClient(supabaseUrl, supabaseKey);
-
-        const { data: user, error } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', post.user_id)
-            .single();
-
-        if (error) {
-            console.error('Error fetching user data:', error);
-            document.getElementById('post-username').innerText = 'Unknown User';
-            document.getElementById('post-profile-pic').src = 'default-profile.png';
-        } else {
-            document.getElementById('post-username').innerText = user.username;
-            document.getElementById('post-profile-pic').src = user.pfp || 'default-profile.png';
-        }
+        document.getElementById('post-username').innerText = post.user.username;
+        document.getElementById('post-profile-pic').src = post.user.pfp || 'default-profile.png';
     } catch (error) {
         console.error('Error fetching post data:', error);
         document.body.innerHTML = '<h1>There was an error fetching the post data.</h1>';
@@ -53,6 +37,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupThemeSwitch(); // Initialize theme switcher
     fetchAndDisplayUserData(); // Fetch and display logged-in user data
 });
+
+function setupThemeSwitch() {
+    const themeSwitch = document.getElementById('theme-switch');
+    const savedTheme = localStorage.getItem('theme') || 'light-mode';
+    applyTheme(savedTheme);
+
+    themeSwitch.addEventListener('click', () => {
+        const newTheme = document.body.classList.contains('light-mode') ? 'dark-mode' : 'light-mode';
+        applyTheme(newTheme);
+    });
+}
 
 function applyTheme(theme) {
     document.body.className = theme;
