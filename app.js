@@ -39,8 +39,10 @@ app.get("/profile", authenticateUser, (req, res) => res.sendFile(path.join(__dir
 
 // Use the posts and users routers with authentication
 app.use('/posts', authenticateUser, postsRouter);
-app.use('/users', authenticateUser, usersRouter);
 app.use('/comments', authenticateUser, commentsRouter);
+
+// Use the users router without authentication for login and signup
+app.use('/users', usersRouter);
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
