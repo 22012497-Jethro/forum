@@ -227,18 +227,28 @@ router.put('/:id', upload.single('image'), async (req, res) => {
     res.json({ message: 'Post updated successfully' });
 });
 
-// Fetch posts endpoint
+// Fetch posts with filters endpoint
 router.get('/', async (req, res) => {
-    const { page = 1, limit = 10 } = req.query;
+    const { title, category, page = 1, limit = 10 } = req.query;
     const start = (page - 1) * limit;
     const end = start + limit - 1;
 
+    let query = supabase
+        .from('posts')
+        .select('id, title, caption, user_id, created_at, category, theme, rooms, room_category, image')
+        .order('created_at', { ascending: false })
+        .range(start, end);
+
+    if (title) {
+        query = query.ilike('title', `%${title}%`);
+    }
+
+    if (category) {
+        query = query.ilike('category', `%${category}%`);
+    }
+
     try {
-        const { data: posts, error } = await supabase
-            .from('posts')
-            .select('id, title, caption, user_id, created_at, category, theme, rooms, room_category, image')
-            .order('created_at', { ascending: false })
-            .range(start, end);
+        const { data: posts, error } = await query;
 
         if (error) {
             return res.status(500).send('Error fetching posts');
@@ -262,8 +272,6 @@ router.get('/', async (req, res) => {
                 profile_pic: user ? user.pfp : 'default-profile.png' 
             };
         });
-
-        console.log(postsWithUsernames); // Log the fetched data for debugging
 
         res.json(postsWithUsernames);
     } catch (error) {

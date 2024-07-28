@@ -123,16 +123,16 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchAndDisplayUserProfile();
     }
 
-    // Fetch user profile data for settings page
-    async function fetchAndDisplayPosts(page) {
+    // Fetch posts with optional filters
+    async function fetchAndDisplayPosts(page, titleFilter = '', categoryFilter = '') {
         try {
-            const response = await fetch(`/posts?page=${page}&limit=10`);
+            const response = await fetch(`/posts?page=${page}&limit=10&title=${titleFilter}&category=${categoryFilter}`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
             const posts = await response.json();
             displayPosts(posts);
-            setupPagination(page);
+            setupPagination(page, titleFilter, categoryFilter);
         } catch (error) {
             console.error('Error fetching posts:', error);
         }
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayPosts(posts) {
         const postsContainer = document.getElementById('posts-container');
         postsContainer.innerHTML = '';
-    
+
         posts.forEach(post => {
             const postElement = document.createElement('div');
             postElement.classList.add('post');
@@ -300,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchPostDetails(postId);
     }
 
-    function setupPagination(currentPage) {
+    function setupPagination(currentPage, titleFilter = '', categoryFilter = '') {
         const paginationContainer = document.getElementById('pagination-container');
         paginationContainer.innerHTML = '';
 
@@ -310,10 +310,21 @@ document.addEventListener('DOMContentLoaded', () => {
             if (i === currentPage) {
                 pageButton.disabled = true;
             }
-            pageButton.onclick = () => fetchAndDisplayPosts(i);
+            pageButton.onclick = () => fetchAndDisplayPosts(i, titleFilter, categoryFilter);
             paginationContainer.appendChild(pageButton);
         }
     }
+
+    // Filter button event listener
+    const filterButton = document.getElementById('filter-button');
+    if (filterButton) {
+        filterButton.addEventListener('click', () => {
+            const titleFilter = document.getElementById('filter-title').value;
+            const categoryFilter = document.getElementById('filter-category').value;
+            fetchAndDisplayPosts(1, titleFilter, categoryFilter);
+        });
+    }
+
     // Navigate to settings page
     function goToSettings() {
         window.location.href = '/settings';
