@@ -5,6 +5,7 @@ const session = require("express-session");
 const postsRouter = require('./routes/posts'); // Import the posts router
 const usersRouter = require('./routes/users'); // Import the users router
 const commentsRouter = require('./routes/comments'); // Import the comments router
+const authenticateUser = require('./middleware/authMiddleware'); // Import the auth middleware
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -26,18 +27,20 @@ app.use(session({
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, 'public/index.html')));
 app.get("/login", (req, res) => res.sendFile(path.join(__dirname, 'public/login.html')));
 app.get("/signup", (req, res) => res.sendFile(path.join(__dirname, 'public/signup.html')));
-app.get("/main", (req, res) => res.sendFile(path.join(__dirname, 'public/main.html')));
-app.get('/create-post', (req, res) => res.sendFile(path.join(__dirname, 'public', 'create-post.html')));
-app.get("/single-post", (req, res) => res.sendFile(path.join(__dirname, 'public', 'single-post.html')));
-app.get("/post", (req, res) => res.sendFile(path.join(__dirname, 'public/post.html')));
-app.get("/edit", (req, res) => res.sendFile(path.join(__dirname, 'public/edit.html')));
-app.get("/settings", (req, res) => res.sendFile(path.join(__dirname, 'public/settings.html')));
-app.get("/profile", (req, res) => res.sendFile(path.join(__dirname, 'public/profile.html')));
 
-// Use the posts and users routers
-app.use('/posts', postsRouter);
-app.use('/users', usersRouter);
-app.use('/comments', commentsRouter);
+// Apply the auth middleware to all routes that require authentication
+app.get("/main", authenticateUser, (req, res) => res.sendFile(path.join(__dirname, 'public/main.html')));
+app.get('/create-post', authenticateUser, (req, res) => res.sendFile(path.join(__dirname, 'public', 'create-post.html')));
+app.get("/single-post", authenticateUser, (req, res) => res.sendFile(path.join(__dirname, 'public', 'single-post.html')));
+app.get("/post", authenticateUser, (req, res) => res.sendFile(path.join(__dirname, 'public/post.html')));
+app.get("/edit", authenticateUser, (req, res) => res.sendFile(path.join(__dirname, 'public/edit.html')));
+app.get("/settings", authenticateUser, (req, res) => res.sendFile(path.join(__dirname, 'public/settings.html')));
+app.get("/profile", authenticateUser, (req, res) => res.sendFile(path.join(__dirname, 'public/profile.html')));
+
+// Use the posts and users routers with authentication
+app.use('/posts', authenticateUser, postsRouter);
+app.use('/users', authenticateUser, usersRouter);
+app.use('/comments', authenticateUser, commentsRouter);
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
