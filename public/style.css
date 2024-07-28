@@ -260,6 +260,11 @@ button {
 /* Comments section styling */
 .comments-section {
     margin-top: 40px;
+    text-align: left;
+    background-color: rgba(0, 0, 0, 0.7); /* Dark background for better readability */
+    padding: 20px;
+    border-radius: 10px;
+    color: white; /* Ensure text color is white */
 }
 
 #comments-container {
