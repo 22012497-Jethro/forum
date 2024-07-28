@@ -340,20 +340,21 @@ router.get('/:id', async (req, res) => {
     res.json(post);
 });
 
-router.get('/:postId/comments', async (req, res) => {
-    const { postId } = req.params;
+// Fetch comments for a specific post
+router.get('/:id/comments', async (req, res) => {
+    const { id } = req.params;
+
     try {
         const { data: comments, error } = await supabase
             .from('comments')
-            .select('id, text, created_at, user_id')
-            .eq('post_id', postId)
+            .select('text, created_at, user_id')
+            .eq('post_id', id)
             .order('created_at', { ascending: true });
 
         if (error) {
-            return res.status(500).json({ error: error.message });
+            return res.status(500).send('Error fetching comments');
         }
 
-        // Fetch user details for each comment
         const userIds = comments.map(comment => comment.user_id);
         const { data: users, error: userError } = await supabase
             .from('users')
@@ -361,7 +362,7 @@ router.get('/:postId/comments', async (req, res) => {
             .in('id', userIds);
 
         if (userError) {
-            return res.status(500).json({ error: userError.message });
+            return res.status(500).send('Error fetching users');
         }
 
         const commentsWithUsernames = comments.map(comment => {
@@ -374,28 +375,33 @@ router.get('/:postId/comments', async (req, res) => {
 
         res.json(commentsWithUsernames);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).send('Error fetching comments');
     }
 });
 
-// Post a comment
-router.post('/:postId/comments', async (req, res) => {
-    const { postId } = req.params;
+// Post a new comment
+router.post('/:id/comments', async (req, res) => {
+    const { id } = req.params;
     const { text } = req.body;
-    const userId = req.session.userId; // Make sure user is authenticated
+    const userId = req.session.userId;
+
+    if (!text || text.trim() === '') {
+        return res.status(400).send('Comment text is required');
+    }
 
     try {
+        const createdAt = new Date().toISOString();
         const { data, error } = await supabase
             .from('comments')
-            .insert([{ text, post_id: postId, user_id: userId }]);
+            .insert([{ post_id: id, text, user_id: userId, created_at: createdAt }]);
 
         if (error) {
-            return res.status(500).json({ error: error.message });
+            return res.status(500).send('Error posting comment');
         }
 
-        res.status(201).json(data);
+        res.status(201).send('Comment posted successfully');
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).send('Error posting comment');
     }
 });
 
