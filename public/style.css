@@ -356,31 +356,5 @@ button {
     #comment-text {
         width: 100%;
     }
-
-    .post-actions {
-        display: flex;
-        justify-content: space-around;
-        margin-top: 10px;
-    }
     
-    .post-actions button {
-        padding: 5px 10px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-    
-    .post-actions button:hover {
-        background-color: #45a049;
-    }
-    
-    .post-actions .dislike-post-button {
-        background-color: #f44336;
-    }
-    
-    .post-actions .dislike-post-button:hover {
-        background-color: #e53935;
-    }
 }

@@ -406,36 +406,4 @@ router.post('/:id/comments', async (req, res) => {
     }
 });
 
-// Like a post
-router.post('/:id/like', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const { data, error } = await supabase
-            .from('posts')
-            .update({ likes: supabase.raw('likes + 1') })
-            .eq('id', id)
-            .single();
-        if (error) throw error;
-        res.json(data);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Dislike a post
-router.post('/:id/dislike', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const { data, error } = await supabase
-            .from('posts')
-            .update({ dislikes: supabase.raw('dislikes + 1') })
-            .eq('id', id)
-            .single();
-        if (error) throw error;
-        res.json(data);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
 module.exports = router;
