@@ -229,9 +229,9 @@ router.put('/:id', upload.single('image'), async (req, res) => {
 
 // Fetch posts with filters endpoint
 router.get('/', async (req, res) => {
-    const { title, category, page = 1, limit = 10 } = req.query;
+    const { title, category, page = 1, limit = 5 } = req.query;
     const start = (page - 1) * limit;
-    const end = start + limit - 1;
+    const end = start + parseInt(limit) - 1;
 
     let query = supabase
         .from('posts')
