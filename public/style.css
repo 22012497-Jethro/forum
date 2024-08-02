@@ -12,7 +12,7 @@ body {
 
 /* Section styling */
 section {
-    text-align: center;
+    text-align: left;
     background-color: rgba(0, 0, 0, 0.7); /* Dark background for better readability */
     padding: 20px;
     border-radius: 10px;
