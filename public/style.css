@@ -203,7 +203,7 @@ button {
     background-color: rgba(50, 50, 50, 0.9); /* Adjust background color for better contrast */
 }
 
-.dark-mode form label, .dark-mode .single-post-container label, .dark-mode .single-post-container, .dark-mode .single-post-container p, .dark-mode .single-post-container h3, .dark-mode .single-post-container h1 {
+.dark-mode form label, .dark-mode .single-post-container label, .dark-mode .single-post-container, .dark-mode .single-post-container p, .dark-mode .single-post-container h3, .dark-mode .single-post-container h1, .dark-mode .single-post-container .post-username, .dark-mode .single-post-container .post-title {
     color: white; /* Ensure label and text color is white */
 }
 
