@@ -290,7 +290,7 @@ button {
     padding: 15px;
     max-width: 800px;
     margin: 20px auto;
-    color: white; /* Ensure text color is white */
+    color: black; /* Ensure text color is white */
 }
 
 .post-details h3 {
