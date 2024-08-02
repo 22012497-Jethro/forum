@@ -70,7 +70,7 @@ router.post("/create", upload.single('image'), async (req, res) => {
     }
 
     try {
-        const createdAt = new Date().toLocaleString();
+        const createdAt = new Date().toISOString();
         console.log("Creating post with data:", { title, caption, image: imageUrl, category, theme, rooms, room_category, user_id: userId, created_at: createdAt });
 
         const { data, error } = await supabase
