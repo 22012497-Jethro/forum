@@ -131,7 +131,7 @@ button {
 #theme-switch, #create-post-button {
     padding: 10px;
     background-color: white;
-    color: #4CAF50;
+    color: #74FF74;
     border: none;
     cursor: pointer;
     border-radius: 4px;
@@ -182,16 +182,16 @@ button {
 
 /* Dark mode styling */
 .dark-mode {
-    background-color: #333;
+    background-color: #022D02;
     color: white;
 }
 
 .dark-mode nav {
-    background-color: #555;
+    background-color: #022D02;
 }
 
 .dark-mode .dropdown-content {
-    background-color: #666;
+    background-color: #777;
 }
 
 .dark-mode .dropdown-content p {
@@ -228,7 +228,7 @@ button {
 }
 
 .light-mode nav {
-    background-color: #4CAF50;
+    background-color: #74FF74;
 }
 
 .light-mode .dropdown-content {
@@ -361,7 +361,7 @@ button {
 
 #comment-form button {
     padding: 10px 20px;
-    background-color: #4CAF50;
+    background-color: #74FF74;
     color: white;
     border: none;
     border-radius: 5px;
@@ -375,7 +375,7 @@ button {
 #home-button {
     padding: 10px;
     background-color: white;
-    color: #4CAF50;
+    color: #74FF74;
     border: none;
     cursor: pointer;
     border-radius: 4px;
