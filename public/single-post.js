@@ -10,8 +10,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log(`Fetching post with ID: ${postId}`);
         const response = await fetch(`/posts/${postId}`);
         if (!response.ok) {
-            document.body.innerHTML = `<h1>Post not found! Status: ${response.status}</h1>`;
-            console.error(`Failed to fetch post. Status: ${response.status}, StatusText: ${response.statusText}`);
+            const errorText = await response.text();
+            document.body.innerHTML = `<h1>Post not found! Status: ${response.status}</h1><p>${errorText}</p>`;
+            console.error(`Failed to fetch post. Status: ${response.status}, StatusText: ${response.statusText}, Error: ${errorText}`);
             return;
         }
         const post = await response.json();
@@ -24,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         await fetchAndDisplayComments(postId);
     } catch (error) {
         console.error('Error fetching post data:', error);
-        document.body.innerHTML = '<h1>There was an error fetching the post data.</h1>';
+        document.body.innerHTML = '<h1>There was an error fetching the post data.</h1><p>Please check the console for more details.</p>';
     }
 
     setupThemeSwitch(); // Initialize theme switcher
@@ -42,83 +43,55 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function populatePostDetails(post) {
     const postSection = document.querySelector('.single-post-container');
-    postSection.innerHTML = ''; // Clear any existing content
 
     if (post.user) {
-        const user = document.createElement('div');
-        user.className = 'post-user';
-        user.innerHTML = `
-            <img id="post-profile-pic" src="${post.user.pfp || 'default-profile.png'}" alt="Profile Picture">
-            <span id="post-username">${post.user.username}</span>
-        `;
-        postSection.appendChild(user);
+        document.getElementById('post-profile-pic').src = post.user.pfp || 'default-profile.png';
+        document.getElementById('post-username').textContent = post.user.username;
     }
 
-    if (post.title) {
-        const title = document.createElement('h1');
-        title.className = 'post-title';
-        title.textContent = post.title;
-        postSection.appendChild(title);
-    }
+    document.getElementById('title').textContent = post.title || 'No Title';
 
     if (post.caption) {
-        const caption = document.createElement('p');
-        caption.className = 'post-caption';
-        caption.textContent = post.caption;
-        postSection.appendChild(caption);
+        document.getElementById('caption').textContent = post.caption;
+    } else {
+        document.getElementById('caption').style.display = 'none';
     }
 
     if (post.image) {
-        const imageContainer = document.createElement('div');
-        imageContainer.id = 'image-container';
-        const image = document.createElement('img');
-        image.className = 'post-image';
-        image.src = post.image;
-        image.alt = 'Post Image';
-        imageContainer.appendChild(image);
-        postSection.appendChild(imageContainer);
+        document.getElementById('image').src = post.image;
+    } else {
+        document.getElementById('image-container').style.display = 'none';
     }
 
     if (post.category) {
-        const category = document.createElement('p');
-        category.className = 'post-category';
-        category.innerHTML = `<strong>Category:</strong> ${post.category}`;
-        postSection.appendChild(category);
+        document.getElementById('category').textContent = post.category;
+    } else {
+        document.getElementById('category').parentElement.style.display = 'none';
     }
 
     if (post.theme) {
-        const theme = document.createElement('p');
-        theme.className = 'post-theme';
-        theme.innerHTML = `<strong>Theme:</strong> ${post.theme}`;
-        postSection.appendChild(theme);
+        document.getElementById('theme').textContent = post.theme;
+    } else {
+        document.getElementById('theme').parentElement.style.display = 'none';
     }
 
     if (post.rooms) {
-        const rooms = document.createElement('p');
-        rooms.className = 'post-rooms';
-        rooms.innerHTML = `<strong>Rooms:</strong> ${post.rooms}`;
-        postSection.appendChild(rooms);
+        document.getElementById('rooms').textContent = post.rooms;
+    } else {
+        document.getElementById('rooms').parentElement.style.display = 'none';
     }
 
     if (post.room_category) {
-        const roomCategory = document.createElement('p');
-        roomCategory.className = 'post-room-category';
-        roomCategory.innerHTML = `<strong>Room Category:</strong> ${post.room_category}`;
-        postSection.appendChild(roomCategory);
+        document.getElementById('room_category').textContent = post.room_category;
+    } else {
+        document.getElementById('room_category').parentElement.style.display = 'none';
     }
 
     if (post.created_at) {
-        const createdAt = document.createElement('p');
-        createdAt.className = 'post-created-at';
-        createdAt.innerHTML = `<strong>Created at:</strong> ${new Date(post.created_at).toLocaleString()}`;
-        postSection.appendChild(createdAt);
+        document.getElementById('created_at').textContent = new Date(post.created_at).toLocaleString();
+    } else {
+        document.getElementById('created_at').parentElement.style.display = 'none';
     }
-
-    const backToHome = document.createElement('a');
-    backToHome.href = '/main';
-    backToHome.className = 'back-button';
-    backToHome.textContent = 'Back to Home';
-    postSection.appendChild(backToHome);
 }
 
 async function fetchAndDisplayComments(postId) {
