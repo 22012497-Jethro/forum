@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
+        console.log(`Fetching post with ID: ${postId}`);
         const response = await fetch(`/posts/${postId}`);
         if (!response.ok) {
             document.body.innerHTML = `<h1>Post not found! Status: ${response.status}</h1>`;
@@ -40,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function populatePostDetails(post) {
-    const postSection = document.getElementById('post-details');
+    const postSection = document.querySelector('.single-post-container');
     postSection.innerHTML = ''; // Clear any existing content
 
     if (post.user) {
@@ -54,7 +55,7 @@ function populatePostDetails(post) {
     }
 
     if (post.title) {
-        const title = document.createElement('h3');
+        const title = document.createElement('h1');
         title.className = 'post-title';
         title.textContent = post.title;
         postSection.appendChild(title);
@@ -67,43 +68,55 @@ function populatePostDetails(post) {
         postSection.appendChild(caption);
     }
 
+    if (post.image) {
+        const imageContainer = document.createElement('div');
+        imageContainer.id = 'image-container';
+        const image = document.createElement('img');
+        image.className = 'post-image';
+        image.src = post.image;
+        image.alt = 'Post Image';
+        imageContainer.appendChild(image);
+        postSection.appendChild(imageContainer);
+    }
+
     if (post.category) {
         const category = document.createElement('p');
         category.className = 'post-category';
-        category.textContent = `Category: ${post.category}`;
+        category.innerHTML = `<strong>Category:</strong> ${post.category}`;
         postSection.appendChild(category);
     }
 
     if (post.theme) {
         const theme = document.createElement('p');
         theme.className = 'post-theme';
-        theme.textContent = `Theme: ${post.theme}`;
+        theme.innerHTML = `<strong>Theme:</strong> ${post.theme}`;
         postSection.appendChild(theme);
     }
 
     if (post.rooms) {
         const rooms = document.createElement('p');
         rooms.className = 'post-rooms';
-        rooms.textContent = `Rooms: ${post.rooms}`;
+        rooms.innerHTML = `<strong>Rooms:</strong> ${post.rooms}`;
         postSection.appendChild(rooms);
     }
 
     if (post.room_category) {
         const roomCategory = document.createElement('p');
         roomCategory.className = 'post-room-category';
-        roomCategory.textContent = `Room Category: ${post.room_category}`;
+        roomCategory.innerHTML = `<strong>Room Category:</strong> ${post.room_category}`;
         postSection.appendChild(roomCategory);
     }
 
     if (post.created_at) {
         const createdAt = document.createElement('p');
         createdAt.className = 'post-created-at';
-        createdAt.textContent = `Created at: ${new Date(post.created_at).toLocaleString()}`;
+        createdAt.innerHTML = `<strong>Created at:</strong> ${new Date(post.created_at).toLocaleString()}`;
         postSection.appendChild(createdAt);
     }
 
     const backToHome = document.createElement('a');
-    backToHome.href = 'home.html';
+    backToHome.href = '/main';
+    backToHome.className = 'back-button';
     backToHome.textContent = 'Back to Home';
     postSection.appendChild(backToHome);
 }
