@@ -17,18 +17,74 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log(`Post fetched successfully: ${JSON.stringify(post)}`);
 
         // Populate the post details
-        document.getElementById('title').innerText = post.title;
-        document.getElementById('caption').innerText = post.caption;
-        document.getElementById('image').src = post.image || 'default-image.png';
-        document.getElementById('category').innerText = post.category;
-        document.getElementById('theme').innerText = post.theme;
-        document.getElementById('rooms').innerText = post.rooms;
-        document.getElementById('room_category').innerText = post.room_category;
-        document.getElementById('created_at').innerText = new Date(post.created_at).toLocaleString();
+        const postSection = document.getElementById('post-details');
+        postSection.innerHTML = ''; // Clear any existing content
+
+        if (post.title) {
+            const title = document.createElement('h3');
+            title.className = 'post-title';
+            title.textContent = post.title;
+            postSection.appendChild(title);
+        }
+
+        if (post.caption) {
+            const caption = document.createElement('p');
+            caption.className = 'post-caption';
+            caption.textContent = post.caption;
+            postSection.appendChild(caption);
+        }
+
+        if (post.image) {
+            const image = document.createElement('img');
+            image.className = 'post-image';
+            image.src = post.image;
+            image.alt = 'Post Image';
+            postSection.appendChild(image);
+        }
+
+        if (post.category) {
+            const category = document.createElement('p');
+            category.className = 'post-category';
+            category.textContent = `Category: ${post.category}`;
+            postSection.appendChild(category);
+        }
+
+        if (post.theme) {
+            const theme = document.createElement('p');
+            theme.className = 'post-theme';
+            theme.textContent = `Theme: ${post.theme}`;
+            postSection.appendChild(theme);
+        }
+
+        if (post.rooms) {
+            const rooms = document.createElement('p');
+            rooms.className = 'post-rooms';
+            rooms.textContent = `Rooms: ${post.rooms}`;
+            postSection.appendChild(rooms);
+        }
+
+        if (post.room_category) {
+            const roomCategory = document.createElement('p');
+            roomCategory.className = 'post-room-category';
+            roomCategory.textContent = `Room Category: ${post.room_category}`;
+            postSection.appendChild(roomCategory);
+        }
+
+        if (post.created_at) {
+            const createdAt = document.createElement('p');
+            createdAt.className = 'post-created-at';
+            createdAt.textContent = `Created at: ${new Date(post.created_at).toLocaleString()}`;
+            postSection.appendChild(createdAt);
+        }
 
         // Display the user who posted
-        document.getElementById('post-username').innerText = post.user.username;
-        document.getElementById('post-profile-pic').src = post.user.pfp || 'default-profile.png';
+        const user = document.createElement('div');
+        user.className = 'post-user';
+        user.innerHTML = `
+            <img id="post-profile-pic" src="${post.user.pfp || 'default-profile.png'}" alt="Profile Picture">
+            <span id="post-username">${post.user.username}</span>
+        `;
+        postSection.insertBefore(user, postSection.firstChild);
 
         // Fetch and display comments
         await fetchAndDisplayComments(postId);
