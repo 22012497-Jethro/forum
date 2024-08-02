@@ -18,7 +18,7 @@ async function fetchAndDisplayUserData() {
 function applyTheme(theme) {
     document.body.className = theme;
     const logo = document.getElementById('nav-logo');
-    logo.src = theme === 'dark-mode' ? 'logo-light.jpg' : 'logo-dark.jpg';
+    logo.src = theme === 'dark-mode' ? 'logo-light.png' : 'logo-dark.png';
     localStorage.setItem('theme', theme);
 }
 
