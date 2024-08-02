@@ -3,7 +3,7 @@ body {
     background-size: cover;
     background-position: center;
     margin: 0;
-    font-family: 'Lexend';
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     overflow-x: hidden;
     min-height: 100vh;
     padding-top: 70px; /* Space for the navbar */
