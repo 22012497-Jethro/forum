@@ -23,7 +23,7 @@ section {
     margin: 20px auto; /* Center the section with some margin */
 }
 
-/* Form styling */
+/* Form styling */z
 form {
     text-align: left; /* Left-align the form */
     margin: 20px 0;
@@ -44,7 +44,7 @@ form input, form select, form textarea {
     border-radius: 5px;
     border: 1px solid #555;
     background-color: #555;
-    color: #000;
+    color: #fff;
 }
 
 form button {
@@ -57,7 +57,7 @@ form button {
 }
 
 form button:hover {
-    background-color: #45a049;
+    background-color: #555555;
 }
 
 /* Navbar styling */
