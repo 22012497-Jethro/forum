@@ -188,6 +188,7 @@ button {
 
 .dark-mode nav {
     background-color: #022D02;
+    color:white;
 }
 
 .dark-mode .dropdown-content {
