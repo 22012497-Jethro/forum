@@ -203,6 +203,10 @@ button {
     background-color: rgba(50, 50, 50, 0.9); /* Adjust background color for better contrast */
 }
 
+.dark-mode form label {
+    color: white; /* Ensure label text color is white */
+}
+
 .dark-mode .dropdown-content p:hover {
     background-color: #777;
 }
