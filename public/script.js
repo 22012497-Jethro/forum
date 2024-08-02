@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fetch posts with optional filters
     async function fetchAndDisplayPosts(page, titleFilter = '', categoryFilter = '') {
         try {
-            const response = await fetch(`/posts?page=${page}&limit=10&title=${titleFilter}&category=${categoryFilter}`);
+            const response = await fetch(`/posts?page=${page}&limit=5&title=${titleFilter}&category=${categoryFilter}`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -300,11 +300,17 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchPostDetails(postId);
     }
 
-    function setupPagination(currentPage, titleFilter = '', categoryFilter = '') {
+    async function setupPagination(currentPage, titleFilter = '', categoryFilter = '') {
         const paginationContainer = document.getElementById('pagination-container');
         paginationContainer.innerHTML = '';
 
-        for (let i = 1; i <= 10; i++) {
+        const totalPostsResponse = await fetch(`/posts/count?title=${titleFilter}&category=${categoryFilter}`);
+        const totalPosts = await totalPostsResponse.json();
+
+        const postsPerPage = 5; // You can adjust this value as needed
+        const totalPages = Math.ceil(totalPosts / postsPerPage);
+
+        for (let i = 1; i <= totalPages; i++) {
             const pageButton = document.createElement('button');
             pageButton.textContent = i;
             if (i === currentPage) {
