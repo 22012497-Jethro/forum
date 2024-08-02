@@ -12,7 +12,7 @@ body {
 
 /* Section styling */
 section {
-    text-align: left;
+    text-align: center;
     background-color: rgba(0, 0, 0, 0.7); /* Dark background for better readability */
     padding: 20px;
     border-radius: 10px;
@@ -21,6 +21,43 @@ section {
     max-width: 800px;
     color: white; /* Ensure text color is white */
     margin: 20px auto; /* Center the section with some margin */
+}
+
+/* Form styling */
+form {
+    text-align: left; /* Left-align the form */
+    margin: 20px 0;
+}
+
+form label {
+    display: block;
+    font-weight: bold;
+    margin-top: 10px;
+    color: white; /* Ensure text color is white */
+}
+
+form input, form select, form textarea {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    color: #000;
+}
+
+form button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #45a049;
 }
 
 /* Navbar styling */
