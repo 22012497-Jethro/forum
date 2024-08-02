@@ -44,6 +44,7 @@ form input, form select, form textarea {
     border: 1px solid #555;
     background-color: #555;
     color: #fff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
 form button {
