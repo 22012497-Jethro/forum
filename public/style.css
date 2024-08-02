@@ -128,7 +128,7 @@ button {
     display: block;
 }
 
-#theme-switch, #create-post-button {
+#theme-switch, #create-post-button, #home-button {
     padding: 10px;
     background-color: white;
     color: #022D02;
@@ -138,7 +138,7 @@ button {
     margin-left: 10px; /* Add margin to the left of buttons */
 }
 
-#theme-switch:hover, #create-post-button:hover {
+#theme-switch:hover, #create-post-button:hover, #home-button:hover {
     background-color: #ddd;
 }
 
@@ -371,20 +371,6 @@ button {
 
 #comment-form button:hover {
     background-color: #45a049;
-}
-
-#home-button {
-    padding: 10px;
-    background-color: white;
-    color: #74FF74;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
-    margin-left: 10px; /* Add margin to the left of buttons */
-}
-
-#home-button:hover {
-    background-color: #ddd;
 }
 
 /* Responsive adjustments */
