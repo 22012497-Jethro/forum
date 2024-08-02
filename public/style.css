@@ -294,6 +294,20 @@ button {
     color: white; /* Ensure text color is white */
 }
 
+.post-container {
+    margin-top: 20px;
+}
+
+.post-details h3 {
+    margin: 10px 0;
+}
+
+.post-details img.post-image {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+}
+
 .pagination-container {
     display: flex;
     justify-content: center;

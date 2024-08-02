@@ -327,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
         filterButton.addEventListener('click', () => {
             const titleFilter = document.getElementById('filter-title').value;
             const categoryFilter = document.getElementById('filter-category').value;
-            console.log('Filters applied - Title:', titleFilter, 'Category:', categoryFilter); // Debugging line
+            console.log('Filters applied - Title:', titleFilter, 'Category:', categoryFilter);
             fetchAndDisplayPosts(1, titleFilter, categoryFilter);
         });
     }
