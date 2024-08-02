@@ -235,7 +235,7 @@ router.get('/', async (req, res) => {
 
     let query = supabase
         .from('posts')
-        .select('id, title, caption, user_id, created_at, category, theme, rooms, room_category, image')
+        .select('id, title, caption, user_id, created_at, category, theme, rooms, room_category, image', { count: 'exact' })
         .order('created_at', { ascending: false })
         .range(start, end);
 
@@ -244,11 +244,11 @@ router.get('/', async (req, res) => {
     }
 
     if (category) {
-        query = query.eq('category', category); // Ensure exact match
+        query = query.eq('category', category);
     }
 
     try {
-        const { data: posts, error } = await query;
+        const { data: posts, count, error } = await query;
 
         if (error) {
             return res.status(500).send('Error fetching posts');
@@ -273,7 +273,7 @@ router.get('/', async (req, res) => {
             };
         });
 
-        res.json(postsWithUsernames);
+        res.json({ posts: postsWithUsernames, totalPosts: count });
     } catch (error) {
         res.status(500).send('Error fetching posts');
     }

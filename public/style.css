@@ -12,10 +12,10 @@ body {
 /* Section styling */
 section {
     text-align: center;
-    background-color: rgba(81, 4, 17, 0.7); /* Dark background for better readability */
+    background-color: rgba(174, 198, 207, 0.7); /* Dark background for better readability */
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(81, 4, 17, 0.5);
+    box-shadow: 0px 0px 10px rgba(174, 198, 207, 0.5);
     width: 90%;
     max-width: 800px;
     color: white; /* Ensure text color is white */
@@ -107,7 +107,7 @@ button {
     right: 0;
     background-color: #f9f9f9;
     min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    box-shadow: 0px 8px 16px 0px rgba(174, 198, 207, 0.2);
     z-index: 1;
 }
 
@@ -151,8 +151,8 @@ button {
     width: 100%; /* Full width */
     height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    background-color: rgb(174, 198, 207); /* Fallback color */
+    background-color: rgba(174, 198, 207, 0.4); /* Black w/ opacity */
     padding-top: 60px;
 }
 
@@ -235,7 +235,7 @@ button {
 }
 
 /* Add styles for post content */
-.post-header {
+.post-header img.creator-pfp {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -283,14 +283,24 @@ button {
 
 /* Styling individual posts */
 .post, .single-post-container {
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(174, 198, 207, 0.7);
     border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 0px 10px rgba(174, 198, 207, 0.1);
     margin-bottom: 20px;
     padding: 15px;
     max-width: 800px;
     margin: 20px auto;
     color: white; /* Ensure text color is white */
+}
+
+.post-details h3 {
+    margin: 10px 0;
+}
+
+.post-details img.post-image {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
 }
 
 /* Pagination container styling */
@@ -319,7 +329,7 @@ button {
 .comments-section {
     margin-top: 40px;
     text-align: left;
-    background-color: rgba(0, 0, 0, 0.7); /* Dark background for better readability */
+    background-color: rgba(174, 198, 207, 0.7); /* Dark background for better readability */
     padding: 20px;
     border-radius: 10px;
     color: white; /* Ensure text color is white */
