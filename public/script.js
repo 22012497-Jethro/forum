@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('Network response was not ok');
             }
             const data = await response.json();
-            console.log('Fetched user data:', data); // Debugging line
+            console.log('Fetched user data:', data);
             if (data) {
                 document.getElementById('profile-username').textContent = data.username;
                 document.getElementById('profile-pic').src = data.pfp || 'default-profile.png';
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = '/login';
         } catch (error) {
             console.error('Error signing up:', error);
-            alert(error.message); // Display error message to the user
+            alert(error.message);
         }
     }
 
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         alert('Profile updated successfully');
-        window.location.href = '/main'; // Redirect to main page after successful update
+        window.location.href = '/main';
     }
 
     const signupForm = document.getElementById('signup-form');
@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('Network response was not ok');
             }
             const profile = await response.json();
-            console.log('Fetched user profile:', profile); // Debugging line
+            console.log('Fetched user profile:', profile);
             if (profile) {
                 document.getElementById('username').value = profile.username;
                 document.getElementById('email').value = profile.email;
@@ -95,26 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error fetching user profile:', error);
         }
-    }
-
-    // Update profile function
-    async function updateProfile(event) {
-        event.preventDefault();
-
-        const formData = new FormData(event.target);
-        const response = await fetch('/users/update-profile', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            alert(errorData.message);
-            return;
-        }
-
-        alert('Profile updated successfully');
-        window.location.href = '/main'; // Redirect to main page after successful update
     }
 
     const settingsForm = document.getElementById('settings-form');
@@ -130,9 +110,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            const posts = await response.json();
-            displayPosts(posts);
-            setupPagination(page, titleFilter, categoryFilter);
+            const data = await response.json();
+            displayPosts(data.posts);
+            setupPagination(page, data.totalPosts, titleFilter, categoryFilter);
         } catch (error) {
             console.error('Error fetching posts:', error);
         }
@@ -233,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 alert('Post deleted successfully');
-                fetchAndDisplayUserPosts(); // Refresh the posts
+                fetchAndDisplayUserPosts();
             } catch (error) {
                 console.error('Error deleting post:', error);
             }
@@ -248,7 +228,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const post = await response.json();
 
-            // Fill the form with post details
             document.getElementById('edit-post-id').value = post.id;
             document.getElementById('edit-post-title').value = post.title;
             document.getElementById('edit-post-caption').value = post.caption;
@@ -281,10 +260,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             alert('Post updated successfully');
-            window.location.href = '/profile'; // Redirect to profile page after successful update
+            window.location.href = '/profile';
         } catch (error) {
             console.error('Error updating post:', error);
-            alert(error.message); // Display error message to the user
+            alert(error.message);
         }
     }
 
@@ -293,19 +272,15 @@ document.addEventListener('DOMContentLoaded', () => {
         editPostForm.addEventListener('submit', updatePost);
     }
 
-    // Check if on edit.html page and load post details
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('postId');
     if (postId) {
         fetchPostDetails(postId);
     }
 
-    async function setupPagination(currentPage, titleFilter = '', categoryFilter = '') {
+    async function setupPagination(currentPage, totalPosts, titleFilter = '', categoryFilter = '') {
         const paginationContainer = document.getElementById('pagination-container');
         paginationContainer.innerHTML = '';
-
-        const totalPostsResponse = await fetch(`/posts/count?title=${titleFilter}&category=${categoryFilter}`);
-        const totalPosts = await totalPostsResponse.json();
 
         const postsPerPage = 5; // Number of posts per page
         const totalPages = Math.ceil(totalPosts / postsPerPage);
@@ -321,7 +296,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Filter button event listener
     const filterButton = document.getElementById('filter-button');
     if (filterButton) {
         filterButton.addEventListener('click', () => {
@@ -330,6 +304,12 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Filters applied - Title:', titleFilter, 'Category:', categoryFilter);
             fetchAndDisplayPosts(1, titleFilter, categoryFilter);
         });
+    }
+
+    fetchAndDisplayUserData();
+    fetchAndDisplayPosts(1);
+    if (window.location.pathname === '/profile') {
+        fetchAndDisplayUserPosts();
     }
 
     // Navigate to settings page
