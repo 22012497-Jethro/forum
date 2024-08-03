@@ -142,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const posts = await response.json();
             displayUserPosts(posts);
+            setupPagination(page, totalPosts, limit, titleFilter, categoryFilter);
         } catch (error) {
             console.error('Error fetching user posts:', error);
         }
