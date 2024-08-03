@@ -134,13 +134,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Fetch and display user posts
-    async function fetchAndDisplayUserPosts() {
+    async function fetchAndDisplayUserPosts(page = 1) {
+        const limit = 5; // Number of posts per page
         try {
-            const response = await fetch('/users/user-posts');
+            const response = await fetch(`/users/user-posts?page=${page}&limit=${limit}`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            const posts = await response.json();
+            const { posts, totalPosts } = await response.json();
             displayUserPosts(posts);
             setupPagination(page, totalPosts, limit, titleFilter, categoryFilter);
         } catch (error) {
