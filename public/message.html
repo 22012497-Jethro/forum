@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<head>
+    <title>Private Messages</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="message.js" defer></script>
+</head>
+<body class="main-page light-mode">
+    <nav>
+        <div class="nav-left">
+            <img src="logo-dark.png" alt="ReVibe Logo" id="nav-logo">
+            <h1>ReVibe Forum</h1>
+        </div>
+        <div class="nav-right">
+            <a href="/main"><button id="home-button">Home</button></a>
+            <div class="dropdown">
+                <img src="default-profile.png" alt="Profile Picture" id="profile-pic">
+                <span id="profile-username">Username</span>
+                <div class="dropdown-content">
+                    <p id="logout-button">Logout</p>
+                </div>
+            </div>
+            <button id="theme-switch">Switch Theme</button>
+        </div>
+    </nav>
+    <section>
+        <!-- Private Messages Layout -->
+        <div class="messages-container">
+            <!-- Conversations List -->
+            <div class="conversations-list">
+                <h3>Your Conversations</h3>
+                <!-- List of users you have conversations with will be dynamically loaded here -->
+                <div id="conversations-section">
+                    <!-- JavaScript will inject conversation links here -->
+                </div>
+            </div>
+
+            <!-- Chat Window -->
+            <div class="chat-window">
+                <h3>Chat</h3>
+                <div id="message-display" class="message-display">
+                    <!-- Messages will be displayed here dynamically -->
+                </div>
+                <form id="message-form">
+                    <textarea id="message-input" placeholder="Type your message here"></textarea>
+                    <button type="submit" id="send-message">Send</button>
+                </form>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
