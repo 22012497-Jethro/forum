@@ -2,24 +2,23 @@
 <html>
 
 <head>
-    <title>Edit Post</title>
+    <title>Others Profile</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="user-profile.js" defer></script>
 </head>
 
 <body class="main-page light-mode">
-    <!-- Navigation Bar -->
     <nav>
         <div class="nav-left">
             <img src="logo-dark.png" alt="ReVibe Logo" id="nav-logo">
             <h1>ReVibe Forum</h1>
         </div>
         <div class="nav-right">
-            <a href="/main"><button id="home-button">Home</button></a>
             <div class="dropdown">
                 <img src="default-profile.png" alt="Profile Picture" id="profile-pic">
                 <span id="profile-username">Username</span>
-                <div class="dropdown-content">
+                <div class="dropdown-content" id="dropdown-content">
+                    <p id="settings-button">Settings</p>
                     <p id="logout-button">Logout</p>
                 </div>
             </div>
@@ -45,8 +44,6 @@
         <div class="post-item">Post Title 2</div>
         -->
     </section>
-
-    <script src="user-profile.js"></script> <!-- JavaScript to fetch and display user data -->
 </body>
 
 </html>
