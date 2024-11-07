@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
             postElement.innerHTML = `
                 <div class="post-header">
                     <img src="${post.profile_pic || 'default-profile.png'}" alt="Creator's Profile Picture" class="creator-pfp">
-                    <a href="/profile/${post.user_id}" class="post-username">${post.username}</a>
+                    <span class="post-username">${post.username}</span>
                 </div>
                 <div class="post-details">
                     <h3 class="post-title"><strong><a href="single-post.html?id=${post.id}">${post.title}</a></strong></h3>
