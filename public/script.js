@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-
     // Signup function
     async function signup(event) {
         event.preventDefault();
@@ -157,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
             postElement.innerHTML = `
                 <div class="post-header">
                     <img src="${post.profile_pic || 'default-profile.png'}" alt="Creator's Profile Picture" class="creator-pfp">
-                    <span class="post-username">${post.username}</span>
+                    <a href="/profile/${post.user_id}" class="post-username">${post.username}</a>
                 </div>
                 <div class="post-details">
                     <h3 class="post-title"><strong><a href="single-post.html?id=${post.id}">${post.title}</a></strong></h3>
