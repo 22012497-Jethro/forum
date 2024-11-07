@@ -34,6 +34,7 @@ app.get('/create-post', authenticateUser, (req, res) => res.sendFile(path.join(_
 app.get("/single-post", authenticateUser, (req, res) => res.sendFile(path.join(__dirname, 'public', 'single-post.html')));
 app.get("/post", authenticateUser, (req, res) => res.sendFile(path.join(__dirname, 'public/post.html')));
 app.get("/edit", authenticateUser, (req, res) => res.sendFile(path.join(__dirname, 'public/edit.html')));
+app.get("/message", authenticateUser, (req, res) => res.sendFile(path.join(__dirname, 'public/message.html')));
 app.get("/settings", authenticateUser, (req, res) => res.sendFile(path.join(__dirname, 'public/settings.html')));
 app.get("/profile", authenticateUser, (req, res) => res.sendFile(path.join(__dirname, 'public/profile.html')));
 
