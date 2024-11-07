@@ -128,7 +128,7 @@ button {
     display: block;
 }
 
-#theme-switch, #create-post-button, #home-button {
+#theme-switch, #create-post-button, #home-button, #message-button {
     padding: 10px;
     background-color: white;
     color: #022D02;
