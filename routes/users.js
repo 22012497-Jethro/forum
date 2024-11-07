@@ -258,29 +258,6 @@ router.get('/user-posts', authenticateUser, async (req, res) => {
     }
 });
 
-// Route to get a user's profile by user ID
-router.get('/profile/:userId', async (req, res) => {
-    const { userId } = req.params;
-
-    try {
-        const { data: user, error } = await supabase
-            .from('users')
-            .select('id, username, profile_picture, bio') // Include other fields you want
-            .eq('id', userId)
-            .single();
-
-        if (error || !user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        // Respond with user data as JSON or render an HTML page
-        res.json(user); // You could also render an HTML template if you're using a view engine
-    } catch (error) {
-        console.error('Error fetching user profile:', error);
-        res.status(500).json({ message: 'Error fetching user profile' });
-    }
-});
-
 router.post('/logout', (req, res) => {
     req.session.destroy(err => {
         if (err) {
