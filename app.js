@@ -37,7 +37,7 @@ app.get("/edit", authenticateUser, (req, res) => res.sendFile(path.join(__dirnam
 app.get("/message", authenticateUser, (req, res) => res.sendFile(path.join(__dirname, 'public/message.html')));
 app.get("/settings", authenticateUser, (req, res) => res.sendFile(path.join(__dirname, 'public/settings.html')));
 app.get("/profile", authenticateUser, (req, res) => res.sendFile(path.join(__dirname, 'public/profile.html')));
-app.get('/profile/:userId', authenticateUser, (req, res) => res.sendFile(path.join(__dirname, 'public/profile.html')));
+app.get('/profile/:userId', authenticateUser, (req, res) => res.sendFile(path.join(__dirname, 'public/user-profile.html')));
 
 // Use the posts and users routers with authentication
 app.use('/posts', authenticateUser, postsRouter);
