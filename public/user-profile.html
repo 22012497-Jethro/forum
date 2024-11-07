@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+</head>
+<body class="main-page light-mode">
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="nav-left">
+            <img src="logo-dark.png" alt="ReVibe Logo" id="nav-logo">
+            <h1>ReVibe Forum</h1>
+        </div>
+        <div class="nav-right">
+            <a href="/main"><button id="home-button">Home</button></a>
+            <div class="dropdown">
+                <img src="default-profile.png" alt="Profile Picture" id="profile-pic">
+                <span id="profile-username">Username</span>
+                <div class="dropdown-content">
+                    <p id="logout-button">Logout</p>
+                </div>
+            </div>
+            <button id="theme-switch">Switch Theme</button>
+        </div>
+    </nav>
+
+    <!-- Profile Header Section -->
+    <section id="profile-header">
+        <img src="default-profile.png" alt="User Profile Picture" id="user-profile-pic">
+        <div id="user-info">
+            <h2 id="user-profile-username">Username</h2>
+            <button id="message-button">Message</button>
+            <p id="post-stats">XX Posts</p>
+        </div>
+    </section>
+
+    <!-- Posts List Section -->
+    <section id="posts-list">
+        <!-- Each post title will be dynamically inserted here as a list item -->
+        <!-- For example:
+        <div class="post-item">Post Title 1</div>
+        <div class="post-item">Post Title 2</div>
+        -->
+    </section>
+
+    <script src="user-profile.js"></script> <!-- JavaScript to fetch and display user data -->
+</body>
+</html>
