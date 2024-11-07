@@ -258,6 +258,30 @@ router.get('/user-posts', authenticateUser, async (req, res) => {
     }
 });
 
+router.get('/users/user-profile/:userId', async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        // Query the user profile information from the database
+        const userQuery = `
+            SELECT username, profile_picture AS pfp, 
+            (SELECT COUNT(*) FROM posts WHERE user_id = ?) AS postCount 
+            FROM users WHERE id = ?;
+        `;
+
+        const [user] = await db.query(userQuery, [userId, userId]);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json(user);
+    } catch (error) {
+        console.error('Error fetching user profile:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 router.post('/logout', (req, res) => {
     req.session.destroy(err => {
         if (err) {
