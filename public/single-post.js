@@ -46,7 +46,17 @@ function populatePostDetails(post) {
 
     if (post.user) {
         document.getElementById('post-profile-pic').src = post.user.pfp || 'default-profile.png';
-        document.getElementById('post-username').textContent = post.user.username;
+        const usernameElement = document.getElementById('post-username');
+        usernameElement.textContent = post.user.username;
+        
+        // Set the profile link for the username
+        const profileLink = document.createElement('a');
+        profileLink.href = `/profile/${post.user.id}`; // Link to profile page
+        profileLink.textContent = post.user.username;
+        
+        // Replace text content with the link
+        usernameElement.innerHTML = '';
+        usernameElement.appendChild(profileLink);
     }
 
     document.getElementById('title').textContent = post.title || 'No Title';
