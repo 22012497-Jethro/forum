@@ -1,9 +1,12 @@
-async function fetchAndDisplayUserData() {
+async function fetchAndDisplayUserData(userId = null) {
     try {
-        const response = await fetch('/users/user-profile');
+        const endpoint = userId ? `/users/user-profile/${userId}` : '/users/user-profile'; // Use own profile if no userId
+        const response = await fetch(endpoint);
+        
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
+        
         const data = await response.json();
         console.log('Fetched user data:', data); // Debugging line
         if (data) {
