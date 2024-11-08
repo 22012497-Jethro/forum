@@ -24,29 +24,26 @@
         </div>
     </nav>
     <section>
-        <!-- Private Messages Layout -->
         <div class="messages-container">
-            <!-- Conversations List -->
             <div class="conversations-list">
                 <h3>Your Conversations</h3>
-                <!-- List of users you have conversations with will be dynamically loaded here -->
-                <div id="conversations-section">
-                    <!-- JavaScript will inject conversation links here -->
-                </div>
+                <!-- Search functionality -->
+                <input type="text" id="username-search" placeholder="Search for a user">
+                <button id="search-button">Search</button>
+                <div id="conversations-section"></div>
+                <div id="search-results"></div> <!-- Display search results here -->
             </div>
-
-            <!-- Chat Window -->
+    
             <div class="chat-window">
                 <h3>Chat</h3>
-                <div id="message-display" class="message-display">
-                    <!-- Messages will be displayed here dynamically -->
-                </div>
+                <div id="message-display" class="message-display"></div>
                 <form id="message-form">
                     <textarea id="message-input" placeholder="Type your message here"></textarea>
-                    <button type="submit" id="send-message">Send</button>
+                    <button type="submit">Send</button>
                 </form>
             </div>
         </div>
     </section>
+    
 </body>
 </html>
