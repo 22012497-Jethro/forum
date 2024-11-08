@@ -1,125 +1,115 @@
-const express = require('express');
-const router = express.Router();
-const { createClient } = require('@supabase/supabase-js');
-const authenticateUser = require('../middleware/authMiddleware');
+let selectedReceiverId = null; // Global variable to store the selected receiver ID
 
-// Supabase setup
-const supabaseUrl = "https://fudsrzbhqpmryvmxgced.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1ZHNyemJocXBtcnl2bXhnY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM5MjE3OTQsImV4cCI6MjAyOTQ5Nzc5NH0.6UMbzoD8J1BQl01h6NSyZAHVhrWerUcD5VVGuBwRcag";
-const supabase = createClient(supabaseUrl, supabaseKey);
+document.addEventListener('DOMContentLoaded', () => {
+    loadConversations();
 
-// Middleware to protect routes
-router.use(authenticateUser);
-
-// Route to get conversations
-router.get('/conversations', async (req, res) => {
-    const userId = req.user.id;
-
-    try {
-        const { data, error } = await supabase
-            .from('messages')
-            .select('receiver_id, sender_id')
-            .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`);
-
-        if (error) throw error;
-
-        // Extract unique user IDs involved in conversations
-        const userIds = [...new Set(data.map(msg => 
-            msg.sender_id === userId ? msg.receiver_id : msg.sender_id
-        ))];
-
-        // Fetch user details based on unique user IDs
-        const { data: users, error: userError } = await supabase
-            .from('users')
-            .select('id, username')
-            .in('id', userIds);
-
-        if (userError) throw userError;
-        res.status(200).json(users);
-    } catch (error) {
-        console.error('Error fetching conversations:', error);
-        res.status(500).json({ message: 'Error fetching conversations' });
+    // Add event listener to search button
+    const searchButton = document.getElementById('search-button');
+    if (searchButton) {
+        searchButton.addEventListener('click', searchUser);
     }
 });
 
-// Route to send a message
-router.post('/send', async (req, res) => {
-    const { receiver_id, message_content } = req.body;
-    const sender_id = req.user.id;
+// Function to load conversations
+async function loadConversations() {
+    try {
+        const response = await fetch(`/messages/conversations`);
+        if (!response.ok) throw new Error('Failed to load conversations');
+        
+        const users = await response.json();
+        const conversationsSection = document.getElementById('conversations-section');
+        conversationsSection.innerHTML = ''; // Clear previous list
 
-    if (!receiver_id || !message_content) {
-        return res.status(400).json({ message: 'Receiver ID and message content are required.' });
+        users.forEach(user => {
+            const conversationLink = document.createElement('div');
+            conversationLink.className = 'conversation';
+            conversationLink.textContent = user.username;
+            conversationLink.addEventListener('click', () => {
+                selectedReceiverId = user.id; // Set the global receiver ID
+                loadConversation(selectedReceiverId); // Load conversation with the selected user
+            });
+            conversationsSection.appendChild(conversationLink);
+        });
+    } catch (error) {
+        console.error('Error loading conversations:', error);
+    }
+}
+
+// Function to load a specific conversation
+async function loadConversation(receiverId) {
+    try {
+        const response = await fetch(`/messages/conversation/${receiverId}`);
+        if (!response.ok) throw new Error('Failed to load conversation');
+        
+        const messages = await response.json();
+        const messageDisplay = document.getElementById('message-display');
+        messageDisplay.innerHTML = ''; // Clear previous messages
+
+        messages.forEach(message => {
+            const messageElement = document.createElement('div');
+            messageElement.className = message.sender_id === receiverId ? 'message-received' : 'message-sent';
+            messageElement.textContent = message.message_content;
+            messageDisplay.appendChild(messageElement);
+        });
+    } catch (error) {
+        console.error('Error loading conversation:', error);
+    }
+}
+
+// Send a new message
+document.getElementById('message-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    if (!selectedReceiverId) {
+        console.error('No receiver selected');
+        return; // Exit if no receiver is selected
     }
 
+    const messageContent = document.getElementById('message-input').value;
+    
     try {
-        const { data, error } = await supabase
-            .from('messages')
-            .insert([{
-                sender_id,
-                receiver_id,
-                message_content,
-                timestamp: new Date(),
-                status: 'unread'
-            }]);
+        const response = await fetch('/messages/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ receiver_id: selectedReceiverId, message_content: messageContent })
+        });
 
-        if (error) throw error;
-        res.status(201).json({ message: 'Message sent', data });
+        if (response.ok) {
+            loadConversation(selectedReceiverId); // Reload the conversation after sending
+            document.getElementById('message-input').value = ''; // Clear the input field
+        } else {
+            console.error('Failed to send message');
+        }
     } catch (error) {
         console.error('Error sending message:', error);
-        res.status(500).json({ message: 'Error sending message' });
     }
 });
 
-// Route to retrieve conversation between two users with optional pagination
-router.get('/conversation/:receiver_id', async (req, res) => {
-    const sender_id = req.user.id;
-    const { receiver_id } = req.params;
-    const { page = 1, limit = 10 } = req.query; // Default pagination settings
-
-    const offset = (page - 1) * limit;
+// Function to search for users by username
+async function searchUser() {
+    const username = document.getElementById('username-search').value;
+    if (!username) return; // Don't search if input is empty
 
     try {
-        const { data, error } = await supabase
-            .from('messages')
-            .select('*')
-            .or(`and(sender_id.eq.${sender_id},receiver_id.eq.${receiver_id}),and(sender_id.eq.${receiver_id},receiver_id.eq.${sender_id})`)
-            .order('timestamp', { ascending: true })
-            .range(offset, offset + limit - 1);
+        const response = await fetch(`/messages/search?username=${username}`);
+        if (!response.ok) throw new Error('Failed to search for user');
 
-        if (error) throw error;
+        const users = await response.json();
+        const searchResults = document.getElementById('search-results');
+        searchResults.innerHTML = ''; // Clear previous search results
 
-        // Count total messages for pagination info
-        const { count, error: countError } = await supabase
-            .from('messages')
-            .select('*', { count: 'exact', head: true })
-            .or(`and(sender_id.eq.${sender_id},receiver_id.eq.${receiver_id}),and(sender_id.eq.${receiver_id},receiver_id.eq.${sender_id})`);
-
-        if (countError) throw countError;
-
-        res.status(200).json({ messages: data, totalMessages: count });
+        users.forEach(user => {
+            const userElement = document.createElement('div');
+            userElement.className = 'search-result-item';
+            userElement.textContent = user.username;
+            userElement.addEventListener('click', () => {
+                selectedReceiverId = user.id;
+                loadConversation(selectedReceiverId); // Load the conversation with the selected user
+                searchResults.innerHTML = ''; // Clear search results after selection
+            });
+            searchResults.appendChild(userElement);
+        });
     } catch (error) {
-        console.error('Error retrieving conversation:', error);
-        res.status(500).json({ message: 'Error retrieving conversation' });
+        console.error('Error searching for user:', error);
     }
-});
-
-// Route to mark messages as read
-router.put('/mark-as-read/:sender_id', async (req, res) => {
-    const receiver_id = req.user.id;
-    const { sender_id } = req.params;
-
-    try {
-        const { data, error } = await supabase
-            .from('messages')
-            .update({ status: 'read' })
-            .match({ sender_id, receiver_id, status: 'unread' });
-
-        if (error) throw error;
-        res.status(200).json({ message: 'Messages marked as read' });
-    } catch (error) {
-        console.error('Error marking messages as read:', error);
-        res.status(500).json({ message: 'Error marking messages as read' });
-    }
-});
-
-module.exports = router;
+}
