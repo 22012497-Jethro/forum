@@ -8,6 +8,9 @@ const supabaseUrl = "https://fudsrzbhqpmryvmxgced.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1ZHNyemJocXBtcnl2bXhnY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM5MjE3OTQsImV4cCI6MjAyOTQ5Nzc5NH0.6UMbzoD8J1BQl01h6NSyZAHVhrWerUcD5VVGuBwRcag";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// Middleware to protect routes
+router.use(authenticateUser);
+
 // Route to get conversations
 router.get('/conversations', async (req, res) => {
     const userId = req.user.id;
@@ -34,7 +37,7 @@ router.get('/conversations', async (req, res) => {
         if (userError) throw userError;
         res.status(200).json(users);
     } catch (error) {
-        console.error(error);
+        console.error('Error fetching conversations:', error);
         res.status(500).json({ message: 'Error fetching conversations' });
     }
 });
@@ -44,43 +47,58 @@ router.post('/send', async (req, res) => {
     const { receiver_id, message_content } = req.body;
     const sender_id = req.user.id;
 
+    if (!receiver_id || !message_content) {
+        return res.status(400).json({ message: 'Receiver ID and message content are required.' });
+    }
+
     try {
         const { data, error } = await supabase
             .from('messages')
-            .insert([
-                {
-                    sender_id,
-                    receiver_id,
-                    message_content,
-                    timestamp: new Date(),
-                    status: 'unread'
-                }
-            ]);
+            .insert([{
+                sender_id,
+                receiver_id,
+                message_content,
+                timestamp: new Date(),
+                status: 'unread'
+            }]);
 
         if (error) throw error;
         res.status(201).json({ message: 'Message sent', data });
     } catch (error) {
-        console.error(error);
+        console.error('Error sending message:', error);
         res.status(500).json({ message: 'Error sending message' });
     }
 });
 
-// Route to retrieve conversation between two users
+// Route to retrieve conversation between two users with optional pagination
 router.get('/conversation/:receiver_id', async (req, res) => {
     const sender_id = req.user.id;
     const { receiver_id } = req.params;
+    const { page = 1, limit = 10 } = req.query; // Default pagination settings
+
+    const offset = (page - 1) * limit;
 
     try {
         const { data, error } = await supabase
             .from('messages')
             .select('*')
             .or(`and(sender_id.eq.${sender_id},receiver_id.eq.${receiver_id}),and(sender_id.eq.${receiver_id},receiver_id.eq.${sender_id})`)
-            .order('timestamp', { ascending: true });
+            .order('timestamp', { ascending: true })
+            .range(offset, offset + limit - 1);
 
         if (error) throw error;
-        res.status(200).json(data);
+
+        // Count total messages for pagination info
+        const { count, error: countError } = await supabase
+            .from('messages')
+            .select('*', { count: 'exact', head: true })
+            .or(`and(sender_id.eq.${sender_id},receiver_id.eq.${receiver_id}),and(sender_id.eq.${receiver_id},receiver_id.eq.${sender_id})`);
+
+        if (countError) throw countError;
+
+        res.status(200).json({ messages: data, totalMessages: count });
     } catch (error) {
-        console.error(error);
+        console.error('Error retrieving conversation:', error);
         res.status(500).json({ message: 'Error retrieving conversation' });
     }
 });
@@ -99,7 +117,7 @@ router.put('/mark-as-read/:sender_id', async (req, res) => {
         if (error) throw error;
         res.status(200).json({ message: 'Messages marked as read' });
     } catch (error) {
-        console.error(error);
+        console.error('Error marking messages as read:', error);
         res.status(500).json({ message: 'Error marking messages as read' });
     }
 });
