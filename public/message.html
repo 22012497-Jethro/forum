@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Private Messages</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="script.js" defer></script>
 </head>
+
 <body class="main-page light-mode">
     <nav>
         <div class="nav-left">
@@ -23,17 +25,18 @@
             <button id="theme-switch">Switch Theme</button>
         </div>
     </nav>
+    <!-- Add this section in your HTML (message.html or the relevant page) -->
     <section>
         <div class="messages-container">
             <div class="conversations-list">
                 <h3>Your Conversations</h3>
-                <!-- Search functionality -->
+                <!-- Search input and button -->
                 <input type="text" id="username-search" placeholder="Search for a user">
                 <button id="search-button">Search</button>
                 <div id="conversations-section"></div>
                 <div id="search-results"></div> <!-- Display search results here -->
             </div>
-    
+
             <div class="chat-window">
                 <h3>Chat</h3>
                 <div id="message-display" class="message-display"></div>
@@ -44,6 +47,7 @@
             </div>
         </div>
     </section>
-    
+
 </body>
+
 </html>
