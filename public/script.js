@@ -361,20 +361,6 @@ document.addEventListener('DOMContentLoaded', () => {
         profilePicButton.addEventListener('click', goToProfile);
     }
 
-    const searchButton = document.getElementById('search-button');
-    if (searchButton) {
-        searchButton.addEventListener('click', searchUser);
-    }
-
-    // Initialize conversations on load
-    loadConversations();
-
-    // Handle sending messages
-    const messageForm = document.getElementById('message-form');
-    if (messageForm) {
-        messageForm.addEventListener('submit', sendMessage);
-    }
-
     // Logout function
     async function logout() {
         try {
@@ -419,4 +405,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.location.pathname === '/profile') {
         fetchAndDisplayUserPosts();
     }
+
+    const searchButton = document.getElementById('search-button');
+    if (searchButton) {
+        searchButton.addEventListener('click', searchUser);
+    }
+
+    // Initialize conversations on load
+    loadConversations();
+
+    // Handle sending messages
+    const messageForm = document.getElementById('message-form');
+    if (messageForm) {
+        messageForm.addEventListener('submit', sendMessage);
+    }
+
 });
