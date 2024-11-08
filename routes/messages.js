@@ -124,20 +124,23 @@ router.put('/mark-as-read/:sender_id', async (req, res) => {
 
 router.get('/search', async (req, res) => {
     const username = req.query.username;
+    console.log("Searching for username:", username); // Debugging line
 
     try {
         const { data, error } = await supabase
             .from('users')
             .select('id, username')
-            .ilike('username', `%${username}%`); // Case-insensitive search
+            .ilike('username', `%${username}%`);
 
         if (error) throw error;
 
+        console.log("Found users:", data); // Debugging line
         res.json(data);
     } catch (error) {
         console.error('Error searching for users:', error);
         res.status(500).json({ message: 'Error searching for users' });
     }
 });
+
 
 module.exports = router;
