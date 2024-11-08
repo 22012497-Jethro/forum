@@ -360,18 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (profilePicButton) {
         profilePicButton.addEventListener('click', goToProfile);
     }
-
-    const searchButton = document.getElementById('search-button');
-    if (searchButton) {
-        searchButton.addEventListener('click', searchUser);
-    }
-
-    const messageForm = document.getElementById('message-form');
-    if (messageForm) {
-        messageForm.addEventListener('submit', sendMessage);
-    }
     
-
     // Logout function
     async function logout() {
         try {
