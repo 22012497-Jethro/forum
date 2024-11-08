@@ -1,16 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Fetch user profile data
-    async function fetchAndDisplayUserData(userId = null) {
+    async function fetchAndDisplayUserData() {
         try {
-            const endpoint = userId ? `/users/user-profile/${userId}` : '/users/user-profile'; // Use own profile if no userId
-            const response = await fetch(endpoint);
-            
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            
+            const response = await fetch('/users/user-profile');
             const data = await response.json();
-            console.log('Fetched user data:', data); // Debugging line
             if (data) {
                 document.getElementById('profile-username').textContent = data.username;
                 document.getElementById('profile-pic').src = data.pfp || 'default-profile.png';
@@ -366,6 +359,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const profilePicButton = document.getElementById('profile-pic');
     if (profilePicButton) {
         profilePicButton.addEventListener('click', goToProfile);
+    }
+
+    const searchButton = document.getElementById('search-button');
+    if (searchButton) {
+        searchButton.addEventListener('click', searchUser);
+    }
+
+    // Initialize conversations on load
+    loadConversations();
+
+    // Handle sending messages
+    const messageForm = document.getElementById('message-form');
+    if (messageForm) {
+        messageForm.addEventListener('submit', sendMessage);
     }
 
     // Logout function
