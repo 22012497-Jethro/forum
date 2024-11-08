@@ -8,6 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (searchButton) {
         searchButton.addEventListener('click', searchUser);
     }
+
+    // Add event listener to message form for sending messages
+    const messageForm = document.getElementById('message-form');
+    if (messageForm) {
+        messageForm.addEventListener('submit', sendMessage);
+    }
 });
 
 // Function to load conversations
@@ -56,8 +62,8 @@ async function loadConversation(receiverId) {
     }
 }
 
-// Send a new message
-document.getElementById('message-form').addEventListener('submit', async (event) => {
+// Function to send a new message
+async function sendMessage(event) {
     event.preventDefault();
 
     if (!selectedReceiverId) {
@@ -66,6 +72,7 @@ document.getElementById('message-form').addEventListener('submit', async (event)
     }
 
     const messageContent = document.getElementById('message-input').value;
+    if (!messageContent.trim()) return; // Prevent sending empty messages
     
     try {
         const response = await fetch('/messages/send', {
@@ -83,12 +90,12 @@ document.getElementById('message-form').addEventListener('submit', async (event)
     } catch (error) {
         console.error('Error sending message:', error);
     }
-});
+}
 
 // Function to search for users by username
 async function searchUser() {
     const username = document.getElementById('username-search').value;
-    if (!username) return; // Don't search if input is empty
+    if (!username.trim()) return; // Don't search if input is empty
 
     try {
         const response = await fetch(`/messages/search?username=${username}`);
