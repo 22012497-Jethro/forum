@@ -88,16 +88,15 @@ document.getElementById('message-form').addEventListener('submit', async (event)
 // Function to search for users by username
 async function searchUser() {
     const username = document.getElementById('username-search').value;
-    if (!username) return;
+    if (!username) return; // Don't search if input is empty
 
     try {
         const response = await fetch(`/messages/search?username=${username}`);
         if (!response.ok) throw new Error('Failed to search for user');
 
         const users = await response.json();
-        console.log("Search results:", users); // Debugging line
         const searchResults = document.getElementById('search-results');
-        searchResults.innerHTML = '';
+        searchResults.innerHTML = ''; // Clear previous search results
 
         users.forEach(user => {
             const userElement = document.createElement('div');
@@ -105,8 +104,8 @@ async function searchUser() {
             userElement.textContent = user.username;
             userElement.addEventListener('click', () => {
                 selectedReceiverId = user.id;
-                loadConversation(selectedReceiverId);
-                searchResults.innerHTML = '';
+                loadConversation(selectedReceiverId); // Load the conversation with the selected user
+                searchResults.innerHTML = ''; // Clear search results after selection
             });
             searchResults.appendChild(userElement);
         });
