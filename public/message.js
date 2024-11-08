@@ -47,7 +47,7 @@ async function loadConversation(receiverId) {
         const response = await fetch(`/messages/conversation/${receiverId}`);
         if (!response.ok) throw new Error('Failed to load conversation');
         
-        const messages = await response.json();
+        const { messages } = await response.json();
         const messageDisplay = document.getElementById('message-display');
         messageDisplay.innerHTML = ''; // Clear previous messages
 
@@ -94,28 +94,35 @@ async function sendMessage(event) {
 
 // Function to search for users by username
 async function searchUser() {
-    const username = document.getElementById('username-search').value;
-    if (!username.trim()) return; // Don't search if input is empty
+    const username = document.getElementById('username-search').value.trim();
+    if (!username) return; // Avoid empty searches
 
     try {
-        const response = await fetch(`/messages/search?username=${username}`);
+        const response = await fetch(`/messages/search?username=${encodeURIComponent(username)}`);
         if (!response.ok) throw new Error('Failed to search for user');
 
         const users = await response.json();
         const searchResults = document.getElementById('search-results');
         searchResults.innerHTML = ''; // Clear previous search results
 
-        users.forEach(user => {
-            const userElement = document.createElement('div');
-            userElement.className = 'search-result-item';
-            userElement.textContent = user.username;
-            userElement.addEventListener('click', () => {
-                selectedReceiverId = user.id;
-                loadConversation(selectedReceiverId); // Load the conversation with the selected user
-                searchResults.innerHTML = ''; // Clear search results after selection
+        if (users.length === 0) {
+            const noResults = document.createElement('div');
+            noResults.className = 'no-results';
+            noResults.textContent = 'No users found';
+            searchResults.appendChild(noResults);
+        } else {
+            users.forEach(user => {
+                const userElement = document.createElement('div');
+                userElement.className = 'search-result-item';
+                userElement.textContent = user.username;
+                userElement.addEventListener('click', () => {
+                    selectedReceiverId = user.id;
+                    loadConversation(selectedReceiverId);
+                    searchResults.innerHTML = ''; // Clear search results after selection
+                });
+                searchResults.appendChild(userElement);
             });
-            searchResults.appendChild(userElement);
-        });
+        }
     } catch (error) {
         console.error('Error searching for user:', error);
     }
