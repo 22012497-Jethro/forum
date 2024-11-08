@@ -269,11 +269,14 @@ router.get('/users/user-profile/:userId', async (req, res) => {
             FROM users WHERE id = ?;
         `;
 
-        const [user] = await db.query(userQuery, [userId, userId]);
+        const [rows] = await db.query(userQuery, [userId, userId]);
 
-        if (!user) {
+        // Check if a user was found
+        if (rows.length === 0) {
             return res.status(404).json({ message: 'User not found' });
         }
+
+        const user = rows[0]; // Extract the user data from the result set
 
         res.json(user);
     } catch (error) {
