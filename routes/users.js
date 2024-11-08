@@ -262,28 +262,35 @@ router.get('/users/user-profile/:userId', async (req, res) => {
     const userId = req.params.userId;
 
     try {
-        // Query the user profile information from the database
+        // SQL query to fetch user profile information and post count
         const userQuery = `
-            SELECT username, profile_picture AS pfp, 
-            (SELECT COUNT(*) FROM posts WHERE user_id = ?) AS postCount 
-            FROM users WHERE id = ?;
+            SELECT 
+                username, 
+                profile_picture AS pfp, 
+                (SELECT COUNT(*) FROM posts WHERE user_id = ?) AS postCount 
+            FROM users 
+            WHERE id = ?;
         `;
 
+        // Execute query with parameterized userId to avoid SQL injection
         const [rows] = await db.query(userQuery, [userId, userId]);
 
-        // Check if a user was found
+        // Check if any user was found
         if (rows.length === 0) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        const user = rows[0]; // Extract the user data from the result set
+        // Extract user data from the result
+        const user = rows[0];
 
+        // Send the user profile data as JSON
         res.json(user);
     } catch (error) {
         console.error('Error fetching user profile:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
+
 
 router.post('/logout', (req, res) => {
     req.session.destroy(err => {
