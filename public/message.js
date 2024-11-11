@@ -1,18 +1,20 @@
+// message.js - Messaging specific functionality
 let selectedReceiverId = null; // Global variable to store the selected receiver ID
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadConversations();
+    if (window.location.pathname === '/messages') { // Only initialize on the messages page
+        loadConversations();
+        
+        const searchInput = document.getElementById('username-search');
+        const messageForm = document.getElementById('message-form');
 
-    // Add event listener to message form for sending messages
-    const messageForm = document.getElementById('message-form');
-    if (messageForm) {
-        messageForm.addEventListener('submit', sendMessage);
-    }
+        if (searchInput) {
+            searchInput.addEventListener('input', searchUser); // Trigger search on input change
+        }
 
-    // Trigger search dynamically as user types
-    const searchInput = document.getElementById('username-search');
-    if (searchInput) {
-        searchInput.addEventListener('input', searchUser); // Trigger search on input change
+        if (messageForm) {
+            messageForm.addEventListener('submit', sendMessage);
+        }
     }
 });
 
