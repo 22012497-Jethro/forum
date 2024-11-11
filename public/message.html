@@ -9,6 +9,8 @@
     <script src="message.js" defer></script>
 </head>
 <body class="main-page light-mode">
+
+    <!-- Navigation Bar -->
     <nav>
         <div class="nav-left">
             <img src="logo-dark.png" alt="ReVibe Logo" id="nav-logo">
@@ -27,22 +29,40 @@
         </div>
     </nav>
 
+    <!-- Main Messaging Section -->
     <section class="messages-container">
+
+        <!-- Conversations & Search -->
         <div class="conversations-list">
             <h3>Your Conversations</h3>
+            
+            <!-- Search Input -->
             <input type="text" id="username-search" placeholder="Search for a user">
-            <div id="search-results"></div> <!-- Display search results here -->
-            <div id="conversations-section"></div> <!-- List of conversations -->
+            
+            <!-- Search Results -->
+            <div id="search-results"></div>
+            
+            <!-- Pagination for Search Results -->
+            <div id="pagination-container"></div> <!-- Pagination buttons go here -->
+            
+            <!-- Existing Conversations List -->
+            <div id="conversations-section"></div>
         </div>
 
+        <!-- Chat Window -->
         <div class="chat-window">
             <h3>Chat</h3>
+            
+            <!-- Message Display Area -->
             <div id="message-display" class="message-display"></div>
+            
+            <!-- Message Input Form -->
             <form id="message-form">
                 <textarea id="message-input" placeholder="Type your message here"></textarea>
                 <button type="submit">Send</button>
             </form>
         </div>
     </section>
+    
 </body>
 </html>
