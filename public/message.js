@@ -1,15 +1,14 @@
 let selectedReceiverId = null;
-let debounceTimeout;
 
 document.addEventListener('DOMContentLoaded', () => {
     if (window.location.pathname === '/messages') {
         loadConversations();
-        
-        const searchInput = document.getElementById('username-search');
+
+        const searchButton = document.getElementById('search-button'); // Ensure this button exists in HTML
         const messageForm = document.getElementById('message-form');
 
-        if (searchInput) {
-            searchInput.addEventListener('input', debounce(searchUser, 300)); // Debounced search
+        if (searchButton) {
+            searchButton.addEventListener('click', () => searchUser(1)); // Trigger search on button click
         }
 
         if (messageForm) {
@@ -17,14 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
-
-// Function to debounce search input
-function debounce(func, delay) {
-    return function (...args) {
-        clearTimeout(debounceTimeout);
-        debounceTimeout = setTimeout(() => func(...args), delay);
-    };
-}
 
 // Function to load existing conversations
 async function loadConversations() {
@@ -51,20 +42,23 @@ async function loadConversations() {
     }
 }
 
-// Function to search for users by username
-async function searchUser(page = 1) { // Accept page parameter for pagination
+// Function to search for users by username with pagination
+async function searchUser(page = 1) {
     const username = document.getElementById('username-search').value.trim();
     const searchResults = document.getElementById('search-results');
     searchResults.innerHTML = ''; // Clear previous results
 
     if (!username) {
-        return; // Exit if search input is empty
+        console.log('No search term entered.');
+        return; // Exit if no username is entered
     }
 
     try {
-        // Include pagination parameters in the request
+        // Fetch users with search and pagination
         const response = await fetch(`/messages/search?username=${encodeURIComponent(username)}&page=${page}&limit=5`);
-        const { users, totalUsers } = await response.json(); // Expect totalUsers count for pagination
+        if (!response.ok) throw new Error('Failed to search for user');
+
+        const { users, totalUsers } = await response.json();
 
         users.forEach(user => {
             const userElement = document.createElement('div');
@@ -79,7 +73,6 @@ async function searchUser(page = 1) { // Accept page parameter for pagination
             searchResults.appendChild(userElement);
         });
 
-        // Display "No users found" if there are no matches
         if (users.length === 0) {
             const noResults = document.createElement('div');
             noResults.className = 'no-results';
@@ -93,12 +86,12 @@ async function searchUser(page = 1) { // Accept page parameter for pagination
     }
 }
 
-// Function to set up pagination buttons
+// Pagination setup
 function setupPagination(currentPage, totalUsers, usersPerPage) {
     const paginationContainer = document.getElementById('pagination-container');
     paginationContainer.innerHTML = ''; // Clear existing pagination
 
-    const totalPages = Math.ceil(totalUsers / usersPerPage); // Calculate total pages
+    const totalPages = Math.ceil(totalUsers / usersPerPage);
 
     for (let i = 1; i <= totalPages; i++) {
         const pageButton = document.createElement('button');
@@ -114,7 +107,7 @@ async function loadConversation(receiverId) {
     try {
         const response = await fetch(`/messages/conversation/${receiverId}`);
         if (!response.ok) throw new Error('Failed to load conversation');
-        
+
         const { messages } = await response.json();
         const messageDisplay = document.getElementById('message-display');
         messageDisplay.innerHTML = ''; // Clear previous messages
@@ -130,13 +123,13 @@ async function loadConversation(receiverId) {
     }
 }
 
-// Function to send a new message
+// Function to send a message
 async function sendMessage(event) {
     event.preventDefault();
 
     if (!selectedReceiverId) {
         console.error('No receiver selected');
-        return; // Exit if no receiver is selected
+        return;
     }
 
     const messageContent = document.getElementById('message-input').value;
