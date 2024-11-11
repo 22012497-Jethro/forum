@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const messageForm = document.getElementById('message-form');
 
         if (searchInput) {
-            searchInput.addEventListener('input', debounce(searchUser, 300)); // Use debounce on search input
+            searchInput.addEventListener('input', debounce(searchUser, 300)); // Debounced search
         }
 
         if (messageForm) {
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Function to debounce search input (wait until user stops typing)
+// Function to debounce search input
 function debounce(func, delay) {
     return function (...args) {
         clearTimeout(debounceTimeout);
@@ -34,7 +34,7 @@ async function loadConversations() {
         
         const users = await response.json();
         const conversationsSection = document.getElementById('conversations-section');
-        conversationsSection.innerHTML = '';
+        conversationsSection.innerHTML = ''; // Clear previous conversations
 
         users.forEach(user => {
             const conversationLink = document.createElement('div');
@@ -42,7 +42,7 @@ async function loadConversations() {
             conversationLink.textContent = user.username;
             conversationLink.addEventListener('click', () => {
                 selectedReceiverId = user.id;
-                loadConversation(selectedReceiverId);
+                loadConversation(selectedReceiverId); // Load the selected conversation
             });
             conversationsSection.appendChild(conversationLink);
         });
@@ -52,18 +52,19 @@ async function loadConversations() {
 }
 
 // Function to search for users by username
-async function searchUser(event) {
-    if (event.key !== 'Enter') return; // Only trigger on Enter key
-    
+async function searchUser(page = 1) { // Accept page parameter for pagination
     const username = document.getElementById('username-search').value.trim();
-    if (!username) return;
-
     const searchResults = document.getElementById('search-results');
     searchResults.innerHTML = ''; // Clear previous results
 
+    if (!username) {
+        return; // Exit if search input is empty
+    }
+
     try {
-        const response = await fetch(`/messages/search?username=${encodeURIComponent(username)}`);
-        const users = await response.json();
+        // Include pagination parameters in the request
+        const response = await fetch(`/messages/search?username=${encodeURIComponent(username)}&page=${page}&limit=5`);
+        const { users, totalUsers } = await response.json(); // Expect totalUsers count for pagination
 
         users.forEach(user => {
             const userElement = document.createElement('div');
@@ -71,52 +72,71 @@ async function searchUser(event) {
             userElement.textContent = user.username;
             userElement.addEventListener('click', () => {
                 selectedReceiverId = user.id;
-                loadConversation(selectedReceiverId);
-                searchResults.innerHTML = '';
-                document.getElementById('username-search').value = '';
+                loadConversation(selectedReceiverId); // Load conversation on selection
+                searchResults.innerHTML = ''; // Clear search results after selection
+                document.getElementById('username-search').value = ''; // Clear search input
             });
             searchResults.appendChild(userElement);
         });
 
+        // Display "No users found" if there are no matches
         if (users.length === 0) {
             const noResults = document.createElement('div');
             noResults.className = 'no-results';
             noResults.textContent = 'No users found';
             searchResults.appendChild(noResults);
+        } else {
+            setupPagination(page, totalUsers, 5); // Setup pagination with total users and users per page
         }
     } catch (error) {
         console.error('Error searching for user:', error);
     }
 }
 
-// Add event listener to trigger search on Enter key
-document.getElementById('username-search').addEventListener('keypress', searchUser);
-
-
+// Function to set up pagination buttons
 function setupPagination(currentPage, totalUsers, usersPerPage) {
     const paginationContainer = document.getElementById('pagination-container');
-    paginationContainer.innerHTML = '';
+    paginationContainer.innerHTML = ''; // Clear existing pagination
 
-    const totalPages = Math.ceil(totalUsers / usersPerPage);
+    const totalPages = Math.ceil(totalUsers / usersPerPage); // Calculate total pages
 
     for (let i = 1; i <= totalPages; i++) {
         const pageButton = document.createElement('button');
         pageButton.textContent = i;
-        if (i === currentPage) {
-            pageButton.disabled = true;
-        }
-        pageButton.onclick = () => searchUser(i); // Fetch next page of search results
+        pageButton.disabled = i === currentPage; // Disable the current page button
+        pageButton.addEventListener('click', () => searchUser(i)); // Trigger search with new page
         paginationContainer.appendChild(pageButton);
     }
 }
 
-// Function to send a new message to the selected receiver
+// Function to load a specific conversation
+async function loadConversation(receiverId) {
+    try {
+        const response = await fetch(`/messages/conversation/${receiverId}`);
+        if (!response.ok) throw new Error('Failed to load conversation');
+        
+        const { messages } = await response.json();
+        const messageDisplay = document.getElementById('message-display');
+        messageDisplay.innerHTML = ''; // Clear previous messages
+
+        messages.forEach(message => {
+            const messageElement = document.createElement('div');
+            messageElement.className = message.sender_id === receiverId ? 'message-received' : 'message-sent';
+            messageElement.textContent = message.message_content;
+            messageDisplay.appendChild(messageElement);
+        });
+    } catch (error) {
+        console.error('Error loading conversation:', error);
+    }
+}
+
+// Function to send a new message
 async function sendMessage(event) {
     event.preventDefault();
 
     if (!selectedReceiverId) {
         console.error('No receiver selected');
-        return;
+        return; // Exit if no receiver is selected
     }
 
     const messageContent = document.getElementById('message-input').value;
