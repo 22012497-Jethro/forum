@@ -5,7 +5,7 @@ const authenticateUser = require('../middleware/authMiddleware');
 
 // Supabase setup
 const supabaseUrl = "https://fudsrzbhqpmryvmxgced.supabase.co";
-const supabaseKey = "YOUR_SUPABASE_KEY"; // Replace with process.env.SUPABASE_KEY in production
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1ZHNyemJocXBtcnl2bXhnY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM5MjE3OTQsImV4cCI6MjAyOTQ5Nzc5NH0.6UMbzoD8J1BQl01h6NSyZAHVhrWerUcD5VVGuBwRcag";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Middleware to protect routes
@@ -16,6 +16,7 @@ router.get('/conversations', async (req, res) => {
     const userId = req.user.id;
 
     try {
+        // Fetch all messages involving the current user
         const { data, error } = await supabase
             .from('messages')
             .select('receiver_id, sender_id')
@@ -23,12 +24,12 @@ router.get('/conversations', async (req, res) => {
 
         if (error) throw error;
 
-        // Extract unique user IDs involved in conversations
+        // Extract unique user IDs involved in conversations with the current user
         const userIds = [...new Set(data.map(msg => 
             msg.sender_id === userId ? msg.receiver_id : msg.sender_id
         ))];
 
-        // Fetch user details based on unique user IDs
+        // Fetch user details for each unique user ID
         const { data: users, error: userError } = await supabase
             .from('users')
             .select('id, username')
@@ -52,6 +53,7 @@ router.post('/send', async (req, res) => {
     }
 
     try {
+        // Insert a new message into the database
         const { data, error } = await supabase
             .from('messages')
             .insert([{
@@ -74,15 +76,16 @@ router.post('/send', async (req, res) => {
 router.get('/conversation/:receiver_id', async (req, res) => {
     const sender_id = req.user.id;
     const { receiver_id } = req.params;
-    const { page = 1, limit = 10 } = req.query; // Default pagination settings
+    const { page = 1, limit = 10 } = req.query;
 
     const offset = (page - 1) * limit;
 
     try {
+        // Fetch messages between the current user and the specified receiver
         const { data, error } = await supabase
             .from('messages')
             .select('*')
-            .or(`and(sender_id.eq.${sender_id},receiver_id.eq.${receiver_id}),and(sender_id.eq.${receiver_id},sender_id.eq.${sender_id})`)
+            .or(`and(sender_id.eq.${sender_id},receiver_id.eq.${receiver_id}),and(sender_id.eq.${receiver_id},receiver_id.eq.${sender_id})`)
             .order('timestamp', { ascending: true })
             .range(offset, offset + limit - 1);
 
@@ -92,7 +95,7 @@ router.get('/conversation/:receiver_id', async (req, res) => {
         const { count, error: countError } = await supabase
             .from('messages')
             .select('*', { count: 'exact', head: true })
-            .or(`and(sender_id.eq.${sender_id},receiver_id.eq.${receiver_id}),and(sender_id.eq.${receiver_id},sender_id.eq.${sender_id})`);
+            .or(`and(sender_id.eq.${sender_id},receiver_id.eq.${receiver_id}),and(sender_id.eq.${receiver_id},receiver_id.eq.${sender_id})`);
 
         if (countError) throw countError;
 
@@ -109,6 +112,7 @@ router.put('/mark-as-read/:sender_id', async (req, res) => {
     const { sender_id } = req.params;
 
     try {
+        // Update message status to 'read' for messages from the specified sender to the current user
         const { data, error } = await supabase
             .from('messages')
             .update({ status: 'read' })
@@ -122,7 +126,7 @@ router.put('/mark-as-read/:sender_id', async (req, res) => {
     }
 });
 
-// Search users by username
+// Route to search users by username
 router.get('/search', async (req, res) => {
     const username = req.query.username;
     const currentUserId = req.user.id;
@@ -134,10 +138,11 @@ router.get('/search', async (req, res) => {
             return res.status(400).json({ message: 'Username query is required' });
         }
 
+        // Search for users by username, excluding the current user
         const { data: users, error } = await supabase
             .from('users')
             .select('id, username')
-            .ilike('username', `%${username}%`)
+            .ilike('username', `%${username}%`) // Case-insensitive search
             .neq('id', currentUserId);
 
         if (error) throw error;
