@@ -1,7 +1,7 @@
 let selectedReceiverId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (window.location.pathname === '/messages') {
+    if (window.location.pathname === '/message') {
         loadConversations();
 
         const searchButton = document.getElementById('search-button'); // Ensure this button exists in HTML
