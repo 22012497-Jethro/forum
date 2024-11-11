@@ -5,6 +5,7 @@ const session = require("express-session");
 const postsRouter = require('./routes/posts'); // Import the posts router
 const usersRouter = require('./routes/users'); // Import the users router
 const commentsRouter = require('./routes/comments'); // Import the comments router
+const messagesRouter = require('./routes/messages'); // Import the comments router
 const authenticateUser = require('./middleware/authMiddleware'); // Import the auth middleware
 
 const app = express();
@@ -41,6 +42,7 @@ app.get("/profile", authenticateUser, (req, res) => res.sendFile(path.join(__dir
 // Use the posts and users routers with authentication
 app.use('/posts', authenticateUser, postsRouter);
 app.use('/comments', authenticateUser, commentsRouter);
+app.use('/messages', authenticateUser, messagesRouter);
 
 // Use the users router without authentication for login and signup
 app.use('/users', usersRouter);
