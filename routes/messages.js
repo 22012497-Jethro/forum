@@ -128,32 +128,30 @@ router.put('/mark-as-read/:sender_id', async (req, res) => {
 
 // Route to search users by username
 router.get('/search', async (req, res) => {
-    const username = req.query.username;
-    const currentUserId = req.user.id;
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const offset = (page - 1) * limit;
+    const username = req.query.username; // Search query
+    const page = parseInt(req.query.page) || 1; // Current page
+    const limit = parseInt(req.query.limit) || 5; // Results per page
+    const offset = (page - 1) * limit; // Calculate offset for pagination
 
     try {
         if (!username) {
             return res.status(400).json({ message: 'Username query is required' });
         }
 
+        // Search for users by username and exclude the current user if needed
         const { data: users, error } = await supabase
             .from('users')
             .select('id, username')
             .ilike('username', `%${username}%`)
-            .neq('id', currentUserId)
-            .range(offset, offset + limit - 1);
+            .range(offset, offset + limit - 1); // Apply pagination using range
 
         if (error) throw error;
 
-        // Get the total count of matching users for pagination
+        // Count total matching users for pagination
         const { count, error: countError } = await supabase
             .from('users')
             .select('*', { count: 'exact', head: true })
-            .ilike('username', `%${username}%`)
-            .neq('id', currentUserId);
+            .ilike('username', `%${username}%`);
 
         if (countError) throw countError;
 
