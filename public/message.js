@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const messageForm = document.getElementById('message-form');
 
         if (searchInput) {
-            searchInput.addEventListener('input', searchUser); // Trigger search on input change
+            searchInput.addEventListener('input', searchUser);
         }
 
         if (messageForm) {
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Function to load conversations
+// Function to load conversations (existing conversations list)
 async function loadConversations() {
     try {
         const response = await fetch(`/messages/conversations`);
@@ -39,6 +39,47 @@ async function loadConversations() {
         });
     } catch (error) {
         console.error('Error loading conversations:', error);
+    }
+}
+
+// Function to search for users by username (for new or existing users)
+async function searchUser() {
+    const username = document.getElementById('username-search').value.trim();
+    if (!username) {
+        document.getElementById('search-results').innerHTML = ''; // Clear results if no input
+        return;
+    }
+
+    try {
+        const response = await fetch(`/messages/search?username=${encodeURIComponent(username)}`);
+        if (!response.ok) throw new Error('Failed to search for user');
+
+        const users = await response.json(); // Get list of users from backend
+        const searchResults = document.getElementById('search-results');
+        searchResults.innerHTML = ''; // Clear previous search results
+
+        users.forEach(user => {
+            const userElement = document.createElement('div');
+            userElement.className = 'search-result-item';
+            userElement.textContent = user.username;
+            userElement.addEventListener('click', () => {
+                selectedReceiverId = user.id;
+                loadConversation(selectedReceiverId); // Start conversation on click
+                searchResults.innerHTML = ''; // Clear search results
+                document.getElementById('username-search').value = ''; // Clear search input
+            });
+            searchResults.appendChild(userElement);
+        });
+
+        // If no users are found, display a "No users found" message
+        if (users.length === 0) {
+            const noResults = document.createElement('div');
+            noResults.className = 'no-results';
+            noResults.textContent = 'No users found';
+            searchResults.appendChild(noResults);
+        }
+    } catch (error) {
+        console.error('Error searching for user:', error);
     }
 }
 
@@ -83,57 +124,12 @@ async function sendMessage(event) {
         });
 
         if (response.ok) {
-            loadConversation(selectedReceiverId);
-            document.getElementById('message-input').value = '';
+            loadConversation(selectedReceiverId); // Reload the conversation after sending
+            document.getElementById('message-input').value = ''; // Clear the input field
         } else {
             console.error('Failed to send message');
         }
     } catch (error) {
         console.error('Error sending message:', error);
-    }
-}
-
-// Function to search for users by username
-async function searchUser() {
-    const username = document.getElementById('username-search').value.trim();
-    if (!username) {
-        document.getElementById('search-results').innerHTML = ''; // Clear results if no input
-        return;
-    }
-
-    try {
-        console.log('Searching for:', username); // Log search input
-
-        const response = await fetch(`/messages/search?username=${encodeURIComponent(username)}`);
-        if (!response.ok) throw new Error('Failed to search for user');
-
-        const users = await response.json();
-        console.log('Search results from backend:', users); // Log the backend response
-
-        const searchResults = document.getElementById('search-results');
-        searchResults.innerHTML = ''; // Clear previous search results
-
-        users.forEach(user => {
-            const userElement = document.createElement('div');
-            userElement.className = 'search-result-item';
-            userElement.textContent = user.username;
-            userElement.addEventListener('click', () => {
-                selectedReceiverId = user.id;
-                loadConversation(selectedReceiverId);
-                searchResults.innerHTML = ''; // Clear search results after selecting a user
-                document.getElementById('username-search').value = ''; // Clear search input
-            });
-            searchResults.appendChild(userElement);
-        });
-
-        // If no users are found, display a "No users found" message
-        if (users.length === 0) {
-            const noResults = document.createElement('div');
-            noResults.className = 'no-results';
-            noResults.textContent = 'No users found';
-            searchResults.appendChild(noResults);
-        }
-    } catch (error) {
-        console.error('Error searching for user:', error);
     }
 }
