@@ -3,16 +3,16 @@ let selectedReceiverId = null; // Global variable to store the selected receiver
 document.addEventListener('DOMContentLoaded', () => {
     loadConversations();
 
-    // Add event listener to search button
-    const searchButton = document.getElementById('search-button');
-    if (searchButton) {
-        searchButton.addEventListener('click', searchUser);
-    }
-
     // Add event listener to message form for sending messages
     const messageForm = document.getElementById('message-form');
     if (messageForm) {
         messageForm.addEventListener('submit', sendMessage);
+    }
+
+    // Trigger search dynamically as user types
+    const searchInput = document.getElementById('username-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', searchUser); // Trigger search on input change
     }
 });
 
@@ -95,7 +95,10 @@ async function sendMessage(event) {
 // Function to search for users by username
 async function searchUser() {
     const username = document.getElementById('username-search').value.trim();
-    if (!username) return; // Avoid empty searches
+    if (!username) {
+        document.getElementById('search-results').innerHTML = ''; // Clear results if no input
+        return;
+    }
 
     try {
         const response = await fetch(`/messages/search?username=${encodeURIComponent(username)}`);
@@ -105,23 +108,24 @@ async function searchUser() {
         const searchResults = document.getElementById('search-results');
         searchResults.innerHTML = ''; // Clear previous search results
 
+        users.forEach(user => {
+            const userElement = document.createElement('div');
+            userElement.className = 'search-result-item';
+            userElement.textContent = user.username;
+            userElement.addEventListener('click', () => {
+                selectedReceiverId = user.id;
+                loadConversation(selectedReceiverId); // Open conversation on click
+                searchResults.innerHTML = ''; // Clear search results
+                document.getElementById('username-search').value = ''; // Clear search input
+            });
+            searchResults.appendChild(userElement);
+        });
+
         if (users.length === 0) {
             const noResults = document.createElement('div');
             noResults.className = 'no-results';
             noResults.textContent = 'No users found';
             searchResults.appendChild(noResults);
-        } else {
-            users.forEach(user => {
-                const userElement = document.createElement('div');
-                userElement.className = 'search-result-item';
-                userElement.textContent = user.username;
-                userElement.addEventListener('click', () => {
-                    selectedReceiverId = user.id;
-                    loadConversation(selectedReceiverId);
-                    searchResults.innerHTML = ''; // Clear search results after selection
-                });
-                searchResults.appendChild(userElement);
-            });
         }
     } catch (error) {
         console.error('Error searching for user:', error);
