@@ -7,10 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const searchInput = document.getElementById('username-search');
         const messageForm = document.getElementById('message-form');
 
+        // Add event listener for the search input to trigger user search
         if (searchInput) {
             searchInput.addEventListener('input', searchUser);
         }
 
+        // Add event listener for the message form to send messages
         if (messageForm) {
             messageForm.addEventListener('submit', sendMessage);
         }
@@ -25,8 +27,9 @@ async function loadConversations() {
         
         const users = await response.json();
         const conversationsSection = document.getElementById('conversations-section');
-        conversationsSection.innerHTML = '';
+        conversationsSection.innerHTML = ''; // Clear previous list
 
+        // Populate the conversations section with each user's name
         users.forEach(user => {
             const conversationLink = document.createElement('div');
             conversationLink.className = 'conversation';
@@ -58,6 +61,7 @@ async function searchUser() {
         const searchResults = document.getElementById('search-results');
         searchResults.innerHTML = ''; // Clear previous search results
 
+        // Display each matching user in the search results
         users.forEach(user => {
             const userElement = document.createElement('div');
             userElement.className = 'search-result-item';
@@ -83,7 +87,7 @@ async function searchUser() {
     }
 }
 
-// Function to load a specific conversation
+// Function to load a specific conversation with a selected user
 async function loadConversation(receiverId) {
     try {
         const response = await fetch(`/messages/conversation/${receiverId}`);
@@ -91,8 +95,9 @@ async function loadConversation(receiverId) {
         
         const { messages } = await response.json();
         const messageDisplay = document.getElementById('message-display');
-        messageDisplay.innerHTML = '';
+        messageDisplay.innerHTML = ''; // Clear previous messages
 
+        // Display each message in the conversation
         messages.forEach(message => {
             const messageElement = document.createElement('div');
             messageElement.className = message.sender_id === receiverId ? 'message-received' : 'message-sent';
@@ -104,7 +109,7 @@ async function loadConversation(receiverId) {
     }
 }
 
-// Function to send a new message
+// Function to send a new message to the selected receiver
 async function sendMessage(event) {
     event.preventDefault();
 
@@ -114,7 +119,7 @@ async function sendMessage(event) {
     }
 
     const messageContent = document.getElementById('message-input').value;
-    if (!messageContent.trim()) return;
+    if (!messageContent.trim()) return; // Prevent sending empty messages
 
     try {
         const response = await fetch('/messages/send', {
