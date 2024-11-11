@@ -54,35 +54,41 @@ async function loadConversations() {
 // Function to search for users by username
 async function searchUser() {
     const username = document.getElementById('username-search').value.trim();
+    const searchResults = document.getElementById('search-results');
+
+    // Clear previous results if the search is empty
     if (!username) {
-        document.getElementById('search-results').innerHTML = ''; // Clear results if no input
+        searchResults.innerHTML = '';
         return;
     }
 
     try {
-        console.log('Searching for:', username); // Debugging log
+        console.log('Searching for:', username); // Debug log
 
         const response = await fetch(`/messages/search?username=${encodeURIComponent(username)}`);
         if (!response.ok) throw new Error('Failed to search for user');
 
-        const users = await response.json(); // Get list of users from backend
-        const searchResults = document.getElementById('search-results');
-        searchResults.innerHTML = ''; // Clear previous search results
+        const users = await response.json(); // Retrieve the list of users
+        console.log('Received search results:', users); // Log the result
 
+        // Clear previous search results
+        searchResults.innerHTML = '';
+
+        // Display each user found
         users.forEach(user => {
             const userElement = document.createElement('div');
             userElement.className = 'search-result-item';
             userElement.textContent = user.username;
             userElement.addEventListener('click', () => {
                 selectedReceiverId = user.id;
-                loadConversation(selectedReceiverId); // Start conversation on click
-                searchResults.innerHTML = ''; // Clear search results
-                document.getElementById('username-search').value = ''; // Clear search input
+                loadConversation(selectedReceiverId);
+                searchResults.innerHTML = '';
+                document.getElementById('username-search').value = '';
             });
             searchResults.appendChild(userElement);
         });
 
-        // If no users are found, display a "No users found" message
+        // If no users found, display "No users found"
         if (users.length === 0) {
             const noResults = document.createElement('div');
             noResults.className = 'no-results';
@@ -91,27 +97,6 @@ async function searchUser() {
         }
     } catch (error) {
         console.error('Error searching for user:', error);
-    }
-}
-
-// Function to load a specific conversation with a selected user
-async function loadConversation(receiverId) {
-    try {
-        const response = await fetch(`/messages/conversation/${receiverId}`);
-        if (!response.ok) throw new Error('Failed to load conversation');
-        
-        const { messages } = await response.json();
-        const messageDisplay = document.getElementById('message-display');
-        messageDisplay.innerHTML = ''; // Clear previous messages
-
-        messages.forEach(message => {
-            const messageElement = document.createElement('div');
-            messageElement.className = message.sender_id === receiverId ? 'message-received' : 'message-sent';
-            messageElement.textContent = message.message_content;
-            messageDisplay.appendChild(messageElement);
-        });
-    } catch (error) {
-        console.error('Error loading conversation:', error);
     }
 }
 
