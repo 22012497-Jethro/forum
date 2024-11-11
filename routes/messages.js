@@ -124,26 +124,24 @@ router.put('/mark-as-read/:sender_id', async (req, res) => {
 
 // Search users by username
 router.get('/search', async (req, res) => {
-    const username = req.query.username;
-    const currentUserId = req.user.id;
-
-    console.log('Received search query:', username); // Log the received username query
+    const username = req.query.username; // The search query
+    const currentUserId = req.user.id;   // The ID of the current user from the authentication middleware
 
     try {
         if (!username) {
             return res.status(400).json({ message: 'Username query is required' });
         }
 
+        // Search for all users who match the username and exclude the current user
         const { data: users, error } = await supabase
             .from('users')
             .select('id, username')
-            .ilike('username', `%${username}%`)
-            .neq('id', currentUserId);
+            .ilike('username', `%${username}%`) // Case-insensitive search for usernames
+            .neq('id', currentUserId);           // Exclude the current user
 
         if (error) throw error;
 
-        console.log('Search results:', users); // Log the search results from Supabase
-        res.status(200).json(users);
+        res.status(200).json(users); // Send back the matching users
     } catch (error) {
         console.error('Error searching for users:', error);
         res.status(500).json({ message: 'Error searching for users' });
