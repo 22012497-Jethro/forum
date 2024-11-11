@@ -52,21 +52,18 @@ async function loadConversations() {
 }
 
 // Function to search for users by username
-async function searchUser(page = 1) {
+async function searchUser(event) {
+    if (event.key !== 'Enter') return; // Only trigger on Enter key
+    
     const username = document.getElementById('username-search').value.trim();
-    const searchResults = document.getElementById('search-results');
+    if (!username) return;
 
-    if (!username) {
-        searchResults.innerHTML = '';
-        return;
-    }
+    const searchResults = document.getElementById('search-results');
+    searchResults.innerHTML = ''; // Clear previous results
 
     try {
-        const response = await fetch(`/messages/search?username=${encodeURIComponent(username)}&page=${page}&limit=10`);
-        if (!response.ok) throw new Error('Failed to search for user');
-
-        const { users, totalUsers } = await response.json();
-        searchResults.innerHTML = ''; // Clear previous search results
+        const response = await fetch(`/messages/search?username=${encodeURIComponent(username)}`);
+        const users = await response.json();
 
         users.forEach(user => {
             const userElement = document.createElement('div');
@@ -86,13 +83,15 @@ async function searchUser(page = 1) {
             noResults.className = 'no-results';
             noResults.textContent = 'No users found';
             searchResults.appendChild(noResults);
-        } else {
-            setupPagination(page, totalUsers, 10); // Add pagination if results are found
         }
     } catch (error) {
         console.error('Error searching for user:', error);
     }
 }
+
+// Add event listener to trigger search on Enter key
+document.getElementById('username-search').addEventListener('keypress', searchUser);
+
 
 function setupPagination(currentPage, totalUsers, usersPerPage) {
     const paginationContainer = document.getElementById('pagination-container');
