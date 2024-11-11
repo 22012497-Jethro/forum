@@ -335,6 +335,10 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = '/profile';
     }
 
+    function goToMessage() {
+        window.location.href = '/message';
+    }
+
     // Ensure the button exists before adding an event listener
     const backToHomepageButton = document.getElementById('back-to-homepage');
     if (backToHomepageButton) {
@@ -359,6 +363,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const profilePicButton = document.getElementById('profile-pic');
     if (profilePicButton) {
         profilePicButton.addEventListener('click', goToProfile);
+    }
+
+    const messageButton = document.getElementById('message-button');
+    if (messageButton) {
+        messageButton.addEventListener('click', goToMessage);
     }
     
     // Logout function
