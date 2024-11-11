@@ -5,7 +5,7 @@ const authenticateUser = require('../middleware/authMiddleware');
 
 // Supabase setup
 const supabaseUrl = "https://fudsrzbhqpmryvmxgced.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1ZHNyemJocXBtcnl2bXhnY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM5MjE3OTQsImV4cCI6MjAyOTQ5Nzc5NH0.6UMbzoD8J1BQl01h6NSyZAHVhrWerUcD5VVGuBwRcag";
+const supabaseKey = "YOUR_SUPABASE_KEY"; // Replace with process.env.SUPABASE_KEY in production
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Middleware to protect routes
@@ -82,7 +82,7 @@ router.get('/conversation/:receiver_id', async (req, res) => {
         const { data, error } = await supabase
             .from('messages')
             .select('*')
-            .or(`and(sender_id.eq.${sender_id},receiver_id.eq.${receiver_id}),and(sender_id.eq.${receiver_id},receiver_id.eq.${sender_id})`)
+            .or(`and(sender_id.eq.${sender_id},receiver_id.eq.${receiver_id}),and(sender_id.eq.${receiver_id},sender_id.eq.${sender_id})`)
             .order('timestamp', { ascending: true })
             .range(offset, offset + limit - 1);
 
@@ -92,7 +92,7 @@ router.get('/conversation/:receiver_id', async (req, res) => {
         const { count, error: countError } = await supabase
             .from('messages')
             .select('*', { count: 'exact', head: true })
-            .or(`and(sender_id.eq.${sender_id},receiver_id.eq.${receiver_id}),and(sender_id.eq.${receiver_id},receiver_id.eq.${sender_id})`);
+            .or(`and(sender_id.eq.${sender_id},receiver_id.eq.${receiver_id}),and(sender_id.eq.${receiver_id},sender_id.eq.${sender_id})`);
 
         if (countError) throw countError;
 
