@@ -1,4 +1,5 @@
 let selectedReceiverId = null;
+let debounceTimeout;
 
 document.addEventListener('DOMContentLoaded', () => {
     if (window.location.pathname === '/messages') {
@@ -7,19 +8,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const searchInput = document.getElementById('username-search');
         const messageForm = document.getElementById('message-form');
 
-        // Add event listener for the search input to trigger user search
         if (searchInput) {
-            searchInput.addEventListener('input', searchUser);
+            searchInput.addEventListener('input', debounce(searchUser, 300)); // Use debounce on search input
         }
 
-        // Add event listener for the message form to send messages
         if (messageForm) {
             messageForm.addEventListener('submit', sendMessage);
         }
     }
 });
 
-// Function to load conversations (existing conversations list)
+// Function to debounce search input (wait until user stops typing)
+function debounce(func, delay) {
+    return function (...args) {
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(() => func(...args), delay);
+    };
+}
+
+// Function to load existing conversations
 async function loadConversations() {
     try {
         const response = await fetch(`/messages/conversations`);
@@ -27,9 +34,8 @@ async function loadConversations() {
         
         const users = await response.json();
         const conversationsSection = document.getElementById('conversations-section');
-        conversationsSection.innerHTML = ''; // Clear previous list
+        conversationsSection.innerHTML = '';
 
-        // Populate the conversations section with each user's name
         users.forEach(user => {
             const conversationLink = document.createElement('div');
             conversationLink.className = 'conversation';
@@ -45,7 +51,7 @@ async function loadConversations() {
     }
 }
 
-// Function to search for users by username (for new or existing users)
+// Function to search for users by username
 async function searchUser() {
     const username = document.getElementById('username-search').value.trim();
     if (!username) {
@@ -54,6 +60,8 @@ async function searchUser() {
     }
 
     try {
+        console.log('Searching for:', username); // Debugging log
+
         const response = await fetch(`/messages/search?username=${encodeURIComponent(username)}`);
         if (!response.ok) throw new Error('Failed to search for user');
 
@@ -61,7 +69,6 @@ async function searchUser() {
         const searchResults = document.getElementById('search-results');
         searchResults.innerHTML = ''; // Clear previous search results
 
-        // Display each matching user in the search results
         users.forEach(user => {
             const userElement = document.createElement('div');
             userElement.className = 'search-result-item';
@@ -97,7 +104,6 @@ async function loadConversation(receiverId) {
         const messageDisplay = document.getElementById('message-display');
         messageDisplay.innerHTML = ''; // Clear previous messages
 
-        // Display each message in the conversation
         messages.forEach(message => {
             const messageElement = document.createElement('div');
             messageElement.className = message.sender_id === receiverId ? 'message-received' : 'message-sent';
