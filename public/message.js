@@ -52,29 +52,22 @@ async function loadConversations() {
 }
 
 // Function to search for users by username
-async function searchUser() {
+async function searchUser(page = 1) {
     const username = document.getElementById('username-search').value.trim();
     const searchResults = document.getElementById('search-results');
 
-    // Clear previous results if the search is empty
     if (!username) {
         searchResults.innerHTML = '';
         return;
     }
 
     try {
-        console.log('Searching for:', username); // Debug log
-
-        const response = await fetch(`/messages/search?username=${encodeURIComponent(username)}`);
+        const response = await fetch(`/messages/search?username=${encodeURIComponent(username)}&page=${page}&limit=10`);
         if (!response.ok) throw new Error('Failed to search for user');
 
-        const users = await response.json(); // Retrieve the list of users
-        console.log('Received search results:', users); // Log the result
+        const { users, totalUsers } = await response.json();
+        searchResults.innerHTML = ''; // Clear previous search results
 
-        // Clear previous search results
-        searchResults.innerHTML = '';
-
-        // Display each user found
         users.forEach(user => {
             const userElement = document.createElement('div');
             userElement.className = 'search-result-item';
@@ -88,15 +81,33 @@ async function searchUser() {
             searchResults.appendChild(userElement);
         });
 
-        // If no users found, display "No users found"
         if (users.length === 0) {
             const noResults = document.createElement('div');
             noResults.className = 'no-results';
             noResults.textContent = 'No users found';
             searchResults.appendChild(noResults);
+        } else {
+            setupPagination(page, totalUsers, 10); // Add pagination if results are found
         }
     } catch (error) {
         console.error('Error searching for user:', error);
+    }
+}
+
+function setupPagination(currentPage, totalUsers, usersPerPage) {
+    const paginationContainer = document.getElementById('pagination-container');
+    paginationContainer.innerHTML = '';
+
+    const totalPages = Math.ceil(totalUsers / usersPerPage);
+
+    for (let i = 1; i <= totalPages; i++) {
+        const pageButton = document.createElement('button');
+        pageButton.textContent = i;
+        if (i === currentPage) {
+            pageButton.disabled = true;
+        }
+        pageButton.onclick = () => searchUser(i); // Fetch next page of search results
+        paginationContainer.appendChild(pageButton);
     }
 }
 
