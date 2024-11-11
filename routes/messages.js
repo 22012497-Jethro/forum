@@ -130,13 +130,12 @@ router.put('/mark-as-read/:sender_id', async (req, res) => {
 router.get('/search', async (req, res) => {
     const username = req.query.username;
     const currentUserId = req.user.id;
-    
-    console.log('Received search query for username:', username); // Check if username is received
-    console.log('Current User ID:', currentUserId); // Check current user ID
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
 
     try {
         if (!username) {
-            console.log('No username provided in query');
             return res.status(400).json({ message: 'Username query is required' });
         }
 
@@ -144,12 +143,21 @@ router.get('/search', async (req, res) => {
             .from('users')
             .select('id, username')
             .ilike('username', `%${username}%`)
-            .neq('id', currentUserId);
+            .neq('id', currentUserId)
+            .range(offset, offset + limit - 1);
 
         if (error) throw error;
 
-        console.log('Users found:', users); // Log users returned from the search
-        res.status(200).json(users);
+        // Get the total count of matching users for pagination
+        const { count, error: countError } = await supabase
+            .from('users')
+            .select('*', { count: 'exact', head: true })
+            .ilike('username', `%${username}%`)
+            .neq('id', currentUserId);
+
+        if (countError) throw countError;
+
+        res.status(200).json({ users, totalUsers: count });
     } catch (error) {
         console.error('Error in /messages/search route:', error);
         res.status(500).json({ message: 'Error searching for users' });
