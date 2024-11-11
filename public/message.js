@@ -1,8 +1,7 @@
-// message.js - Messaging specific functionality
-let selectedReceiverId = null; // Global variable to store the selected receiver ID
+let selectedReceiverId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (window.location.pathname === '/messages') { // Only initialize on the messages page
+    if (window.location.pathname === '/messages') {
         loadConversations();
         
         const searchInput = document.getElementById('username-search');
@@ -26,15 +25,15 @@ async function loadConversations() {
         
         const users = await response.json();
         const conversationsSection = document.getElementById('conversations-section');
-        conversationsSection.innerHTML = ''; // Clear previous list
+        conversationsSection.innerHTML = '';
 
         users.forEach(user => {
             const conversationLink = document.createElement('div');
             conversationLink.className = 'conversation';
             conversationLink.textContent = user.username;
             conversationLink.addEventListener('click', () => {
-                selectedReceiverId = user.id; // Set the global receiver ID
-                loadConversation(selectedReceiverId); // Load conversation with the selected user
+                selectedReceiverId = user.id;
+                loadConversation(selectedReceiverId);
             });
             conversationsSection.appendChild(conversationLink);
         });
@@ -51,7 +50,7 @@ async function loadConversation(receiverId) {
         
         const { messages } = await response.json();
         const messageDisplay = document.getElementById('message-display');
-        messageDisplay.innerHTML = ''; // Clear previous messages
+        messageDisplay.innerHTML = '';
 
         messages.forEach(message => {
             const messageElement = document.createElement('div');
@@ -70,12 +69,12 @@ async function sendMessage(event) {
 
     if (!selectedReceiverId) {
         console.error('No receiver selected');
-        return; // Exit if no receiver is selected
+        return;
     }
 
     const messageContent = document.getElementById('message-input').value;
-    if (!messageContent.trim()) return; // Prevent sending empty messages
-    
+    if (!messageContent.trim()) return;
+
     try {
         const response = await fetch('/messages/send', {
             method: 'POST',
@@ -84,8 +83,8 @@ async function sendMessage(event) {
         });
 
         if (response.ok) {
-            loadConversation(selectedReceiverId); // Reload the conversation after sending
-            document.getElementById('message-input').value = ''; // Clear the input field
+            loadConversation(selectedReceiverId);
+            document.getElementById('message-input').value = '';
         } else {
             console.error('Failed to send message');
         }
@@ -98,7 +97,7 @@ async function sendMessage(event) {
 async function searchUser() {
     const username = document.getElementById('username-search').value.trim();
     if (!username) {
-        document.getElementById('search-results').innerHTML = ''; // Clear results if no input
+        document.getElementById('search-results').innerHTML = '';
         return;
     }
 
@@ -108,7 +107,7 @@ async function searchUser() {
 
         const users = await response.json();
         const searchResults = document.getElementById('search-results');
-        searchResults.innerHTML = ''; // Clear previous search results
+        searchResults.innerHTML = '';
 
         users.forEach(user => {
             const userElement = document.createElement('div');
@@ -116,9 +115,9 @@ async function searchUser() {
             userElement.textContent = user.username;
             userElement.addEventListener('click', () => {
                 selectedReceiverId = user.id;
-                loadConversation(selectedReceiverId); // Open conversation on click
-                searchResults.innerHTML = ''; // Clear search results
-                document.getElementById('username-search').value = ''; // Clear search input
+                loadConversation(selectedReceiverId);
+                searchResults.innerHTML = '';
+                document.getElementById('username-search').value = '';
             });
             searchResults.appendChild(userElement);
         });
