@@ -102,21 +102,24 @@ async function searchUser() {
     }
 
     try {
+        console.log('Searching for:', username); // Log search input
+
         const response = await fetch(`/messages/search?username=${encodeURIComponent(username)}`);
         if (!response.ok) throw new Error('Failed to search for user');
 
-        const users = await response.json(); // Get list of users from backend
+        const users = await response.json();
+        console.log('Search results from backend:', users); // Log the backend response
+
         const searchResults = document.getElementById('search-results');
         searchResults.innerHTML = ''; // Clear previous search results
 
-        // Display each matching user in the search results
         users.forEach(user => {
             const userElement = document.createElement('div');
             userElement.className = 'search-result-item';
             userElement.textContent = user.username;
             userElement.addEventListener('click', () => {
                 selectedReceiverId = user.id;
-                loadConversation(selectedReceiverId); // Load conversation on click
+                loadConversation(selectedReceiverId);
                 searchResults.innerHTML = ''; // Clear search results after selecting a user
                 document.getElementById('username-search').value = ''; // Clear search input
             });
