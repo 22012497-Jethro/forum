@@ -426,6 +426,25 @@ button {
     padding: 10px 20px;
 }
 
+.search-dropdown {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ddd;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+    z-index: 1000;
+}
+
+.search-result-item {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.search-result-item:hover {
+    background-color: #f1f1f1;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     nav {
