@@ -10,11 +10,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Route to get conversations
 router.get('/conversations', async (req, res) => {
-    if (!req.user || !req.user.id) {
-        return res.status(401).json({ message: 'Unauthorized' });
-    }
-    
-    const userId = req.user.id;
+    const userId = req.session.userId;
 
     try {
         const { data, error } = await supabase
@@ -24,13 +20,15 @@ router.get('/conversations', async (req, res) => {
 
         if (error) throw error;
 
+        // Extract unique user IDs involved in conversations
         const userIds = [...new Set(data.map(msg => 
             msg.sender_id === userId ? msg.receiver_id : msg.sender_id
         ))];
 
+        // Fetch user details including pfp based on unique user IDs
         const { data: users, error: userError } = await supabase
             .from('users')
-            .select('id, username')
+            .select('id, username, pfp') // Include 'pfp' here
             .in('id', userIds);
 
         if (userError) throw userError;
