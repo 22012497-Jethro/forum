@@ -10,10 +10,12 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Route to get conversations
 router.get('/conversations', async (req, res) => {
+    if (!req.user || !req.user.id) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
     const userId = req.user.id;
 
     try {
-        // Fetch all messages involving the current user
         const { data, error } = await supabase
             .from('messages')
             .select('receiver_id, sender_id')
@@ -21,12 +23,10 @@ router.get('/conversations', async (req, res) => {
 
         if (error) throw error;
 
-        // Extract unique user IDs involved in conversations with the current user
         const userIds = [...new Set(data.map(msg => 
             msg.sender_id === userId ? msg.receiver_id : msg.sender_id
         ))];
 
-        // Fetch user details for each unique user ID
         const { data: users, error: userError } = await supabase
             .from('users')
             .select('id, username')
@@ -42,15 +42,17 @@ router.get('/conversations', async (req, res) => {
 
 // Route to send a message
 router.post('/send', async (req, res) => {
-    const { receiver_id, message_content } = req.body;
+    if (!req.user || !req.user.id) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
     const sender_id = req.user.id;
+    const { receiver_id, message_content } = req.body;
 
     if (!receiver_id || !message_content) {
         return res.status(400).json({ message: 'Receiver ID and message content are required.' });
     }
 
     try {
-        // Insert a new message into the database
         const { data, error } = await supabase
             .from('messages')
             .insert([{
@@ -69,34 +71,23 @@ router.post('/send', async (req, res) => {
     }
 });
 
-// Route to retrieve conversation between two users with optional pagination
+// Route to retrieve a conversation between two users
 router.get('/conversation/:receiver_id', async (req, res) => {
+    if (!req.user || !req.user.id) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
     const sender_id = req.user.id;
     const { receiver_id } = req.params;
-    const { page = 1, limit = 10 } = req.query;
-
-    const offset = (page - 1) * limit;
 
     try {
-        // Fetch messages between the current user and the specified receiver
         const { data, error } = await supabase
             .from('messages')
             .select('*')
             .or(`and(sender_id.eq.${sender_id},receiver_id.eq.${receiver_id}),and(sender_id.eq.${receiver_id},receiver_id.eq.${sender_id})`)
-            .order('timestamp', { ascending: true })
-            .range(offset, offset + limit - 1);
+            .order('timestamp', { ascending: true });
 
         if (error) throw error;
-
-        // Count total messages for pagination info
-        const { count, error: countError } = await supabase
-            .from('messages')
-            .select('*', { count: 'exact', head: true })
-            .or(`and(sender_id.eq.${sender_id},receiver_id.eq.${receiver_id}),and(sender_id.eq.${receiver_id},receiver_id.eq.${sender_id})`);
-
-        if (countError) throw countError;
-
-        res.status(200).json({ messages: data, totalMessages: count });
+        res.status(200).json({ messages: data });
     } catch (error) {
         console.error('Error retrieving conversation:', error);
         res.status(500).json({ message: 'Error retrieving conversation' });
@@ -105,11 +96,13 @@ router.get('/conversation/:receiver_id', async (req, res) => {
 
 // Route to mark messages as read
 router.put('/mark-as-read/:sender_id', async (req, res) => {
+    if (!req.user || !req.user.id) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
     const receiver_id = req.user.id;
     const { sender_id } = req.params;
 
     try {
-        // Update message status to 'read' for messages from the specified sender to the current user
         const { data, error } = await supabase
             .from('messages')
             .update({ status: 'read' })
@@ -125,36 +118,28 @@ router.put('/mark-as-read/:sender_id', async (req, res) => {
 
 // Route to search users by username
 router.get('/search', async (req, res) => {
-    const username = req.query.username; // Search query
-    const page = parseInt(req.query.page) || 1; // Current page
-    const limit = parseInt(req.query.limit) || 5; // Results per page
-    const offset = (page - 1) * limit; // Calculate offset for pagination
+    if (!req.user || !req.user.id) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+    const username = req.query.username;
+    const currentUserId = req.user.id;
 
     try {
         if (!username) {
             return res.status(400).json({ message: 'Username query is required' });
         }
 
-        // Search for users by username and exclude the current user if needed
         const { data: users, error } = await supabase
             .from('users')
             .select('id, username')
             .ilike('username', `%${username}%`)
-            .range(offset, offset + limit - 1); // Apply pagination using range
+            .neq('id', currentUserId);
 
         if (error) throw error;
 
-        // Count total matching users for pagination
-        const { count, error: countError } = await supabase
-            .from('users')
-            .select('*', { count: 'exact', head: true })
-            .ilike('username', `%${username}%`);
-
-        if (countError) throw countError;
-
-        res.status(200).json({ users, totalUsers: count });
+        res.status(200).json(users);
     } catch (error) {
-        console.error('Error in /messages/search route:', error);
+        console.error('Error searching for users:', error);
         res.status(500).json({ message: 'Error searching for users' });
     }
 });
