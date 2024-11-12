@@ -40,14 +40,17 @@
     
         <div class="chat-window">
             <div id="chat-header">
-                <h3>Chat</h3> <!-- Default header, updated dynamically -->
+                <img src="default-profile.png" alt="Profile Picture" class="chat-profile-pic">
+                <span id="chat-username">Username</span>
             </div>
-            <div id="message-display" class="message-display"></div>
-            <form id="message-form">
+            <div id="message-display" class="message-display">
+                <!-- Messages will be dynamically appended here -->
+            </div>
+            <form id="message-form" style="display: flex;">
                 <textarea id="message-input" placeholder="Type your message here"></textarea>
                 <button type="submit" id="send-message">Send</button>
             </form>
-        </div>
+        </div>        
     </section>
 
 </body>
