@@ -144,6 +144,11 @@ function displayMessage(message) {
     messageElement.className = message.sender_id === selectedReceiverId ? 'message-received' : 'message-sent';
     messageElement.textContent = message.message_content;
 
+    // Example display of read/unread (optional)
+    if (message.status === false) {
+        messageElement.classList.add('unread');
+    }
+
     messageDisplay.appendChild(messageElement);
     messageDisplay.scrollTop = messageDisplay.scrollHeight;
 }
