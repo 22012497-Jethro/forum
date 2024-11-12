@@ -122,31 +122,35 @@ router.put('/mark-as-read/:sender_id', async (req, res) => {
 
 // Route to search users by username, including unmessaged users
 router.get('/search', async (req, res) => {
-    if (!req.user || !req.user.id) {
-        return res.status(401).json({ message: 'Unauthorized' });
-    }
-    
     const username = req.query.username;
-    const currentUserId = req.user.id;
+    const currentUserId = req.user ? req.user.id : null; // Ensure req.user is defined
+
+    if (!username) {
+        return res.status(400).json({ message: 'Username query is required' });
+    }
 
     try {
-        if (!username) {
-            return res.status(400).json({ message: 'Username query is required' });
+        // Start with the base query to fetch users
+        let query = supabase
+            .from('users')
+            .select('id, username, pfp')
+            .ilike('username', `%${username}%`) // Case-insensitive username filter
+            .neq('id', currentUserId); // Exclude current user
+
+        // Execute the query
+        const { data: users, error } = await query;
+
+        // Handle potential errors
+        if (error) {
+            console.error('Error fetching users:', error);
+            return res.status(500).json({ message: 'Error fetching users' });
         }
 
-        // Search for users with a case-insensitive match and exclude the current user
-        const { data: users, error } = await supabase
-            .from('users')
-            .select('id, username')
-            .ilike('username', `%${username}%`) // Case-insensitive search
-            .neq('id', currentUserId); // Exclude the current user from results
-
-        if (error) throw error;
-
-        res.status(200).json(users); // Return found users
+        // Return users in the response
+        res.json(users);
     } catch (error) {
-        console.error('Error searching for users:', error);
-        res.status(500).json({ message: 'Error searching for users' });
+        console.error('Server error in /messages/search:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
