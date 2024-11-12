@@ -30,34 +30,16 @@
 
     <!-- Main Messaging Section -->
     <section class="messages-container">
-
-        <!-- Conversations & Search -->
         <div class="conversations-list">
             <h3>Your Conversations</h3>
-            
-            <!-- Search Input -->
             <input type="text" id="username-search" placeholder="Search for a user">
-            
-            <button id="search-button">Search</button> <!-- New search button -->
-
-            <!-- Search Results -->
-            <div id="search-results"></div>
-            
-            <!-- Pagination for Search Results -->
-            <div id="pagination-container"></div> <!-- Pagination buttons go here -->
-            
-            <!-- Existing Conversations List -->
+            <div id="search-results" class="search-dropdown"></div> <!-- Dropdown for search results -->
             <div id="conversations-section"></div>
         </div>
 
-        <!-- Chat Window -->
         <div class="chat-window">
             <h3>Chat</h3>
-            
-            <!-- Message Display Area -->
             <div id="message-display" class="message-display"></div>
-            
-            <!-- Message Input Form -->
             <form id="message-form">
                 <textarea id="message-input" placeholder="Type your message here"></textarea>
                 <button type="submit">Send</button>
