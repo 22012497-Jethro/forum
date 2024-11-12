@@ -43,29 +43,20 @@ async function searchUser() {
 
     try {
         const response = await fetch(`/messages/search?username=${encodeURIComponent(username)}`);
-        if (!response.ok) throw new Error('Failed to search for user');
-
         const users = await response.json();
-        searchResults.innerHTML = '';
 
-        users.forEach(user => {
-            const userElement = document.createElement('div');
-            userElement.className = 'search-result-item';
-            userElement.textContent = user.username;
-            userElement.addEventListener('click', () => {
-                selectedReceiverId = user.id;
-                loadConversation(selectedReceiverId);
-                searchResults.innerHTML = ''; // Clear results on selection
-                document.getElementById('username-search').value = ''; // Clear search input
-            });
-            searchResults.appendChild(userElement);
-        });
+        searchResults.innerHTML = ''; // Clear previous results
+        console.log('Search results:', users); // Log the users to check the response
 
         if (users.length === 0) {
-            const noResults = document.createElement('div');
-            noResults.className = 'no-results';
-            noResults.textContent = 'No users found';
-            searchResults.appendChild(noResults);
+            searchResults.innerHTML = '<div class="no-results">No users found</div>';
+        } else {
+            users.forEach(user => {
+                const userElement = document.createElement('div');
+                userElement.className = 'search-result-item';
+                userElement.textContent = user.username;
+                searchResults.appendChild(userElement);
+            });
         }
     } catch (error) {
         console.error('Error searching for user:', error);
