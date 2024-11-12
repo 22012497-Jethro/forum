@@ -65,8 +65,8 @@ async function searchUser() {
         const response = await fetch(`/messages/search?username=${encodeURIComponent(username)}`);
         if (!response.ok) throw new Error('Failed to search for user');
 
-        const users = await response.json(); // Get the list of users from backend
-        searchResults.innerHTML = ''; // Clear previous search results
+        const users = await response.json();
+        searchResults.innerHTML = '';
 
         users.forEach(user => {
             const userElement = document.createElement('div');
@@ -74,14 +74,13 @@ async function searchUser() {
             userElement.textContent = user.username;
             userElement.addEventListener('click', () => {
                 selectedReceiverId = user.id;
-                loadConversation(selectedReceiverId); // Start conversation on click
-                searchResults.innerHTML = ''; // Clear search results
-                document.getElementById('username-search').value = ''; // Clear search input
+                loadConversation(selectedReceiverId);
+                searchResults.innerHTML = '';
+                document.getElementById('username-search').value = '';
             });
             searchResults.appendChild(userElement);
         });
 
-        // Display "No users found" if there are no matches
         if (users.length === 0) {
             const noResults = document.createElement('div');
             noResults.className = 'no-results';
