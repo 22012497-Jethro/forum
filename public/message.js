@@ -52,6 +52,7 @@ async function loadConversations() {
 }
 
 // Function to search for users by username
+// Function to search for users by username
 async function searchUser() {
     const username = document.getElementById('username-search').value.trim();
     if (!username) {
