@@ -25,13 +25,14 @@ router.get('/conversations', async (req, res) => {
             msg.sender_id === userId ? msg.receiver_id : msg.sender_id
         ))];
 
-        // Fetch user details including pfp based on unique user IDs
+        // Fetch user details including profile picture
         const { data: users, error: userError } = await supabase
             .from('users')
-            .select('id, username, pfp') // Include 'pfp' here
+            .select('id, username, pfp')
             .in('id', userIds);
 
         if (userError) throw userError;
+
         res.status(200).json(users);
     } catch (error) {
         console.error('Error fetching conversations:', error);
@@ -42,7 +43,7 @@ router.get('/conversations', async (req, res) => {
 // Route to send a message
 router.post('/send', async (req, res) => {
     const { receiver_id, message_content } = req.body;
-    const sender_id = req.session.userId; // Updated to use req.session.userId
+    const sender_id = req.session.userId;
 
     if (!receiver_id || !message_content) {
         return res.status(400).json({ message: 'Receiver ID and message content are required.' });
@@ -71,20 +72,17 @@ router.post('/send', async (req, res) => {
 
 // Route to mark messages as read
 router.put('/mark-as-read/:sender_id', async (req, res) => {
-    if (!req.user || !req.user.id) {
-        return res.status(401).json({ message: 'Unauthorized' });
-    }
-    
-    const receiver_id = req.user.id;
+    const receiver_id = req.session.userId;
     const { sender_id } = req.params;
 
     try {
         const { data, error } = await supabase
             .from('messages')
-            .update({ status: 'read' })
-            .match({ sender_id, receiver_id, status: 'unread' });
+            .update({ status: true }) // Mark as read (boolean true)
+            .match({ sender_id, receiver_id, status: false }); // Match only unread messages
 
         if (error) throw error;
+
         res.status(200).json({ message: 'Messages marked as read' });
     } catch (error) {
         console.error('Error marking messages as read:', error);
@@ -92,7 +90,7 @@ router.put('/mark-as-read/:sender_id', async (req, res) => {
     }
 });
 
-// Search route to find users by username and include pfp
+// Route to search users by username and include profile picture
 router.get('/search', async (req, res) => {
     const username = req.query.username;
     const currentUserId = req.session.userId;
@@ -104,7 +102,7 @@ router.get('/search', async (req, res) => {
 
         const { data: users, error } = await supabase
             .from('users')
-            .select('id, username, pfp') // Include 'pfp' here
+            .select('id, username, pfp')
             .ilike('username', `%${username}%`)
             .neq('id', currentUserId); // Exclude the current user
 
