@@ -168,9 +168,6 @@ async function sendMessage(event) {
         return;
     }
 
-    console.log('Sending message to:', selectedReceiverId); // Debugging log
-    console.log('Message content:', messageContent); // Debugging log
-
     try {
         const response = await fetch('/messages/send', {
             method: 'POST',
@@ -181,13 +178,10 @@ async function sendMessage(event) {
             })
         });
 
-        console.log('Response status:', response.status); // Check response status
-
         if (response.ok) {
             const newMessage = await response.json();
-            console.log("Message sent:", newMessage); // Verify response data
-            displayMessage(newMessage); // Display the new message in the UI
-            document.getElementById('message-input').value = ''; // Clear input field
+            displayMessage(newMessage); // Function to display the new message in the UI
+            document.getElementById('message-input').value = ''; // Clear the input field
         } else {
             console.error('Failed to send message:', await response.text());
         }
