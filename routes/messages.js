@@ -35,17 +35,16 @@ router.get('/conversations', async (req, res) => {
 
         res.status(200).json(users);
     } catch (error) {
-        console.error('Error fetching conversations:', error);
         res.status(500).json({ message: 'Error fetching conversations' });
     }
 });
 
 // Route to send a message
 router.post('/send', async (req, res) => {
-    const { receiver_id, message_content } = req.body;
+    const { receiver_id, content } = req.body;
     const sender_id = req.session.userId;
 
-    if (!receiver_id || !message_content) {
+    if (!receiver_id || !content) {
         return res.status(400).json({ message: 'Receiver ID and message content are required.' });
     }
 
@@ -55,17 +54,16 @@ router.post('/send', async (req, res) => {
             .insert([{
                 sender_id,
                 receiver_id,
-                message_content,
-                timestamp: new Date(),
-                status: false // Set as false for unread messages
+                content,
+                status: false, // Unread status
+                created_at: new Date() // Timestamp
             }])
             .select();
 
         if (error) throw error;
 
-        res.status(201).json(data[0]); // Return the new message
+        res.status(201).json(data[0]);
     } catch (error) {
-        console.error('Error sending message:', error);
         res.status(500).json({ message: 'Error sending message' });
     }
 });
@@ -78,14 +76,13 @@ router.put('/mark-as-read/:sender_id', async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('messages')
-            .update({ status: true }) // Mark as read (boolean true)
+            .update({ status: true }) // Mark as read
             .match({ sender_id, receiver_id, status: false }); // Match only unread messages
 
         if (error) throw error;
 
         res.status(200).json({ message: 'Messages marked as read' });
     } catch (error) {
-        console.error('Error marking messages as read:', error);
         res.status(500).json({ message: 'Error marking messages as read' });
     }
 });
@@ -110,7 +107,6 @@ router.get('/search', async (req, res) => {
 
         res.status(200).json(users);
     } catch (error) {
-        console.error('Error searching for users:', error);
         res.status(500).json({ message: 'Error searching for users' });
     }
 });
