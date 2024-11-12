@@ -40,9 +40,10 @@ router.get('/conversations', async (req, res) => {
 });
 
 // Route to send a message
+// Route to send a message
 router.post('/send', async (req, res) => {
     const { receiver_id, message_content } = req.body;
-    const sender_id = req.session.userId; // Ensure this is the correct way to get the sender ID
+    const sender_id = req.session.userId;
 
     if (!receiver_id || !message_content) {
         return res.status(400).json({ message: 'Receiver ID and message content are required.' });
@@ -64,30 +65,6 @@ router.post('/send', async (req, res) => {
     } catch (error) {
         console.error('Error sending message:', error);
         res.status(500).json({ message: 'Error sending message' });
-    }
-});
-
-// Route to retrieve a conversation between two users
-router.get('/conversation/:receiver_id', async (req, res) => {
-    if (!req.user || !req.user.id) {
-        return res.status(401).json({ message: 'Unauthorized' });
-    }
-    
-    const sender_id = req.user.id;
-    const { receiver_id } = req.params;
-
-    try {
-        const { data, error } = await supabase
-            .from('messages')
-            .select('*')
-            .or(`and(sender_id.eq.${sender_id},receiver_id.eq.${receiver_id}),and(sender_id.eq.${receiver_id},receiver_id.eq.${sender_id})`)
-            .order('timestamp', { ascending: true });
-
-        if (error) throw error;
-        res.status(200).json({ messages: data });
-    } catch (error) {
-        console.error('Error retrieving conversation:', error);
-        res.status(500).json({ message: 'Error retrieving conversation' });
     }
 });
 
