@@ -146,19 +146,22 @@ async function sendMessage(event) {
         return;
     }
 
-    const messageContent = document.getElementById('message-input').value;
-    if (!messageContent.trim()) return;
+    const messageContent = document.getElementById('message-input').value.trim();
+    if (!messageContent) return; // Prevent sending empty messages
 
     try {
         const response = await fetch('/messages/send', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ receiver_id: selectedReceiverId, message_content: messageContent })
+            body: JSON.stringify({
+                receiver_id: selectedReceiverId,
+                message_content: messageContent
+            })
         });
 
         if (response.ok) {
-            loadConversation(selectedReceiverId); // Reload conversation after sending
-            document.getElementById('message-input').value = ''; // Clear input field
+            loadConversation(selectedReceiverId); // Reload the conversation after sending
+            document.getElementById('message-input').value = ''; // Clear the input field
         } else {
             console.error('Failed to send message');
         }
