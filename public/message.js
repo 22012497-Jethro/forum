@@ -177,16 +177,30 @@ async function sendMessage() {
 // Function to fetch and display messages for the selected conversation
 async function fetchAndDisplayMessages(receiverId) {
     try {
+        // Fetch all messages for the current conversation
         const response = await fetch(`/messages/conversation/${receiverId}`);
         if (!response.ok) throw new Error('Failed to load messages');
 
-        const { messages } = await response.json(); // Ensure this fetches all past messages
+        const { messages } = await response.json();
         const messageDisplay = document.getElementById('message-display');
-        messageDisplay.innerHTML = ''; // Clear previous messages
+        messageDisplay.innerHTML = ''; // Clear any previous messages
 
-        // Display all messages between the current user and the selected receiver
+        // Display each message in the conversation
         messages.forEach(message => displayMessage(message));
     } catch (error) {
         console.error('Error fetching messages:', error);
     }
+}
+
+// Function to display a single message in the chat display
+function displayMessage(message) {
+    const messageDisplay = document.getElementById('message-display');
+
+    const messageElement = document.createElement('div');
+    // Determine if the message was sent by the current user or received
+    messageElement.className = message.sender_id === selectedReceiverId ? 'message-received' : 'message-sent';
+    messageElement.textContent = message.content;
+
+    messageDisplay.appendChild(messageElement);
+    messageDisplay.scrollTop = messageDisplay.scrollHeight; // Scroll to the latest message
 }
