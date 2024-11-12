@@ -127,17 +127,13 @@ async function loadConversation(receiverId) {
         messageDisplay.innerHTML = ''; // Clear previous messages
 
         messages.forEach(message => {
-            const messageElement = document.createElement('div');
-            messageElement.className = message.sender_id === receiverId ? 'message-received' : 'message-sent';
-            messageElement.textContent = message.message_content;
-            messageDisplay.appendChild(messageElement);
+            appendMessageToChat(message); // Use appendMessageToChat to add each message
         });
     } catch (error) {
         console.error('Error loading conversation:', error);
     }
 }
 
-// Function to send a new message to the selected receiver
 // Function to send a new message to the selected receiver and update the chat window
 async function sendMessage(event) {
     event.preventDefault();
