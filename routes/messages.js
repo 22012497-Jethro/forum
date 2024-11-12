@@ -121,36 +121,26 @@ router.put('/mark-as-read/:sender_id', async (req, res) => {
 });
 
 // Route to search users by username, including unmessaged users
+// Route to search for users by username
 router.get('/search', async (req, res) => {
-    const username = req.query.username;
-    const currentUserId = req.user ? req.user.id : null; // Ensure req.user is defined
-
-    if (!username) {
-        return res.status(400).json({ message: 'Username query is required' });
-    }
+    const { username } = req.query;
 
     try {
-        // Start with the base query to fetch users
-        let query = supabase
-            .from('users')
-            .select('id, username, pfp')
-            .ilike('username', `%${username}%`) // Case-insensitive username filter
-            .neq('id', currentUserId); // Exclude current user
-
-        // Execute the query
-        const { data: users, error } = await query;
-
-        // Handle potential errors
-        if (error) {
-            console.error('Error fetching users:', error);
-            return res.status(500).json({ message: 'Error fetching users' });
+        if (!username) {
+            return res.status(400).json({ message: 'Username query is required' });
         }
 
-        // Return users in the response
-        res.json(users);
+        const { data: users, error } = await supabase
+            .from('users')
+            .select('id, username')
+            .ilike('username', `%${username}%`); // Case-insensitive search for the username
+
+        if (error) throw error;
+
+        res.status(200).json(users);
     } catch (error) {
-        console.error('Server error in /messages/search:', error);
-        res.status(500).json({ message: 'Server error' });
+        console.error('Error in /messages/search route:', error);
+        res.status(500).json({ message: 'Error searching for users' });
     }
 });
 
