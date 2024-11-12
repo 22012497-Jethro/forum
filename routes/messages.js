@@ -118,29 +118,27 @@ router.put('/mark-as-read/:sender_id', async (req, res) => {
     }
 });
 
-// Route to search for users by username
+// Search route to find users by username and include pfp
 router.get('/search', async (req, res) => {
-    const { username } = req.query;
-    console.log(`Search query received: ${username}`); // Debug log
+    const username = req.query.username;
+    const currentUserId = req.session.userId;
 
     try {
         if (!username) {
-            console.log('No username provided'); // Log if username is empty
             return res.status(400).json({ message: 'Username query is required' });
         }
 
-        // Search users where the username matches the input, case-insensitively
         const { data: users, error } = await supabase
             .from('users')
-            .select('id, username')
-            .ilike('username', `%${username}%`); // Use case-insensitive search
+            .select('id, username, pfp') // Include 'pfp' here
+            .ilike('username', `%${username}%`)
+            .neq('id', currentUserId); // Exclude the current user
 
         if (error) throw error;
-        
-        console.log('Users found:', users); // Log the users found
+
         res.status(200).json(users);
     } catch (error) {
-        console.error('Error in /messages/search route:', error);
+        console.error('Error searching for users:', error);
         res.status(500).json({ message: 'Error searching for users' });
     }
 });
