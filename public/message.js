@@ -2,33 +2,61 @@ let selectedReceiverId = null;
 let debounceTimeout;
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (window.location.pathname === '/messages') {
-        loadConversations();
+    // Load existing conversations on page load
+    loadConversations();
 
-        const searchInput = document.getElementById('username-search');
-        const searchButton = document.getElementById('search-button'); // Search button
-        const messageForm = document.getElementById('message-form');
+    // Access the search input and search button elements
+    const searchInput = document.getElementById('username-search');
+    const searchButton = document.getElementById('search-button');
+    const messageForm = document.getElementById('message-form');
 
-        if (searchInput) {
-            searchInput.addEventListener('input', debounce(searchUser, 300)); // Debounce on input
-        }
+    // Event listener for search input with debounce
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(searchUser, 300));
+    }
 
-        if (searchButton) {
-            searchButton.addEventListener('click', searchUser); // Trigger search on button click
-        }
+    // Event listener for the search button
+    if (searchButton) {
+        searchButton.addEventListener('click', searchUser);
+    }
 
-        if (messageForm) {
-            messageForm.addEventListener('submit', sendMessage);
-        }
+    // Event listener for sending messages
+    if (messageForm) {
+        messageForm.addEventListener('submit', sendMessage);
     }
 });
 
-// Debounce function to delay search until user stops typing
+// Debounce function to limit the frequency of API calls while typing
 function debounce(func, delay) {
     return function (...args) {
         clearTimeout(debounceTimeout);
         debounceTimeout = setTimeout(() => func(...args), delay);
     };
+}
+
+// Function to load the user's conversations
+async function loadConversations() {
+    try {
+        const response = await fetch(`/messages/conversations`);
+        if (!response.ok) throw new Error('Failed to load conversations');
+        
+        const users = await response.json();
+        const conversationsSection = document.getElementById('conversations-section');
+        conversationsSection.innerHTML = ''; // Clear existing list
+
+        users.forEach(user => {
+            const conversationLink = document.createElement('div');
+            conversationLink.className = 'conversation';
+            conversationLink.textContent = user.username;
+            conversationLink.addEventListener('click', () => {
+                selectedReceiverId = user.id;
+                loadConversation(selectedReceiverId); // Load conversation when clicked
+            });
+            conversationsSection.appendChild(conversationLink);
+        });
+    } catch (error) {
+        console.error('Error loading conversations:', error);
+    }
 }
 
 // Function to search for users by username
@@ -37,7 +65,7 @@ async function searchUser() {
     const searchResults = document.getElementById('search-results');
 
     if (!username) {
-        searchResults.innerHTML = ''; // Clear results if input is empty
+        searchResults.innerHTML = '<div class="no-results">Enter a username to search</div>';
         return;
     }
 
@@ -46,7 +74,7 @@ async function searchUser() {
         const users = await response.json();
 
         searchResults.innerHTML = ''; // Clear previous results
-        console.log('Search results:', users); // Log the users to check the response
+        console.log('Search results:', users); // Debug log
 
         if (users.length === 0) {
             searchResults.innerHTML = '<div class="no-results">No users found</div>';
@@ -55,15 +83,22 @@ async function searchUser() {
                 const userElement = document.createElement('div');
                 userElement.className = 'search-result-item';
                 userElement.textContent = user.username;
+                userElement.addEventListener('click', () => {
+                    selectedReceiverId = user.id;
+                    loadConversation(selectedReceiverId); // Start chat on click
+                    searchResults.innerHTML = ''; // Clear search results
+                    document.getElementById('username-search').value = ''; // Clear input
+                });
                 searchResults.appendChild(userElement);
             });
         }
     } catch (error) {
         console.error('Error searching for user:', error);
+        searchResults.innerHTML = '<div class="no-results">Error retrieving search results</div>';
     }
 }
 
-// Function to load a specific conversation
+// Function to load a specific conversation between the user and the selected receiver
 async function loadConversation(receiverId) {
     try {
         const response = await fetch(`/messages/conversation/${receiverId}`);
@@ -71,7 +106,7 @@ async function loadConversation(receiverId) {
         
         const { messages } = await response.json();
         const messageDisplay = document.getElementById('message-display');
-        messageDisplay.innerHTML = '';
+        messageDisplay.innerHTML = ''; // Clear previous messages
 
         messages.forEach(message => {
             const messageElement = document.createElement('div');
@@ -84,7 +119,7 @@ async function loadConversation(receiverId) {
     }
 }
 
-// Function to send a new message
+// Function to send a new message to the selected receiver
 async function sendMessage(event) {
     event.preventDefault();
 
@@ -104,8 +139,8 @@ async function sendMessage(event) {
         });
 
         if (response.ok) {
-            loadConversation(selectedReceiverId); // Reload the conversation after sending
-            document.getElementById('message-input').value = ''; // Clear the input field
+            loadConversation(selectedReceiverId); // Reload conversation after sending
+            document.getElementById('message-input').value = ''; // Clear input field
         } else {
             console.error('Failed to send message');
         }
