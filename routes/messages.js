@@ -42,14 +42,10 @@ router.get('/conversations', async (req, res) => {
 // Route to send a message
 router.post('/send', async (req, res) => {
     const { receiver_id, message_content } = req.body;
-    const sender_id = req.session.userId; // Make sure this is populated correctly
+    const sender_id = req.session.userId; // Updated to use req.session.userId
 
-    console.log('Sender ID:', sender_id); // Debugging log
-    console.log('Receiver ID:', receiver_id); // Debugging log
-    console.log('Message content:', message_content); // Debugging log
-
-    if (!sender_id || !receiver_id || !message_content) {
-        return res.status(400).json({ message: 'Sender ID, receiver ID, and message content are required.' });
+    if (!receiver_id || !message_content) {
+        return res.status(400).json({ message: 'Receiver ID and message content are required.' });
     }
 
     try {
@@ -60,15 +56,13 @@ router.post('/send', async (req, res) => {
                 receiver_id,
                 message_content,
                 timestamp: new Date(),
-                status: false
-            }]);
+                status: false // Set as false for unread messages
+            }])
+            .select();
 
-        if (error) {
-            console.error('Database error:', error);
-            throw error;
-        }
+        if (error) throw error;
 
-        res.status(201).json({ message: 'Message sent', data });
+        res.status(201).json(data[0]); // Return the new message
     } catch (error) {
         console.error('Error sending message:', error);
         res.status(500).json({ message: 'Error sending message' });
