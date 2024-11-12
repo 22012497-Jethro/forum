@@ -111,4 +111,26 @@ router.get('/search', async (req, res) => {
     }
 });
 
+// Route to retrieve all messages in a conversation between the current user and the receiver
+router.get('/conversation/:receiver_id', async (req, res) => {
+    const sender_id = req.session.userId; // Current user
+    const { receiver_id } = req.params; // Selected receiver
+
+    try {
+        // Fetch all messages between sender and receiver
+        const { data: messages, error } = await supabase
+            .from('messages')
+            .select('*')
+            .or(`and(sender_id.eq.${sender_id},receiver_id.eq.${receiver_id}),and(sender_id.eq.${receiver_id},receiver_id.eq.${sender_id})`)
+            .order('created_at', { ascending: true });
+
+        if (error) throw error;
+
+        res.status(200).json({ messages }); // Send all messages to the frontend
+    } catch (error) {
+        console.error('Error retrieving conversation:', error);
+        res.status(500).json({ message: 'Error retrieving conversation' });
+    }
+});
+
 module.exports = router;
