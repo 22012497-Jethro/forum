@@ -5,21 +5,16 @@ document.addEventListener('DOMContentLoaded', () => {
     loadConversations();
 
     const searchInput = document.getElementById('username-search');
-    const searchButton = document.getElementById('search-button');
     const messageForm = document.getElementById('message-form');
 
     if (searchInput) {
         searchInput.addEventListener('input', debounce(searchUser, 300));
     }
 
-    if (searchButton) {
-        searchButton.addEventListener('click', searchUser);
-    }
-
     if (messageForm) {
         messageForm.addEventListener('submit', async (event) => {
             event.preventDefault();
-            await sendMessage(selectedReceiverId);
+            await sendMessage();
         });
     }
 });
@@ -43,9 +38,7 @@ async function loadConversations() {
         const conversationsSection = document.getElementById('conversations-section');
         conversationsSection.innerHTML = '';
 
-        users.forEach(user => {
-            addConversationToList(user);
-        });
+        users.forEach(user => addConversationToList(user));
     } catch (error) {
         console.error('Error loading conversations:', error);
     }
@@ -128,9 +121,7 @@ async function fetchAndDisplayMessages(receiverId) {
         const messageDisplay = document.getElementById('message-display');
         messageDisplay.innerHTML = '';
 
-        messages.forEach(message => {
-            displayMessage(message);
-        });
+        messages.forEach(message => displayMessage(message));
     } catch (error) {
         console.error('Error fetching messages:', error);
     }
@@ -139,30 +130,23 @@ async function fetchAndDisplayMessages(receiverId) {
 // Function to display a single message in the chat display
 function displayMessage(message) {
     const messageDisplay = document.getElementById('message-display');
-
     const messageElement = document.createElement('div');
+    
     messageElement.className = message.sender_id === selectedReceiverId ? 'message-received' : 'message-sent';
-    messageElement.textContent = message.message_content;
-
-    // Example display of read/unread (optional)
-    if (message.status === false) {
-        messageElement.classList.add('unread');
-    }
+    messageElement.textContent = message.content;
 
     messageDisplay.appendChild(messageElement);
     messageDisplay.scrollTop = messageDisplay.scrollHeight;
 }
 
 // Function to send a new message to the selected receiver
-async function sendMessage(event) {
-    event.preventDefault();
-
+async function sendMessage() {
     if (!selectedReceiverId) {
         console.error('No receiver selected');
         return;
     }
 
-    const content = document.getElementById('message-input').value.trim(); // Changed to 'content'
+    const content = document.getElementById('message-input').value.trim();
     if (!content) {
         console.error('Message content is empty');
         return;
@@ -174,16 +158,16 @@ async function sendMessage(event) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 receiver_id: selectedReceiverId,
-                content // Use 'content' instead of 'message_content'
+                content
             })
         });
 
         if (response.ok) {
             const newMessage = await response.json();
-            displayMessage(newMessage); // Function to display the new message in the UI
+            displayMessage(newMessage); // Display the new message in the UI
             document.getElementById('message-input').value = ''; // Clear the input field
         } else {
-            console.error('Failed to send message:', await response.text());
+            console.error('Failed to send message');
         }
     } catch (error) {
         console.error('Error sending message:', error);
