@@ -42,7 +42,7 @@ router.get('/conversations', async (req, res) => {
 // Route to send a message
 router.post('/send', async (req, res) => {
     const { receiver_id, message_content } = req.body;
-    const sender_id = req.session.userId; // Ensure you're using the correct session user ID
+    const sender_id = req.session.userId; // Ensure this is the correct way to get the sender ID
 
     if (!receiver_id || !message_content) {
         return res.status(400).json({ message: 'Receiver ID and message content are required.' });
