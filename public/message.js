@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Function to debounce search input (waits until the user stops typing)
+// Debounce function to delay search until user stops typing
 function debounce(func, delay) {
     return function (...args) {
         clearTimeout(debounceTimeout);
@@ -52,11 +52,12 @@ async function loadConversations() {
 }
 
 // Function to search for users by username
-// Function to search for users by username
 async function searchUser() {
     const username = document.getElementById('username-search').value.trim();
+    const searchResults = document.getElementById('search-results');
+
     if (!username) {
-        document.getElementById('search-results').innerHTML = ''; // Clear results if input is empty
+        searchResults.innerHTML = ''; // Clear results if input is empty
         return;
     }
 
@@ -65,7 +66,6 @@ async function searchUser() {
         if (!response.ok) throw new Error('Failed to search for user');
 
         const users = await response.json(); // Get the list of users from backend
-        const searchResults = document.getElementById('search-results');
         searchResults.innerHTML = ''; // Clear previous search results
 
         users.forEach(user => {
