@@ -5,28 +5,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load existing conversations on page load
     loadConversations();
 
-    // Access the search input and search button elements
     const searchInput = document.getElementById('username-search');
     const searchButton = document.getElementById('search-button');
     const messageForm = document.getElementById('message-form');
 
-    // Event listener for search input with debounce
     if (searchInput) {
         searchInput.addEventListener('input', debounce(searchUser, 300));
     }
 
-    // Event listener for the search button
     if (searchButton) {
         searchButton.addEventListener('click', searchUser);
     }
 
-    // Event listener for sending messages
     if (messageForm) {
         messageForm.addEventListener('submit', sendMessage);
     }
 });
 
-// Debounce function to limit the frequency of API calls while typing
+// Debounce function to limit the frequency of API calls
 function debounce(func, delay) {
     return function (...args) {
         clearTimeout(debounceTimeout);
@@ -42,20 +38,32 @@ async function loadConversations() {
         
         const users = await response.json();
         const conversationsSection = document.getElementById('conversations-section');
-        conversationsSection.innerHTML = ''; // Clear existing list
+        conversationsSection.innerHTML = '';
 
         users.forEach(user => {
-            const conversationLink = document.createElement('div');
-            conversationLink.className = 'conversation';
-            conversationLink.textContent = user.username;
-            conversationLink.addEventListener('click', () => {
-                selectedReceiverId = user.id;
-                loadConversation(selectedReceiverId); // Load conversation when clicked
-            });
-            conversationsSection.appendChild(conversationLink);
+            addConversationToList(user); // Use helper function to add to list
         });
     } catch (error) {
         console.error('Error loading conversations:', error);
+    }
+}
+
+// Helper function to add a user to the conversation list
+function addConversationToList(user) {
+    const conversationsSection = document.getElementById('conversations-section');
+    const existingUser = [...conversationsSection.children].find(child => child.textContent === user.username);
+
+    // Only add if the user doesn't already exist in the list
+    if (!existingUser) {
+        const conversationLink = document.createElement('div');
+        conversationLink.className = 'conversation';
+        conversationLink.textContent = user.username;
+        conversationLink.addEventListener('click', () => {
+            selectedReceiverId = user.id;
+            updateChatHeader(user); // Update chat header
+            loadConversation(selectedReceiverId); // Load conversation
+        });
+        conversationsSection.appendChild(conversationLink);
     }
 }
 
@@ -73,9 +81,7 @@ async function searchUser() {
         const response = await fetch(`/messages/search?username=${encodeURIComponent(username)}`);
         const users = await response.json();
 
-        searchResults.innerHTML = ''; // Clear previous results
-        console.log('Search results:', users); // Debug log
-
+        searchResults.innerHTML = '';
         if (users.length === 0) {
             searchResults.innerHTML = '<div class="no-results">No users found</div>';
         } else {
@@ -85,7 +91,9 @@ async function searchUser() {
                 userElement.textContent = user.username;
                 userElement.addEventListener('click', () => {
                     selectedReceiverId = user.id;
-                    loadConversation(selectedReceiverId); // Start chat on click
+                    updateChatHeader(user); // Update chat header with selected user
+                    loadConversation(selectedReceiverId);
+                    addConversationToList(user); // Add user to conversations list if not there
                     searchResults.innerHTML = ''; // Clear search results
                     document.getElementById('username-search').value = ''; // Clear input
                 });
@@ -96,6 +104,15 @@ async function searchUser() {
         console.error('Error searching for user:', error);
         searchResults.innerHTML = '<div class="no-results">Error retrieving search results</div>';
     }
+}
+
+// Function to update the chat header with selected user's profile picture and username
+function updateChatHeader(user) {
+    const chatHeader = document.getElementById('chat-header');
+    chatHeader.innerHTML = `
+        <img src="${user.pfp || 'default-profile.png'}" alt="Profile Picture" class="chat-profile-pic">
+        <span>${user.username}</span>
+    `;
 }
 
 // Function to load a specific conversation between the user and the selected receiver
@@ -129,7 +146,7 @@ async function sendMessage(event) {
     }
 
     const messageContent = document.getElementById('message-input').value;
-    if (!messageContent.trim()) return; // Prevent sending empty messages
+    if (!messageContent.trim()) return;
 
     try {
         const response = await fetch('/messages/send', {
