@@ -434,20 +434,28 @@ button {
 
 .message-sent {
     align-self: flex-end;
-    background-color: #d1e7dd;
+    background-color: #d1e7dd; /* Light green shade for sent messages */
+    color: #022D02; /* Dark green text for readability */
     text-align: right;
     border-top-right-radius: 5px;
     border-top-left-radius: 15px;
     border-bottom-left-radius: 15px;
+    padding: 10px 15px;
+    max-width: 60%;
+    word-wrap: break-word;
 }
 
 .message-received {
     align-self: flex-start;
-    background-color: #f8d7da;
+    background-color: #f8d7da; /* Light pink shade for received messages */
+    color: #022D02; /* Dark green text for readability */
     text-align: left;
     border-top-left-radius: 5px;
     border-top-right-radius: 15px;
     border-bottom-right-radius: 15px;
+    padding: 10px 15px;
+    max-width: 60%;
+    word-wrap: break-word;
 }
 
 #message-input {
@@ -469,6 +477,37 @@ button {
 
 #send-message:hover {
     background-color: #0056b3;
+}
+
+/* Dark Mode Styles */
+.dark-mode .message-display {
+    background-color: #022D02; /* Dark green for message display area */
+    border-color: #333;
+}
+
+.dark-mode .message-sent {
+    background-color: #74FF74; /* Light green for sent messages */
+    color: #022D02; /* Dark green text */
+}
+
+.dark-mode .message-received {
+    background-color: #333; /* Dark gray for received messages */
+    color: #ddd; /* Light text color for readability */
+}
+
+.dark-mode #message-input {
+    background-color: #333; /* Dark gray for message input */
+    color: #ddd; /* Light text color for input */
+    border-color: #555; /* Adjust border color to match dark mode */
+}
+
+.dark-mode #send-message {
+    background-color: #74FF74; /* Light green for send button */
+    color: #022D02;
+}
+
+.dark-mode #send-message:hover {
+    background-color: #4a90e2; /* Slightly darker blue-green on hover */
 }
 
 /* Responsive adjustments */
