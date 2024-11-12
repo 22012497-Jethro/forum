@@ -154,28 +154,42 @@ function displayMessage(message) {
 }
 
 // Function to send a new message to the selected receiver
-async function sendMessage(receiverId) {
-    const messageContent = document.getElementById('message-input').value.trim();
-    if (!messageContent) {
-        alert("Message cannot be empty.");
+async function sendMessage(event) {
+    event.preventDefault();
+
+    if (!selectedReceiverId) {
+        console.error('No receiver selected');
         return;
     }
+
+    const messageContent = document.getElementById('message-input').value.trim();
+    if (!messageContent) {
+        console.error('Message content is empty');
+        return;
+    }
+
+    console.log('Sending message to:', selectedReceiverId); // Debugging log
+    console.log('Message content:', messageContent); // Debugging log
 
     try {
         const response = await fetch('/messages/send', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ receiver_id: receiverId, message_content: messageContent })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                receiver_id: selectedReceiverId,
+                message_content: messageContent
+            })
         });
+
+        console.log('Response status:', response.status); // Check response status
 
         if (response.ok) {
             const newMessage = await response.json();
-            displayMessage(newMessage);
-            document.getElementById('message-input').value = '';
+            console.log("Message sent:", newMessage); // Verify response data
+            displayMessage(newMessage); // Display the new message in the UI
+            document.getElementById('message-input').value = ''; // Clear input field
         } else {
-            console.error('Failed to send message');
+            console.error('Failed to send message:', await response.text());
         }
     } catch (error) {
         console.error('Error sending message:', error);
