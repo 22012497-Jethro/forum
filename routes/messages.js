@@ -116,7 +116,7 @@ router.put('/mark-as-read/:sender_id', async (req, res) => {
     }
 });
 
-// Route to search users by username
+// Route to search users by username, including unmessaged users
 router.get('/search', async (req, res) => {
     if (!req.user || !req.user.id) {
         return res.status(401).json({ message: 'Unauthorized' });
@@ -130,7 +130,7 @@ router.get('/search', async (req, res) => {
             return res.status(400).json({ message: 'Username query is required' });
         }
 
-        // Perform a search in Supabase with a case-insensitive match
+        // Search for users with a case-insensitive match and exclude the current user
         const { data: users, error } = await supabase
             .from('users')
             .select('id, username')
