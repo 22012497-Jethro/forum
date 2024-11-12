@@ -147,7 +147,10 @@ async function sendMessage(event) {
     }
 
     const messageContent = document.getElementById('message-input').value.trim();
-    if (!messageContent) return; // Prevent sending empty messages
+    if (!messageContent) {
+        console.error('Message content is empty');
+        return;
+    }
 
     try {
         const response = await fetch('/messages/send', {
@@ -163,7 +166,8 @@ async function sendMessage(event) {
             loadConversation(selectedReceiverId); // Reload the conversation after sending
             document.getElementById('message-input').value = ''; // Clear the input field
         } else {
-            console.error('Failed to send message');
+            const errorData = await response.json();
+            console.error('Failed to send message:', errorData.message);
         }
     } catch (error) {
         console.error('Error sending message:', error);
