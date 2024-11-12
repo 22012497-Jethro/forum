@@ -149,8 +149,10 @@ async function sendMessage(event) {
         return;
     }
 
+    console.log('Sending message to:', selectedReceiverId); // Debugging log
+    console.log('Message content:', messageContent); // Debugging log
+
     try {
-        // Send the message to the server
         const response = await fetch('/messages/send', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -160,16 +162,11 @@ async function sendMessage(event) {
             })
         });
 
-        if (response.ok) {
-            // Clear the input field
-            document.getElementById('message-input').value = '';
+        console.log('Response status:', response.status); // Debugging log
 
-            // Append the new message to the chat window
-            appendMessageToChat({
-                sender_id: 'me', // Placeholder for "me"; in the database this would be the actual sender_id
-                message_content: messageContent,
-                timestamp: new Date().toLocaleTimeString()
-            });
+        if (response.ok) {
+            loadConversation(selectedReceiverId); // Reload conversation after sending
+            document.getElementById('message-input').value = ''; // Clear input
         } else {
             console.error('Failed to send message');
         }
