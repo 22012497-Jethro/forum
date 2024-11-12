@@ -1,14 +1,15 @@
 let selectedReceiverId = null;
+let debounceTimeout;
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (window.location.pathname === '/message') {
+    if (window.location.pathname === '/messages') {
         loadConversations();
 
-        const searchButton = document.getElementById('search-button'); // Ensure this button exists in HTML
+        const searchInput = document.getElementById('username-search');
         const messageForm = document.getElementById('message-form');
 
-        if (searchButton) {
-            searchButton.addEventListener('click', () => searchUser(1)); // Trigger search on button click
+        if (searchInput) {
+            searchInput.addEventListener('input', debounce(searchUser, 300)); // Debounce search input
         }
 
         if (messageForm) {
@@ -16,6 +17,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
+// Function to debounce search input (waits until the user stops typing)
+function debounce(func, delay) {
+    return function (...args) {
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(() => func(...args), delay);
+    };
+}
 
 // Function to load existing conversations
 async function loadConversations() {
@@ -25,7 +34,7 @@ async function loadConversations() {
         
         const users = await response.json();
         const conversationsSection = document.getElementById('conversations-section');
-        conversationsSection.innerHTML = ''; // Clear previous conversations
+        conversationsSection.innerHTML = '';
 
         users.forEach(user => {
             const conversationLink = document.createElement('div');
@@ -33,7 +42,7 @@ async function loadConversations() {
             conversationLink.textContent = user.username;
             conversationLink.addEventListener('click', () => {
                 selectedReceiverId = user.id;
-                loadConversation(selectedReceiverId); // Load the selected conversation
+                loadConversation(selectedReceiverId);
             });
             conversationsSection.appendChild(conversationLink);
         });
@@ -42,23 +51,21 @@ async function loadConversations() {
     }
 }
 
-// Function to search for users by username with pagination
-async function searchUser(page = 1) {
+// Function to search for users by username
+async function searchUser() {
     const username = document.getElementById('username-search').value.trim();
-    const searchResults = document.getElementById('search-results');
-    searchResults.innerHTML = ''; // Clear previous results
-
     if (!username) {
-        console.log('No search term entered.');
-        return; // Exit if no username is entered
+        document.getElementById('search-results').innerHTML = ''; // Clear results if input is empty
+        return;
     }
 
     try {
-        // Fetch users with search and pagination
-        const response = await fetch(`/messages/search?username=${encodeURIComponent(username)}&page=${page}&limit=5`);
+        const response = await fetch(`/messages/search?username=${encodeURIComponent(username)}`);
         if (!response.ok) throw new Error('Failed to search for user');
 
-        const { users, totalUsers } = await response.json();
+        const users = await response.json(); // Get the list of users from backend
+        const searchResults = document.getElementById('search-results');
+        searchResults.innerHTML = ''; // Clear previous search results
 
         users.forEach(user => {
             const userElement = document.createElement('div');
@@ -66,39 +73,22 @@ async function searchUser(page = 1) {
             userElement.textContent = user.username;
             userElement.addEventListener('click', () => {
                 selectedReceiverId = user.id;
-                loadConversation(selectedReceiverId); // Load conversation on selection
-                searchResults.innerHTML = ''; // Clear search results after selection
+                loadConversation(selectedReceiverId); // Start conversation on click
+                searchResults.innerHTML = ''; // Clear search results
                 document.getElementById('username-search').value = ''; // Clear search input
             });
             searchResults.appendChild(userElement);
         });
 
+        // Display "No users found" if there are no matches
         if (users.length === 0) {
             const noResults = document.createElement('div');
             noResults.className = 'no-results';
             noResults.textContent = 'No users found';
             searchResults.appendChild(noResults);
-        } else {
-            setupPagination(page, totalUsers, 5); // Setup pagination with total users and users per page
         }
     } catch (error) {
         console.error('Error searching for user:', error);
-    }
-}
-
-// Pagination setup
-function setupPagination(currentPage, totalUsers, usersPerPage) {
-    const paginationContainer = document.getElementById('pagination-container');
-    paginationContainer.innerHTML = ''; // Clear existing pagination
-
-    const totalPages = Math.ceil(totalUsers / usersPerPage);
-
-    for (let i = 1; i <= totalPages; i++) {
-        const pageButton = document.createElement('button');
-        pageButton.textContent = i;
-        pageButton.disabled = i === currentPage; // Disable the current page button
-        pageButton.addEventListener('click', () => searchUser(i)); // Trigger search with new page
-        paginationContainer.appendChild(pageButton);
     }
 }
 
@@ -107,10 +97,10 @@ async function loadConversation(receiverId) {
     try {
         const response = await fetch(`/messages/conversation/${receiverId}`);
         if (!response.ok) throw new Error('Failed to load conversation');
-
+        
         const { messages } = await response.json();
         const messageDisplay = document.getElementById('message-display');
-        messageDisplay.innerHTML = ''; // Clear previous messages
+        messageDisplay.innerHTML = '';
 
         messages.forEach(message => {
             const messageElement = document.createElement('div');
@@ -123,7 +113,7 @@ async function loadConversation(receiverId) {
     }
 }
 
-// Function to send a message
+// Function to send a new message
 async function sendMessage(event) {
     event.preventDefault();
 
