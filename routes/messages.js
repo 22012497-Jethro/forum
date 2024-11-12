@@ -60,7 +60,7 @@ router.post('/send', async (req, res) => {
                 receiver_id,
                 message_content,
                 timestamp: new Date(),
-                status: 'unread'
+                status: false
             }]);
 
         if (error) {
