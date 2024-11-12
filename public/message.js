@@ -197,10 +197,9 @@ function displayMessage(message) {
     const messageDisplay = document.getElementById('message-display');
 
     const messageElement = document.createElement('div');
-    // Determine if the message was sent by the current user or received
-    messageElement.className = message.sender_id === selectedReceiverId ? 'message-received' : 'message-sent';
+    messageElement.className = `message ${message.sender_id === selectedReceiverId ? 'message-received' : 'message-sent'}`;
     messageElement.textContent = message.content;
 
     messageDisplay.appendChild(messageElement);
-    messageDisplay.scrollTop = messageDisplay.scrollHeight; // Scroll to the latest message
+    messageDisplay.scrollTop = messageDisplay.scrollHeight;
 }
