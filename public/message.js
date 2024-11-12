@@ -6,10 +6,15 @@ document.addEventListener('DOMContentLoaded', () => {
         loadConversations();
 
         const searchInput = document.getElementById('username-search');
+        const searchButton = document.getElementById('search-button'); // Search button
         const messageForm = document.getElementById('message-form');
 
         if (searchInput) {
-            searchInput.addEventListener('input', debounce(searchUser, 300)); // Debounce search input
+            searchInput.addEventListener('input', debounce(searchUser, 300)); // Debounce on input
+        }
+
+        if (searchButton) {
+            searchButton.addEventListener('click', searchUser); // Trigger search on button click
         }
 
         if (messageForm) {
@@ -24,31 +29,6 @@ function debounce(func, delay) {
         clearTimeout(debounceTimeout);
         debounceTimeout = setTimeout(() => func(...args), delay);
     };
-}
-
-// Function to load existing conversations
-async function loadConversations() {
-    try {
-        const response = await fetch(`/messages/conversations`);
-        if (!response.ok) throw new Error('Failed to load conversations');
-        
-        const users = await response.json();
-        const conversationsSection = document.getElementById('conversations-section');
-        conversationsSection.innerHTML = '';
-
-        users.forEach(user => {
-            const conversationLink = document.createElement('div');
-            conversationLink.className = 'conversation';
-            conversationLink.textContent = user.username;
-            conversationLink.addEventListener('click', () => {
-                selectedReceiverId = user.id;
-                loadConversation(selectedReceiverId);
-            });
-            conversationsSection.appendChild(conversationLink);
-        });
-    } catch (error) {
-        console.error('Error loading conversations:', error);
-    }
 }
 
 // Function to search for users by username
@@ -75,8 +55,8 @@ async function searchUser() {
             userElement.addEventListener('click', () => {
                 selectedReceiverId = user.id;
                 loadConversation(selectedReceiverId);
-                searchResults.innerHTML = '';
-                document.getElementById('username-search').value = '';
+                searchResults.innerHTML = ''; // Clear results on selection
+                document.getElementById('username-search').value = ''; // Clear search input
             });
             searchResults.appendChild(userElement);
         });
