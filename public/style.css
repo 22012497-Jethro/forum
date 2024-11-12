@@ -488,6 +488,33 @@ button {
     font-style: italic;
 }
 
+.message-sent {
+    text-align: right;
+    background-color: #d1e7dd;
+    padding: 8px;
+    margin: 5px;
+    border-radius: 10px;
+    max-width: 60%;
+    align-self: flex-end;
+}
+
+.message-received {
+    text-align: left;
+    background-color: #f8d7da;
+    padding: 8px;
+    margin: 5px;
+    border-radius: 10px;
+    max-width: 60%;
+    align-self: flex-start;
+}
+
+#message-display {
+    overflow-y: auto;
+    height: 400px; /* Adjust as needed */
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     nav {
