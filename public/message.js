@@ -108,14 +108,13 @@ async function searchUser() {
 
 // Function to update the chat header with selected user's profile picture and username
 function updateChatHeader(user) {
-    const profilePictureUrl = user.pfp ? `/uploads/${user.pfp}` : 'default-profile.png'; // Adjust path if necessary
+    const profilePictureUrl = user.pfp ? user.pfp : 'default-profile.png';
     const chatHeader = document.getElementById('chat-header');
     chatHeader.innerHTML = `
         <img src="${profilePictureUrl}" alt="Profile Picture" class="chat-profile-pic">
         <span>${user.username}</span>
     `;
 }
-
 
 // Function to load a specific conversation between the user and the selected receiver
 async function loadConversation(receiverId) {
