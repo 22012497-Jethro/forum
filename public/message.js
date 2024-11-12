@@ -1,5 +1,4 @@
 let selectedReceiverId = null;
-let debounceTimeout;
 
 document.addEventListener('DOMContentLoaded', () => {
     // Load existing conversations on page load
@@ -18,12 +17,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (messageForm) {
-        messageForm.addEventListener('submit', sendMessage);
+        messageForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            await sendMessage(selectedReceiverId);
+        });
     }
 });
 
 // Debounce function to limit the frequency of API calls
 function debounce(func, delay) {
+    let debounceTimeout;
     return function (...args) {
         clearTimeout(debounceTimeout);
         debounceTimeout = setTimeout(() => func(...args), delay);
@@ -41,7 +44,7 @@ async function loadConversations() {
         conversationsSection.innerHTML = '';
 
         users.forEach(user => {
-            addConversationToList(user); // Use helper function to add to list
+            addConversationToList(user);
         });
     } catch (error) {
         console.error('Error loading conversations:', error);
@@ -53,15 +56,14 @@ function addConversationToList(user) {
     const conversationsSection = document.getElementById('conversations-section');
     const existingUser = [...conversationsSection.children].find(child => child.textContent === user.username);
 
-    // Only add if the user doesn't already exist in the list
     if (!existingUser) {
         const conversationLink = document.createElement('div');
         conversationLink.className = 'conversation';
         conversationLink.textContent = user.username;
         conversationLink.addEventListener('click', () => {
             selectedReceiverId = user.id;
-            updateChatHeader(user); // Update chat header
-            loadConversation(selectedReceiverId); // Load conversation
+            updateChatHeader(user);
+            fetchAndDisplayMessages(selectedReceiverId);
         });
         conversationsSection.appendChild(conversationLink);
     }
@@ -91,11 +93,11 @@ async function searchUser() {
                 userElement.textContent = user.username;
                 userElement.addEventListener('click', () => {
                     selectedReceiverId = user.id;
-                    updateChatHeader(user); // Update chat header with selected user
-                    loadConversation(selectedReceiverId);
-                    addConversationToList(user); // Add user to conversations list if not there
-                    searchResults.innerHTML = ''; // Clear search results
-                    document.getElementById('username-search').value = ''; // Clear input
+                    updateChatHeader(user);
+                    fetchAndDisplayMessages(selectedReceiverId);
+                    addConversationToList(user);
+                    searchResults.innerHTML = '';
+                    document.getElementById('username-search').value = '';
                 });
                 searchResults.appendChild(userElement);
             });
@@ -116,78 +118,61 @@ function updateChatHeader(user) {
     `;
 }
 
-// Function to load a specific conversation between the user and the selected receiver
-async function loadConversation(receiverId) {
+// Function to fetch and display messages for the selected conversation
+async function fetchAndDisplayMessages(receiverId) {
     try {
         const response = await fetch(`/messages/conversation/${receiverId}`);
-        if (!response.ok) throw new Error('Failed to load conversation');
-        
+        if (!response.ok) throw new Error('Failed to load messages');
+
         const { messages } = await response.json();
         const messageDisplay = document.getElementById('message-display');
-        messageDisplay.innerHTML = ''; // Clear previous messages
+        messageDisplay.innerHTML = '';
 
         messages.forEach(message => {
-            appendMessageToChat(message); // Use appendMessageToChat to add each message
+            displayMessage(message);
         });
     } catch (error) {
-        console.error('Error loading conversation:', error);
+        console.error('Error fetching messages:', error);
     }
 }
 
-// Function to send a new message to the selected receiver and update the chat window
-async function sendMessage(event) {
-    event.preventDefault();
+// Function to display a single message in the chat display
+function displayMessage(message) {
+    const messageDisplay = document.getElementById('message-display');
 
-    if (!selectedReceiverId) {
-        console.error('No receiver selected');
-        return;
-    }
+    const messageElement = document.createElement('div');
+    messageElement.className = message.sender_id === selectedReceiverId ? 'message-received' : 'message-sent';
+    messageElement.textContent = message.message_content;
 
+    messageDisplay.appendChild(messageElement);
+    messageDisplay.scrollTop = messageDisplay.scrollHeight;
+}
+
+// Function to send a new message to the selected receiver
+async function sendMessage(receiverId) {
     const messageContent = document.getElementById('message-input').value.trim();
     if (!messageContent) {
-        console.error('Message content is empty');
+        alert("Message cannot be empty.");
         return;
     }
-
-    console.log('Sending message to:', selectedReceiverId); // Debugging log
-    console.log('Message content:', messageContent); // Debugging log
 
     try {
         const response = await fetch('/messages/send', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                receiver_id: selectedReceiverId,
-                message_content: messageContent
-            })
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ receiver_id: receiverId, message_content: messageContent })
         });
-
-        console.log('Response status:', response.status); // Debugging log
 
         if (response.ok) {
             const newMessage = await response.json();
-            appendMessageToChat(newMessage); // Append new message to chat without reloading
-            document.getElementById('message-input').value = ''; // Clear input
+            displayMessage(newMessage);
+            document.getElementById('message-input').value = '';
         } else {
             console.error('Failed to send message');
         }
     } catch (error) {
         console.error('Error sending message:', error);
     }
-}
-
-// Function to append a new message to the chat display
-function appendMessageToChat(message) {
-    const messageDisplay = document.getElementById('message-display');
-    
-    // Create a message element based on the sender
-    const messageElement = document.createElement('div');
-    messageElement.className = message.sender_id === selectedReceiverId ? 'message-received' : 'message-sent';
-    messageElement.textContent = message.message_content;
-
-    // Append to the message display
-    messageDisplay.appendChild(messageElement);
-
-    // Scroll to the bottom to view the latest message
-    messageDisplay.scrollTop = messageDisplay.scrollHeight;
 }
