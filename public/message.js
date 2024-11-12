@@ -165,7 +165,8 @@ async function sendMessage(event) {
         console.log('Response status:', response.status); // Debugging log
 
         if (response.ok) {
-            loadConversation(selectedReceiverId); // Reload conversation after sending
+            const newMessage = await response.json();
+            appendMessageToChat(newMessage); // Append new message to chat without reloading
             document.getElementById('message-input').value = ''; // Clear input
         } else {
             console.error('Failed to send message');
@@ -181,7 +182,7 @@ function appendMessageToChat(message) {
     
     // Create a message element based on the sender
     const messageElement = document.createElement('div');
-    messageElement.className = message.sender_id === 'me' ? 'message-sent' : 'message-received';
+    messageElement.className = message.sender_id === selectedReceiverId ? 'message-received' : 'message-sent';
     messageElement.textContent = message.message_content;
 
     // Append to the message display
