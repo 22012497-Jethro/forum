@@ -162,8 +162,8 @@ async function sendMessage(event) {
         return;
     }
 
-    const messageContent = document.getElementById('message-input').value.trim();
-    if (!messageContent) {
+    const content = document.getElementById('message-input').value.trim(); // Changed to 'content'
+    if (!content) {
         console.error('Message content is empty');
         return;
     }
@@ -174,7 +174,7 @@ async function sendMessage(event) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 receiver_id: selectedReceiverId,
-                message_content: messageContent
+                content // Use 'content' instead of 'message_content'
             })
         });
 
