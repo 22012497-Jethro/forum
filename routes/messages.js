@@ -15,17 +15,30 @@ router.get('/conversations', async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('messages')
-            .select('receiver_id, sender_id')
-            .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`);
+            .select('receiver_id, sender_id, message_content, timestamp')
+            .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+            .order('timestamp', { ascending: false });
 
         if (error) throw error;
 
-        // Extract unique user IDs involved in conversations
-        const userIds = [...new Set(data.map(msg => 
-            msg.sender_id === userId ? msg.receiver_id : msg.sender_id
-        ))];
+        const uniqueConversations = [];
+        const seenUsers = new Set();
 
-        // Fetch user details including profile picture
+        // Loop through messages to get only the latest message per user
+        data.forEach(msg => {
+            const otherUserId = msg.sender_id === userId ? msg.receiver_id : msg.sender_id;
+            if (!seenUsers.has(otherUserId)) {
+                seenUsers.add(otherUserId);
+                uniqueConversations.push({
+                    userId: otherUserId,
+                    lastMessage: msg.message_content,
+                    timestamp: msg.timestamp
+                });
+            }
+        });
+
+        // Fetch user details based on unique user IDs
+        const userIds = uniqueConversations.map(conv => conv.userId);
         const { data: users, error: userError } = await supabase
             .from('users')
             .select('id, username, pfp')
@@ -33,8 +46,21 @@ router.get('/conversations', async (req, res) => {
 
         if (userError) throw userError;
 
-        res.status(200).json(users);
+        // Map the usernames and profile pictures to the unique conversations
+        const conversations = uniqueConversations.map(conv => {
+            const user = users.find(u => u.id === conv.userId);
+            return {
+                userId: conv.userId,
+                username: user.username,
+                pfp: user.pfp,
+                lastMessage: conv.lastMessage,
+                timestamp: conv.timestamp
+            };
+        });
+
+        res.status(200).json(conversations);
     } catch (error) {
+        console.error('Error fetching conversations:', error);
         res.status(500).json({ message: 'Error fetching conversations' });
     }
 });
