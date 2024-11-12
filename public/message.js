@@ -163,13 +163,30 @@ async function sendMessage() {
         });
 
         if (response.ok) {
-            const newMessage = await response.json();
-            displayMessage(newMessage); // Display the new message in the UI
+            const newMessage = await response.json(); // Get the stored message from the server
+            displayMessage(newMessage); // Display the new message immediately in the UI
             document.getElementById('message-input').value = ''; // Clear the input field
         } else {
             console.error('Failed to send message');
         }
     } catch (error) {
         console.error('Error sending message:', error);
+    }
+}
+
+// Function to fetch and display messages for the selected conversation
+async function fetchAndDisplayMessages(receiverId) {
+    try {
+        const response = await fetch(`/messages/conversation/${receiverId}`);
+        if (!response.ok) throw new Error('Failed to load messages');
+
+        const { messages } = await response.json(); // Ensure this fetches all past messages
+        const messageDisplay = document.getElementById('message-display');
+        messageDisplay.innerHTML = ''; // Clear previous messages
+
+        // Display all messages between the current user and the selected receiver
+        messages.forEach(message => displayMessage(message));
+    } catch (error) {
+        console.error('Error fetching messages:', error);
     }
 }
