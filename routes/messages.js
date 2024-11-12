@@ -13,6 +13,7 @@ router.get('/conversations', async (req, res) => {
     if (!req.user || !req.user.id) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
+    
     const userId = req.user.id;
 
     try {
@@ -45,6 +46,7 @@ router.post('/send', async (req, res) => {
     if (!req.user || !req.user.id) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
+    
     const sender_id = req.user.id;
     const { receiver_id, message_content } = req.body;
 
@@ -76,6 +78,7 @@ router.get('/conversation/:receiver_id', async (req, res) => {
     if (!req.user || !req.user.id) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
+    
     const sender_id = req.user.id;
     const { receiver_id } = req.params;
 
@@ -99,6 +102,7 @@ router.put('/mark-as-read/:sender_id', async (req, res) => {
     if (!req.user || !req.user.id) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
+    
     const receiver_id = req.user.id;
     const { sender_id } = req.params;
 
