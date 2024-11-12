@@ -121,20 +121,22 @@ router.put('/mark-as-read/:sender_id', async (req, res) => {
 });
 
 // Route to search users by username, including unmessaged users
-// Route to search for users by username
 router.get('/search', async (req, res) => {
     const { username } = req.query;
+    console.log(`Search query received: ${username}`); // Log received search term
 
     try {
         if (!username) {
+            console.log('No username provided'); // Log if username is empty
             return res.status(400).json({ message: 'Username query is required' });
         }
 
         const { data: users, error } = await supabase
             .from('users')
             .select('id, username')
-            .ilike('username', `%${username}%`); // Case-insensitive search for the username
+            .ilike('username', `%${username}%`);
 
+        console.log('Users found:', users); // Log the retrieved users
         if (error) throw error;
 
         res.status(200).json(users);
