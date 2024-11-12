@@ -138,6 +138,7 @@ async function loadConversation(receiverId) {
 }
 
 // Function to send a new message to the selected receiver
+// Function to send a new message to the selected receiver and update the chat window
 async function sendMessage(event) {
     event.preventDefault();
 
@@ -153,6 +154,7 @@ async function sendMessage(event) {
     }
 
     try {
+        // Send the message to the server
         const response = await fetch('/messages/send', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -163,13 +165,35 @@ async function sendMessage(event) {
         });
 
         if (response.ok) {
-            loadConversation(selectedReceiverId); // Reload the conversation after sending
-            document.getElementById('message-input').value = ''; // Clear the input field
+            // Clear the input field
+            document.getElementById('message-input').value = '';
+
+            // Append the new message to the chat window
+            appendMessageToChat({
+                sender_id: 'me', // Placeholder for "me"; in the database this would be the actual sender_id
+                message_content: messageContent,
+                timestamp: new Date().toLocaleTimeString()
+            });
         } else {
-            const errorData = await response.json();
-            console.error('Failed to send message:', errorData.message);
+            console.error('Failed to send message');
         }
     } catch (error) {
         console.error('Error sending message:', error);
     }
+}
+
+// Function to append a new message to the chat display
+function appendMessageToChat(message) {
+    const messageDisplay = document.getElementById('message-display');
+    
+    // Create a message element based on the sender
+    const messageElement = document.createElement('div');
+    messageElement.className = message.sender_id === 'me' ? 'message-sent' : 'message-received';
+    messageElement.textContent = message.message_content;
+
+    // Append to the message display
+    messageDisplay.appendChild(messageElement);
+
+    // Scroll to the bottom to view the latest message
+    messageDisplay.scrollTop = messageDisplay.scrollHeight;
 }
