@@ -481,7 +481,7 @@ button {
 
 /* Dark Mode Styles */
 .dark-mode .message-display {
-    background-color: #022D02; /* Dark green for message display area */
+    background-color: #444; /* Dark green for message display area */
     border-color: #333;
 }
 
@@ -491,7 +491,7 @@ button {
 }
 
 .dark-mode .message-received {
-    background-color: #333; /* Dark gray for received messages */
+    background-color: #db3040; /*Red for received messages */
     color: #ddd; /* Light text color for readability */
 }
 
