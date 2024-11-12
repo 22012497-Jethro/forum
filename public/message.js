@@ -43,22 +43,47 @@ async function loadConversations() {
         console.error('Error loading conversations:', error);
     }
 }
+// Function to format timestamp
+function formatTimestamp(timestamp) {
+    const messageDate = new Date(timestamp);
+    const today = new Date();
+    const isToday = messageDate.toDateString() === today.toDateString();
 
-// Helper function to add a user to the conversation list
-function addConversationToList(user) {
+    if (isToday) {
+        return messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else {
+        return messageDate.toLocaleDateString();
+    }
+}
+
+// Update addConversationToList to show the last message and timestamp
+function addConversationToList(conversation) {
     const conversationsSection = document.getElementById('conversations-section');
-    const existingUser = [...conversationsSection.children].find(child => child.textContent === user.username);
+    const existingUser = [...conversationsSection.children].find(child => child.dataset.userId === conversation.userId);
 
     if (!existingUser) {
-        const conversationLink = document.createElement('div');
-        conversationLink.className = 'conversation';
-        conversationLink.textContent = user.username;
-        conversationLink.addEventListener('click', () => {
-            selectedReceiverId = user.id;
-            updateChatHeader(user);
+        const conversationDiv = document.createElement('div');
+        conversationDiv.className = 'conversation';
+        conversationDiv.dataset.userId = conversation.userId;
+
+        conversationDiv.innerHTML = `
+            <div class="conversation-header">
+                <img src="${conversation.pfp || 'default-profile.png'}" alt="Profile Picture" class="conversation-profile-pic">
+                <div>
+                    <span class="conversation-username">${conversation.username}</span>
+                    <span class="conversation-timestamp">${formatTimestamp(conversation.timestamp)}</span>
+                </div>
+            </div>
+            <p class="conversation-last-message">${conversation.lastMessage || 'No messages yet.'}</p>
+        `;
+
+        conversationDiv.addEventListener('click', () => {
+            selectedReceiverId = conversation.userId;
+            updateChatHeader(conversation);
             fetchAndDisplayMessages(selectedReceiverId);
         });
-        conversationsSection.appendChild(conversationLink);
+
+        conversationsSection.appendChild(conversationDiv);
     }
 }
 
