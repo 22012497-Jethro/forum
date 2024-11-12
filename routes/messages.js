@@ -121,6 +121,7 @@ router.get('/search', async (req, res) => {
     if (!req.user || !req.user.id) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
+    
     const username = req.query.username;
     const currentUserId = req.user.id;
 
@@ -129,15 +130,16 @@ router.get('/search', async (req, res) => {
             return res.status(400).json({ message: 'Username query is required' });
         }
 
+        // Perform a search in Supabase with a case-insensitive match
         const { data: users, error } = await supabase
             .from('users')
             .select('id, username')
-            .ilike('username', `%${username}%`)
-            .neq('id', currentUserId);
+            .ilike('username', `%${username}%`) // Case-insensitive search
+            .neq('id', currentUserId); // Exclude the current user from results
 
         if (error) throw error;
 
-        res.status(200).json(users);
+        res.status(200).json(users); // Return found users
     } catch (error) {
         console.error('Error searching for users:', error);
         res.status(500).json({ message: 'Error searching for users' });
