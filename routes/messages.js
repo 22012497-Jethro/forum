@@ -13,32 +13,26 @@ router.get('/conversations', async (req, res) => {
     const userId = req.session.userId;
 
     try {
-        const { data, error } = await supabase
+        // Fetch messages for the user, ordered by created_at descending (latest first)
+        const { data: messages, error } = await supabase
             .from('messages')
-            .select('receiver_id, sender_id, message_content, timestamp')
+            .select('sender_id, receiver_id, content, created_at')
             .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
-            .order('timestamp', { ascending: false });
+            .order('created_at', { ascending: false });
 
         if (error) throw error;
 
-        const uniqueConversations = [];
-        const seenUsers = new Set();
-
-        // Loop through messages to get only the latest message per user
-        data.forEach(msg => {
-            const otherUserId = msg.sender_id === userId ? msg.receiver_id : msg.sender_id;
-            if (!seenUsers.has(otherUserId)) {
-                seenUsers.add(otherUserId);
-                uniqueConversations.push({
-                    userId: otherUserId,
-                    lastMessage: msg.message_content,
-                    timestamp: msg.timestamp
-                });
+        // Extract unique conversation partners with their latest message
+        const conversationsMap = new Map();
+        messages.forEach((message) => {
+            const otherUserId = message.sender_id === userId ? message.receiver_id : message.sender_id;
+            if (!conversationsMap.has(otherUserId)) {
+                conversationsMap.set(otherUserId, message); // Store the latest message for each conversation
             }
         });
 
-        // Fetch user details based on unique user IDs
-        const userIds = uniqueConversations.map(conv => conv.userId);
+        // Fetch user details for each conversation partner
+        const userIds = Array.from(conversationsMap.keys());
         const { data: users, error: userError } = await supabase
             .from('users')
             .select('id, username, pfp')
@@ -46,15 +40,15 @@ router.get('/conversations', async (req, res) => {
 
         if (userError) throw userError;
 
-        // Map the usernames and profile pictures to the unique conversations
-        const conversations = uniqueConversations.map(conv => {
-            const user = users.find(u => u.id === conv.userId);
+        // Combine user details with the latest message for each conversation
+        const conversations = users.map((user) => {
+            const message = conversationsMap.get(user.id);
             return {
-                userId: conv.userId,
+                userId: user.id,
                 username: user.username,
-                pfp: user.pfp,
-                lastMessage: conv.lastMessage,
-                timestamp: conv.timestamp
+                pfp: user.pfp || 'default-profile.png',
+                lastMessage: message.content,
+                timestamp: message.created_at,
             };
         });
 
@@ -90,6 +84,7 @@ router.post('/send', async (req, res) => {
 
         res.status(201).json(data[0]);
     } catch (error) {
+        console.error('Error sending message:', error);
         res.status(500).json({ message: 'Error sending message' });
     }
 });
