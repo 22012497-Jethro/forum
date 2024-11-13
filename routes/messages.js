@@ -13,26 +13,25 @@ router.get('/conversations', async (req, res) => {
     const userId = req.session.userId;
 
     try {
-        // Fetch messages for the user, ordered by created_at descending (latest first)
-        const { data: messages, error } = await supabase
+        const { data, error } = await supabase
             .from('messages')
-            .select('sender_id, receiver_id, content, created_at')
+            .select('receiver_id, sender_id, content, created_at')
             .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
             .order('created_at', { ascending: false });
 
         if (error) throw error;
 
-        // Extract unique conversation partners with their latest message
-        const conversationsMap = new Map();
-        messages.forEach((message) => {
-            const otherUserId = message.sender_id === userId ? message.receiver_id : message.sender_id;
-            if (!conversationsMap.has(otherUserId)) {
-                conversationsMap.set(otherUserId, message); // Store the latest message for each conversation
+        // Process unique user IDs and last message
+        const conversations = {};
+        data.forEach(msg => {
+            const otherUserId = msg.sender_id === userId ? msg.receiver_id : msg.sender_id;
+            if (!conversations[otherUserId]) {
+                conversations[otherUserId] = { userId: otherUserId, lastMessage: msg.content, lastTimestamp: msg.created_at };
             }
         });
 
-        // Fetch user details for each conversation partner
-        const userIds = Array.from(conversationsMap.keys());
+        // Fetch user details including profile pictures
+        const userIds = Object.keys(conversations);
         const { data: users, error: userError } = await supabase
             .from('users')
             .select('id, username, pfp')
@@ -40,21 +39,14 @@ router.get('/conversations', async (req, res) => {
 
         if (userError) throw userError;
 
-        // Combine user details with the latest message for each conversation
-        const conversations = users.map((user) => {
-            const message = conversationsMap.get(user.id);
-            return {
-                userId: user.id,
-                username: user.username,
-                pfp: user.pfp || 'default-profile.png',
-                lastMessage: message.content,
-                timestamp: message.created_at,
-            };
-        });
+        // Attach user details to conversations
+        const conversationList = userIds.map(id => ({
+            ...conversations[id],
+            ...users.find(user => user.id === parseInt(id))
+        }));
 
-        res.status(200).json(conversations);
+        res.status(200).json(conversationList);
     } catch (error) {
-        console.error('Error fetching conversations:', error);
         res.status(500).json({ message: 'Error fetching conversations' });
     }
 });
@@ -64,35 +56,20 @@ router.post('/send', async (req, res) => {
     const { receiver_id, content } = req.body;
     const sender_id = req.session.userId;
 
-    // Check if sender_id is available
-    if (!sender_id) {
-        console.error('Sender ID not found in session.');
-        return res.status(401).json({ message: 'User not authenticated' });
-    }
-
-    // Validate receiver_id and content
     if (!receiver_id || !content) {
-        console.error('Receiver ID or message content missing.');
         return res.status(400).json({ message: 'Receiver ID and message content are required.' });
     }
 
     try {
         const { data, error } = await supabase
             .from('messages')
-            .insert([{
-                sender_id,
-                receiver_id,
-                content,
-                status: false, // Unread status
-                created_at: new Date() // Timestamp
-            }])
+            .insert([{ sender_id, receiver_id, content, status: false, created_at: new Date() }])
             .select();
 
         if (error) throw error;
 
         res.status(201).json(data[0]);
     } catch (error) {
-        console.error('Error sending message:', error);
         res.status(500).json({ message: 'Error sending message' });
     }
 });
@@ -105,8 +82,8 @@ router.put('/mark-as-read/:sender_id', async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('messages')
-            .update({ status: true }) // Mark as read
-            .match({ sender_id, receiver_id, status: false }); // Match only unread messages
+            .update({ status: true })
+            .match({ sender_id, receiver_id, status: false });
 
         if (error) throw error;
 
@@ -116,7 +93,7 @@ router.put('/mark-as-read/:sender_id', async (req, res) => {
     }
 });
 
-// Route to search users by username and include profile picture
+// Route to search users by username
 router.get('/search', async (req, res) => {
     const username = req.query.username;
     const currentUserId = req.session.userId;
@@ -130,7 +107,7 @@ router.get('/search', async (req, res) => {
             .from('users')
             .select('id, username, pfp')
             .ilike('username', `%${username}%`)
-            .neq('id', currentUserId); // Exclude the current user
+            .neq('id', currentUserId);
 
         if (error) throw error;
 
@@ -140,13 +117,12 @@ router.get('/search', async (req, res) => {
     }
 });
 
-// Route to retrieve all messages in a conversation between the current user and the receiver
+// Route to retrieve all messages in a conversation with timestamps
 router.get('/conversation/:receiver_id', async (req, res) => {
-    const sender_id = req.session.userId; // Current user
-    const { receiver_id } = req.params; // Selected receiver
+    const sender_id = req.session.userId;
+    const { receiver_id } = req.params;
 
     try {
-        // Fetch all messages between sender and receiver
         const { data: messages, error } = await supabase
             .from('messages')
             .select('*')
@@ -155,9 +131,8 @@ router.get('/conversation/:receiver_id', async (req, res) => {
 
         if (error) throw error;
 
-        res.status(200).json({ messages }); // Send all messages to the frontend
+        res.status(200).json({ messages });
     } catch (error) {
-        console.error('Error retrieving conversation:', error);
         res.status(500).json({ message: 'Error retrieving conversation' });
     }
 });
