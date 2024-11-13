@@ -43,6 +43,7 @@ async function loadConversations() {
         console.error('Error loading conversations:', error);
     }
 }
+
 // Function to format timestamp
 function formatTimestamp(timestamp) {
     const messageDate = new Date(timestamp);
