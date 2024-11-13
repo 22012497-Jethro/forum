@@ -64,7 +64,15 @@ router.post('/send', async (req, res) => {
     const { receiver_id, content } = req.body;
     const sender_id = req.session.userId;
 
+    // Check if sender_id is available
+    if (!sender_id) {
+        console.error('Sender ID not found in session.');
+        return res.status(401).json({ message: 'User not authenticated' });
+    }
+
+    // Validate receiver_id and content
     if (!receiver_id || !content) {
+        console.error('Receiver ID or message content missing.');
         return res.status(400).json({ message: 'Receiver ID and message content are required.' });
     }
 
