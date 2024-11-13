@@ -13,7 +13,7 @@ router.get('/conversations', async (req, res) => {
     const userId = req.session.userId;
 
     try {
-        const { data, error } = await supabase
+        const { data: conversations, error } = await supabase
             .from('messages')
             .select('receiver_id, sender_id, content, created_at')
             .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
@@ -21,17 +21,21 @@ router.get('/conversations', async (req, res) => {
 
         if (error) throw error;
 
-        // Process unique user IDs and last message
-        const conversations = {};
-        data.forEach(msg => {
-            const otherUserId = msg.sender_id === userId ? msg.receiver_id : msg.sender_id;
-            if (!conversations[otherUserId]) {
-                conversations[otherUserId] = { userId: otherUserId, lastMessage: msg.content, lastTimestamp: msg.created_at };
+        // Extract unique user IDs and their latest message for conversations
+        const userConversations = {};
+        conversations.forEach((message) => {
+            const otherUserId = message.sender_id === userId ? message.receiver_id : message.sender_id;
+            if (!userConversations[otherUserId]) {
+                userConversations[otherUserId] = {
+                    id: otherUserId,
+                    last_message: message.content,
+                    last_message_time: message.created_at,
+                };
             }
         });
 
-        // Fetch user details including profile pictures
-        const userIds = Object.keys(conversations);
+        // Fetch user details for each unique user ID in the conversations
+        const userIds = Object.keys(userConversations);
         const { data: users, error: userError } = await supabase
             .from('users')
             .select('id, username, pfp')
@@ -39,14 +43,18 @@ router.get('/conversations', async (req, res) => {
 
         if (userError) throw userError;
 
-        // Attach user details to conversations
-        const conversationList = userIds.map(id => ({
-            ...conversations[id],
-            ...users.find(user => user.id === parseInt(id))
-        }));
+        // Attach username and profile picture to each conversation
+        users.forEach(user => {
+            if (userConversations[user.id]) {
+                userConversations[user.id].username = user.username;
+                userConversations[user.id].pfp = user.pfp || 'default-profile.png';
+            }
+        });
 
-        res.status(200).json(conversationList);
+        // Send the conversation data as an array
+        res.status(200).json(Object.values(userConversations));
     } catch (error) {
+        console.error('Error fetching conversations:', error);
         res.status(500).json({ message: 'Error fetching conversations' });
     }
 });
