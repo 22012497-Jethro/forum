@@ -47,37 +47,34 @@ async function loadConversations() {
 // Helper function to add a user to the conversation list with the last message and timestamp
 function addConversationToList(conversation) {
     const conversationsSection = document.getElementById('conversations-section');
-    
-    // Check if this user is already in the conversation list
-    const existingUser = [...conversationsSection.children].find(child => child.dataset.userId === conversation.id);
 
-    if (!existingUser) {
-        const conversationLink = document.createElement('div');
-        conversationLink.className = 'conversation';
-        conversationLink.dataset.userId = conversation.id; // Set user ID for easy retrieval
+    const conversationLink = document.createElement('div');
+    conversationLink.className = 'conversation';
+    conversationLink.dataset.userId = conversation.id; // Set user ID for easy retrieval
 
-        // Display the profile picture and username
-        const profilePictureUrl = conversation.pfp || 'default-profile.png';
-        const displayName = conversation.username || 'Unknown User';
+    const profilePictureUrl = conversation.pfp || 'default-profile.png';
+    const displayName = conversation.username || 'Unknown User';
+    const lastMessage = conversation.last_message || '';
+    const lastMessageTime = conversation.last_message_time 
+        ? new Date(conversation.last_message_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        : '';
 
-        conversationLink.innerHTML = `
-            <img src="${profilePictureUrl}" alt="Profile Picture" class="chat-profile-pic">
-            <div>
-                <strong>${displayName}</strong><br>
-                <small>${conversation.last_message || ''}</small><br>
-                <small>${conversation.last_message_time || ''}</small>
-            </div>
-        `;
+    conversationLink.innerHTML = `
+        <img src="${profilePictureUrl}" alt="Profile Picture" class="chat-profile-pic">
+        <div>
+            <strong>${displayName}</strong><br>
+            <small>${lastMessage}</small><br>
+            <small>${lastMessageTime}</small>
+        </div>
+    `;
 
-        // Add click event to load conversation when this item is clicked
-        conversationLink.addEventListener('click', () => {
-            selectedReceiverId = conversation.id;
-            updateChatHeader(conversation); // Update chat header
-            fetchAndDisplayMessages(selectedReceiverId); // Load conversation messages
-        });
+    conversationLink.addEventListener('click', () => {
+        selectedReceiverId = conversation.id;
+        updateChatHeader(conversation);
+        fetchAndDisplayMessages(selectedReceiverId);
+    });
 
-        conversationsSection.appendChild(conversationLink);
-    }
+    conversationsSection.appendChild(conversationLink);
 }
 
 // Utility function to format timestamp (e.g., '12:45 PM' or 'Yesterday')
