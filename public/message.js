@@ -146,12 +146,12 @@ async function sendMessage() {
         });
 
         if (response.ok) {
-            const newMessage = await response.json(); // Get the stored message from the server
-            displayMessage(newMessage); // Display the new message immediately in the UI
+            const newMessage = await response.json();
+            displayMessage(newMessage); // Display the new message in the UI
             document.getElementById('message-input').value = ''; // Clear the input field
-            loadConversations(); // Reload conversations to show the latest message
         } else {
-            console.error('Failed to send message');
+            const errorText = await response.text();
+            console.error('Failed to send message:', errorText);
         }
     } catch (error) {
         console.error('Error sending message:', error);
