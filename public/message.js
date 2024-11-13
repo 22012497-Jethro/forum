@@ -45,24 +45,37 @@ async function loadConversations() {
 }
 
 // Helper function to add a user to the conversation list with the last message and timestamp
-function addConversationToList(user) {
+function addConversationToList(conversation) {
     const conversationsSection = document.getElementById('conversations-section');
-    const existingUser = [...conversationsSection.children].find(child => child.dataset.userId === String(user.id));
+    
+    // Check if this user is already in the conversation list
+    const existingUser = [...conversationsSection.children].find(child => child.dataset.userId === conversation.id);
 
     if (!existingUser) {
         const conversationLink = document.createElement('div');
         conversationLink.className = 'conversation';
-        conversationLink.dataset.userId = user.id;
+        conversationLink.dataset.userId = conversation.id; // Set user ID for easy retrieval
+
+        // Display the profile picture and username
+        const profilePictureUrl = conversation.pfp || 'default-profile.png';
+        const displayName = conversation.username || 'Unknown User';
+
         conversationLink.innerHTML = `
-            <div><strong>${user.username}</strong></div>
-            <div>${user.lastMessage ? user.lastMessage : 'No messages yet'}</div>
-            <small>${user.lastTimestamp ? formatTimestamp(user.lastTimestamp) : ''}</small>
+            <img src="${profilePictureUrl}" alt="Profile Picture" class="chat-profile-pic">
+            <div>
+                <strong>${displayName}</strong><br>
+                <small>${conversation.last_message || ''}</small><br>
+                <small>${conversation.last_message_time || ''}</small>
+            </div>
         `;
+
+        // Add click event to load conversation when this item is clicked
         conversationLink.addEventListener('click', () => {
-            selectedReceiverId = user.id;
-            updateChatHeader(user);
-            fetchAndDisplayMessages(selectedReceiverId);
+            selectedReceiverId = conversation.id;
+            updateChatHeader(conversation); // Update chat header
+            fetchAndDisplayMessages(selectedReceiverId); // Load conversation messages
         });
+
         conversationsSection.appendChild(conversationLink);
     }
 }
@@ -126,7 +139,7 @@ function updateChatHeader(user) {
     const chatHeader = document.getElementById('chat-header');
     chatHeader.innerHTML = `
         <img src="${profilePictureUrl}" alt="Profile Picture" class="chat-profile-pic">
-        <span>${user.username}</span>
+        <span>${user.username || 'Unknown User'}</span>
     `;
 }
 
